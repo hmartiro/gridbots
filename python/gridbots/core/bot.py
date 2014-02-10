@@ -1,20 +1,8 @@
 """
 
-Gridbots plan:
-
-Inputs:
-- File describing the terrain
-- File describing the initial positions
-- File describing the goal positions
-
-Outputs:
-- Paths of each robot
-- Visualization
-
 """
 
 import math
-import pygame
 
 def enum(**enums):
     return type('Enum', (), enums)
@@ -46,6 +34,4 @@ class Bot:
 
     def rotate(self, rad):
         self.orientation += rad
-
-    def render(self, screen):
-        pygame.draw.circle(screen, (255,0,0), (self.x, self.y), 10)
+        
