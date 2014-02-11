@@ -23,7 +23,7 @@ class Bot:
         self.y = y
         self.orientation = orientation
 
-    def __str__(self):
+    def __repr__(self):
         return '[Bot] Pos: ({}, {}), Orientation: {}'.format(self.x, self.y, self.orientation)
 
     def moveX(self, dx):
