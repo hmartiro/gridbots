@@ -10,10 +10,11 @@ from gridbots.utils.vec2d import Vec2d
 SCREEN_WIDTH = 600
 
 # Fraction of map size to show as margin
-MARGIN = 0.1
+MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 2
+FRAMERATE = 6
+REDRAW_SUBSTEPS = 10
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -116,18 +117,24 @@ class PyGameDrawer():
             if event.type == pygame.QUIT:
                 quit()
 
-        # Redraw the background
-        self.screen.fill(BG_COLOR)
-        
-        # Draw the map components
-        self.draw_map()
+        # Instead of drawing one frame with the robot, interpolate
+        # between the old and new robot positions so the simulation
+        # plays a smooth movement
+        for t in range(REDRAW_SUBSTEPS):
 
-        for bot in self.sim.bots:
-            self.draw_bot(bot)
+            # Redraw the background
+            self.screen.fill(BG_COLOR)
+            
+            # Draw the map components
+            self.draw_map()
 
-        pygame.display.flip()
+            for bot in self.sim.bots:
+                fraction = float(t+1)/REDRAW_SUBSTEPS
+                self.draw_bot(bot, fraction)
 
-        self.clock.tick(FRAMERATE)
+            pygame.display.flip()
+
+            self.clock.tick(FRAMERATE * REDRAW_SUBSTEPS)
 
     def draw_map(self):
 
@@ -144,12 +151,28 @@ class PyGameDrawer():
             target = self.sim.graph.vs[e.target]["coords"]
             self.draw_line(source, target, BLACK, width=2)
 
-    def draw_bot(self, bot):
+    def draw_bot(self, bot, fraction):
 
-        coords = [bot.x, bot.y]
+        # Get the old and new positions of the robot
+        c1 = self.sim.graph.vs[bot.last_pos]["coords"]
+        c2 = self.sim.graph.vs[bot.pos]["coords"]
 
+        # Interpolate based on the fraction
+        coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
+
+        # Draw!
         self.draw_rect(coords, (0.5, 0.5), ROBOT_COLOR)
         self.draw_rect(coords, (0.25, 0.25), INNER_ROBOT_COLOR)
+
+    def run(self):
+
+        while(True):
+
+            # Update simulation
+            self.sim.update()
+
+            # Draw everything
+            self.draw()
 
     def quit(self):
         sys.exit()

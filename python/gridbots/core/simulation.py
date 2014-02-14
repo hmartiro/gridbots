@@ -6,28 +6,29 @@ import yaml
 
 from igraph import Graph, summary, plot
 
-from gridbots.core.bot import Bot, Orientation
+from gridbots.core.bot import Bot
 
 class Simulation:
     """ The overall simulation class. """
 
-    def __init__(self, map_filename, moves, renderer):
+    def __init__(self, map_filename, renderer):
 
-        print 'Welcome to gridbots!'
+        print('Welcome to gridbots!')
 
         # Read the map file
         with open(map_filename) as map_file:
             map_data = yaml.load(map_file.read())
         print map_data
-        
+
         # Extract data from the yaml
         self.map_name = map_data['name']
         vertices = map_data['vertices']
         edges = map_data['edges']
-        
+
+        # Find the outer dimensions of the map
         min_x = min_y = float("+inf")
         max_x = max_y = float("-inf")
-        for v in vertices.values():
+        for v_id, v in vertices:
             if v[0] > max_x:
                 max_x = v[0]
             if v[0] < min_x:
@@ -38,51 +39,70 @@ class Simulation:
                 min_y = v[1]
         self.map_dimensions = (min_x, max_x, min_y, max_y)
 
-        # Create bots
+        print('----- Creating bots -----')
+        # List of bots in the simulation
         self.bots = []
-        for bot_name in map_data['bots']:
-            coords = vertices[map_data['bots'][bot_name]]
-            bot = Bot(x=coords[0], y=coords[1], orientation=Orientation.N)
-            self.bots.append(bot)
 
-        print 'Vertices: {}'.format(vertices)
-        print 'Edges: {}'.format(edges)
-        print 'Bots: {}'.format(self.bots)
+        # Iterate through the input file and create bots
+        for bot_name, bot_data in map_data['bots'].items():
+
+            # Create a bot
+            bot = Bot(
+                    name=bot_name,
+                    position=bot_data['position'],
+                    orientation=bot_data['orientation']
+                )
+
+            # Queue all goal positions
+            for vertex in bot_data['goals']:
+                bot.add_goal(vertex)
+
+            # Add it to our list
+            self.bots.append(bot)
 
         self.graph = Graph(len(vertices))
         self.graph.add_edges(edges)
 
-        self.graph.vs["coords"] = vertices.values()
+        for v_id, v_coord in vertices:
+            self.graph.vs[v_id]["coords"] = v_coord
 
-        #print self.graph.es[1].target
-        #layout = self.graph.layout("kk")
-        #plot(self.graph, layout=layout)
-
-        self.moves = moves
+        # Count frames
+        self.frame = 0
 
         # Create a renderer instance from the given class
         self.renderer = renderer(self)
 
-        self.frame = 0
+        # Start the loop, this calls update
+        self.renderer.run()
 
     def __str__(self):
         return '[Simulation] Bots: {}'.format(len(bots))
 
     def update(self):
 
-        print '----- frame: {} -----'.format(self.frame)
+        self.frame += 1
+        print('----- frame: {} -----'.format(self.frame))
 
-        self.renderer.draw()
+        for bot in self.bots:
 
-        if(self.frame < len(self.moves[0])):
-            for i in range(len(self.bots)):
-                self.bots[i].moveX(self.moves[i][self.frame][0])
-                self.bots[i].moveY(self.moves[i][self.frame][1])
-                print self.bots[i]
+            # If the bot has reached its goal
+            if bot.at_goal():
 
-    def run(self):
+                # If there are more goals
+                if bot.has_goal():
 
-        while(True):
+                    # Get the next one
+                    goal = bot.pop_goal()
 
-            self.update()
-            self.frame += 1
+                    # Calculate the shortest path to the goal
+                    moves = self.graph.get_shortest_paths(bot.pos, to=goal)
+
+                    # Add these as moves for the bot
+                    for move in moves[0][1:]:
+                        bot.add_move(move)
+
+            # Move a step if it has one
+            bot.update()
+
+            # Output the bot's current status
+            bot.print_status()
