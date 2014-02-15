@@ -1,3 +1,6 @@
+gridbots
+========
+
 Gridbots is a simulation and path-planning platform for the microbot construction project being developed at SRI:
 
 http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/
