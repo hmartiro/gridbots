@@ -18,7 +18,7 @@ class Simulation:
         # Read the map file
         with open(map_filename) as map_file:
             map_data = yaml.load(map_file.read())
-        print map_data
+        #print map_data
 
         # Extract data from the yaml
         self.map_name = map_data['name']
@@ -39,6 +39,20 @@ class Simulation:
                 min_y = v[1]
         self.map_dimensions = (min_x, max_x, min_y, max_y)
 
+        self.graph = Graph()
+
+        v_names = [v[0] for v in vertices]
+        v_coords = [v[1] for v in vertices]
+
+        self.graph.add_vertices(v_names)
+
+        for v, v_coord in zip(self.graph.vs, v_coords):
+            v["coords"] = v_coord
+
+        print [v for v in self.graph.vs]
+
+        self.graph.add_edges(edges)
+
         print('----- Creating bots -----')
         # List of bots in the simulation
         self.bots = []
@@ -50,7 +64,8 @@ class Simulation:
             bot = Bot(
                     name=bot_name,
                     position=bot_data['position'],
-                    orientation=bot_data['orientation']
+                    orientation=bot_data['orientation'],
+                    sim=self
                 )
 
             # Queue all goal positions
@@ -59,12 +74,6 @@ class Simulation:
 
             # Add it to our list
             self.bots.append(bot)
-
-        self.graph = Graph(len(vertices))
-        self.graph.add_edges(edges)
-
-        for v_id, v_coord in vertices:
-            self.graph.vs[v_id]["coords"] = v_coord
 
         # Count frames
         self.frame = 0
@@ -95,10 +104,11 @@ class Simulation:
                     goal = bot.pop_goal()
 
                     # Calculate the shortest path to the goal
-                    moves = self.graph.get_shortest_paths(bot.pos, to=goal)
-
+                    move_ids = self.graph.get_shortest_paths(bot.pos, to=goal)
+                    moves = [self.graph.vs[m]["name"] for m in move_ids[0]]
+                    print moves
                     # Add these as moves for the bot
-                    for move in moves[0][1:]:
+                    for move in moves[1:]:
                         bot.add_move(move)
 
             # Move a step if it has one

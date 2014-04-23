@@ -13,16 +13,20 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 6
-REDRAW_SUBSTEPS = 10
+FRAMERATE = 1.5
+REDRAW_SUBSTEPS = 40
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
-ROBOT_COLOR = (255, 255, 255)
+LIGHT_GRAY = (200, 200, 200)
 INNER_ROBOT_COLOR = (50, 50, 50)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 ###############################
 
@@ -54,6 +58,8 @@ class PyGameDrawer():
         self.width = SCREEN_WIDTH
         self.height = self.width * (self.maxY - self.minY) / (self.maxX - self.minX)
 
+        self.scaling = math.sqrt((self.maxY - self.minY) * (self.maxX - self.minX))
+
         # Add some room for margins
         self.margin = SCREEN_WIDTH * MARGIN / 2
         self.full_width = int(self.width + self.margin * 2)
@@ -61,6 +67,9 @@ class PyGameDrawer():
 
         # Set pygame screen width
         self.screen = pygame.display.set_mode((self.full_width, self.full_height), 0, 32)
+
+        # Title
+        pygame.display.set_caption('Gridbots!')
 
         # Create clock to count frames
         self.clock = pygame.time.Clock()
@@ -98,8 +107,11 @@ class PyGameDrawer():
         # Calculate radius
         p_radius = self.scale((radius, radius))[0]
 
+        # Calculate width
+        p_width = self.scale((width, width))[0]
+
         # Draw the circle
-        pygame.draw.circle(self.screen, color, p_center, p_radius)
+        pygame.draw.circle(self.screen, color, p_center, p_radius, p_width)
 
     def draw_line(self, start, end, color, width=1):
 
@@ -109,6 +121,17 @@ class PyGameDrawer():
 
         # Draw the line
         pygame.draw.line(self.screen, color, p_start, p_end, width)
+
+    def draw_text(self, coords, text, size=.5, color=BLACK, font=None):
+
+        p_size = self.scale((size, size))[0]
+
+        fontObj = pygame.font.Font(font, p_size)
+        textSurfaceObj = fontObj.render(text, True, color)
+        textRectObj = textSurfaceObj.get_rect()
+        textRectObj.center = self.to_pixel(coords)
+
+        self.screen.blit(textSurfaceObj, textRectObj)
 
     def draw(self):
 
@@ -143,13 +166,15 @@ class PyGameDrawer():
         #size = (self.maxX - self.minX, self.maxY - self.minY)
         #self.draw_rect(center, size, (150, 150, 150), width=2)
 
-        for v in self.sim.graph.vs:
-           self.draw_circle(v["coords"], 0.1, BLACK)
 
         for e in self.sim.graph.es:
             source = self.sim.graph.vs[e.source]["coords"]
             target = self.sim.graph.vs[e.target]["coords"]
             self.draw_line(source, target, BLACK, width=2)
+
+        for v in self.sim.graph.vs:
+           self.draw_circle(v["coords"], 0.1, BLACK)
+           self.draw_text(v["coords"], str(v["name"]), size=0.18, color=WHITE)
 
     def draw_bot(self, bot, fraction):
 
@@ -161,18 +186,21 @@ class PyGameDrawer():
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
 
         # Draw!
-        self.draw_rect(coords, (0.5, 0.5), ROBOT_COLOR)
-        self.draw_rect(coords, (0.25, 0.25), INNER_ROBOT_COLOR)
+        self.draw_circle(coords, 0.4, LIGHT_GRAY)
+        self.draw_circle(coords, 0.4 + 0.04, BLACK, width=0.04)
+
+        self.draw_text(coords, bot.name, size=0.6, color=BLACK)
 
     def run(self):
 
         while(True):
 
+            # Draw everything
+            self.draw()
+
             # Update simulation
             self.sim.update()
 
-            # Draw everything
-            self.draw()
 
     def quit(self):
         sys.exit()

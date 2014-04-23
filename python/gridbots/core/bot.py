@@ -19,10 +19,10 @@ class Bot:
             'W': 3*math.pi/2.
         }
 
-    def __init__(self, name, position, orientation):
+    def __init__(self, name, position, orientation, sim):
 
         # What is my name
-        self.name = name
+        self.name = str(name)
 
         # Which vertex am I at?
         self.pos = position
@@ -41,6 +41,9 @@ class Bot:
 
         # Where was my last position?
         self.last_pos = self.pos
+
+        # Save a reference to the simulation
+        self.sim = sim
 
         print('Bot {} initialized at vertex {}.'.format(self.name, self.pos))
 
@@ -64,9 +67,6 @@ class Bot:
     def has_move(self):
         return len(self.move_queue) != 0
 
-    def move(self):
-        self.pos = self.move_queue.popleft()
-
     def at_goal(self):
 
         at_goal = (self.pos == self.current_goal)
@@ -76,13 +76,48 @@ class Bot:
 
         return at_goal
 
+    def is_free(self, node):
+
+        for bot in self.sim.bots:
+
+            if(bot.pos == node):
+                return False
+
+        return True
+
     def rotate(self, rad):
         self.orientation += rad
 
     def update(self):
         self.last_pos = self.pos
+
         if self.has_move():
-            self.move()
+            
+            p = self.move_queue.popleft()
+            
+            if self.is_free(p):
+                self.pos = p
+            else:
+                print('bot {} says node {} is occupied!'.format(self.name, p))
+
+                # Get graph without the offending point
+                g2 = self.sim.graph.copy()
+                g2.delete_vertices(p)
+
+                # Calculate shortest path
+                move_ids = g2.get_shortest_paths(self.pos, to=self.current_goal)
+                moves = [g2.vs[m]["name"] for m in move_ids[0]]
+
+                # Clear current moves and add new
+                old_move_queue = self.move_queue
+                self.move_queue = deque()
+                for move in moves:
+                    self.add_move(move)
+
+                #print old_move_queue, self.move_queue
+
+                # Move!
+                self.pos = self.move_queue.popleft()
 
     def print_status(self):
 
