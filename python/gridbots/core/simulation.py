@@ -104,7 +104,9 @@ class Simulation:
                     goal = bot.pop_goal()
 
                     # Calculate the shortest path to the goal
-                    move_ids = self.graph.get_shortest_paths(bot.pos, to=goal)
+                    src = self.graph.vs.select(name=bot.pos)[0]
+                    target = self.graph.vs.select(name=goal)[0]
+                    move_ids = self.graph.get_shortest_paths(src, to=target)
                     moves = [self.graph.vs[m]["name"] for m in move_ids[0]]
                     print moves
                     # Add these as moves for the bot

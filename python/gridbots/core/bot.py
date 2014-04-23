@@ -90,7 +90,7 @@ class Bot:
 
     def update(self):
         self.last_pos = self.pos
-
+        print self.move_queue
         if self.has_move():
             
             p = self.move_queue.popleft()
@@ -105,16 +105,21 @@ class Bot:
                 g2.delete_vertices(p)
 
                 # Calculate shortest path
-                move_ids = g2.get_shortest_paths(self.pos, to=self.current_goal)
-                moves = [g2.vs[m]["name"] for m in move_ids[0]]
+                src = g2.vs.select(name=self.pos)[0]
+                target = g2.vs.select(name=self.current_goal)[0]
 
+                print("bot: {}, src: {}, target: {}".format(self.name, src["name"], target["name"]))
+
+                move_ids = g2.get_shortest_paths(src, to=target)
+                moves = [g2.vs[m]["name"] for m in move_ids[0]]
+                
                 # Clear current moves and add new
                 old_move_queue = self.move_queue
                 self.move_queue = deque()
-                for move in moves:
+                for move in moves[1:]:
                     self.add_move(move)
 
-                #print old_move_queue, self.move_queue
+                print old_move_queue, self.move_queue
 
                 # Move!
                 self.pos = self.move_queue.popleft()
