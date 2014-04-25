@@ -13,8 +13,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 1.5
-REDRAW_SUBSTEPS = 40
+FRAMERATE = 3
+REDRAW_SUBSTEPS = 22
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -179,8 +179,8 @@ class PyGameDrawer():
     def draw_bot(self, bot, fraction):
 
         # Get the old and new positions of the robot
-        c1 = self.sim.graph.vs[bot.last_pos]["coords"]
-        c2 = self.sim.graph.vs[bot.pos]["coords"]
+        c1 = self.sim.graph.vs.select(name=bot.last_pos)[0]["coords"]
+        c2 = self.sim.graph.vs.select(name=bot.pos)[0]["coords"]
 
         # Interpolate based on the fraction
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
@@ -193,7 +193,9 @@ class PyGameDrawer():
 
     def run(self):
 
-        while(True):
+        self.running = True
+
+        while(self.running):
 
             # Draw everything
             self.draw()
@@ -201,6 +203,11 @@ class PyGameDrawer():
             # Update simulation
             self.sim.update()
 
+    def stop(self):
+        self.running = False
+
+    def resume(self):
+        self.running = True
 
     def quit(self):
         sys.exit()

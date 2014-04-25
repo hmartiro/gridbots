@@ -81,16 +81,18 @@ class Simulation:
         # Create a renderer instance from the given class
         self.renderer = renderer(self)
 
-        # Start the loop, this calls update
-        self.renderer.run()
-
     def __str__(self):
         return '[Simulation] Bots: {}'.format(len(bots))
 
     def update(self):
 
+        if not self.running:
+            return
+
         self.frame += 1
         print('----- frame: {} -----'.format(self.frame))
+
+        status = [(bot.pos, bot.current_goal) for bot in self.bots]
 
         for bot in self.bots:
 
@@ -99,3 +101,28 @@ class Simulation:
 
             # Output the bot's current status
             bot.print_status()
+
+        new_status = [(bot.pos, bot.current_goal) for bot in self.bots]
+
+        # Nothing has changed, but 
+        if (status == new_status):
+            for bot in self.bots:
+                if not bot.at_goal():
+                    print('TRAFFIC JAM!!!!')
+                    return
+            print('')
+            print('=============================================')
+            print('Simulation completed successfully!')
+            self.stop()
+
+    def run(self):
+
+        # Start the loop, this calls update
+        self.running = True
+        self.renderer.run()
+
+    def stop(self):
+        self.running = False
+
+    def resume(self):
+        self.running = True

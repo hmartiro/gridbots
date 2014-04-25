@@ -1,20 +1,31 @@
 bots: 
   0:
-    position: 2
+    position: a
     orientation: "N"
-    goals: [22]
+    goals: [11]
   1:
-    position: 22
-    orientation: "S"
-    goals: [3]
-  2:
     position: 10
+    orientation: "S"
+    goals: [1]
+  2:
+    position: 5
     orientation: "W"
-    goals: [14]
+    goals: [6]
   3:
     position: 19
     orientation: "N"
-    goals: [5]
+    goals: [9, 2]
+
+  4:
+    position: 23
+    orientation: "N"
+    goals: [3, 17]
+
+  5:
+    position: 14
+    orientation: "N"
+    goals: [5, 24, 20]
+
 edges:
 - [a, 1]
 - [1, 2]

@@ -92,6 +92,15 @@ class Bot:
     def rotate(self, rad):
         self.orientation += rad
 
+    def get_obstacles(self):
+
+        finished_bots = []
+        for bot in self.sim.bots:
+            if bot.at_goal() and not bot.has_goal():
+                finished_bots.append(bot.pos)
+
+        return finished_bots
+
     def plan_path(self, graph, current, goal):
         """
         Given a graph, a starting node, and a goal node,
@@ -144,24 +153,42 @@ class Bot:
             g2 = self.sim.graph.copy()
 
             # Get all neighbors of my current position
-            neighbors = self.sim.graph.vs.select(name=self.pos)[0].neighbors()
+            neighbors = [n["name"] for n in self.sim.graph.vs.select(name=self.pos)[0].neighbors()]
 
             # Find which neighbors are occupied
             occupied_neighbors = []
             for n in neighbors:
-                if not self.is_free(n["name"]):
-                    occupied_neighbors.append(n["name"])
+                if not self.is_free(n):
+                    occupied_neighbors.append(n)
 
-            print("Occupied neighbors of {}: {}".format(self.pos, occupied_neighbors))
+            print("Neighbors of {}: {}. Occupied: {}".format(self.pos, neighbors, occupied_neighbors))
 
-            g2.delete_vertices(occupied_neighbors)
+            # Check if path is completely blocked
+            if occupied_neighbors == neighbors:
+                self.move_queue.appendleft(p)
+                print('Completely trapped, waiting!')
+                return 
+
+            g2.delete_vertices(g2.vs.select(name_in=occupied_neighbors))
+
+            obstacles = self.get_obstacles()
+            g2.delete_vertices(g2.vs.select(name_in=obstacles))
+
+            print("Deleting nodes {} because bots are at goals".format(obstacles))
+            
+            # Check if goal is still in the graph
+            if self.current_goal in occupied_neighbors:
+                #print('{} not found in graph, deleted {}!'.format(self.current_goal, occupied_neighbors))
+                self.move_queue.appendleft(p)
+                return
 
             old_move_queue = self.move_queue
 
             # Calculate shortest path
+            print('source: {}, dest: {}'.format(self.pos, self.current_goal))
             moves = self.plan_path(g2, self.pos, self.current_goal)
 
-            #print old_move_queue, self.move_queue
+            print old_move_queue, self.move_queue
 
             # Move!
             self.pos = self.move_queue.popleft()  
