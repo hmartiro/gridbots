@@ -77,6 +77,10 @@ class Bot:
         return at_goal
 
     def is_free(self, node):
+        """
+        Is the given node currently unoccupied?
+
+        """
 
         for bot in self.sim.bots:
 
@@ -88,41 +92,79 @@ class Bot:
     def rotate(self, rad):
         self.orientation += rad
 
+    def plan_path(self, graph, current, goal):
+        """
+        Given a graph, a starting node, and a goal node,
+        calculate the shortest path and add it to the move
+        queue.
+
+        """
+
+        src = graph.vs.select(name=current)[0]
+        target = graph.vs.select(name=goal)[0]
+
+        move_ids = graph.get_shortest_paths(src, to=target)
+        moves = [graph.vs[m]["name"] for m in move_ids[0]]
+
+        self.move_queue = deque()
+        for move in moves[1:]:
+            self.add_move(move)
+
+        return moves
+
     def update(self):
+
+        # If the bot has reached its goal
+        if self.at_goal():
+
+            # If there are more goals
+            if self.has_goal():
+
+                # Get the next one
+                goal = self.pop_goal()
+
+                # Calculate the shortest path to the goal
+                moves = self.plan_path(self.sim.graph, self.pos, goal)
+                print moves
+
         self.last_pos = self.pos
         print self.move_queue
-        if self.has_move():
-            
-            p = self.move_queue.popleft()
-            
-            if self.is_free(p):
-                self.pos = p
-            else:
-                print('bot {} says node {} is occupied!'.format(self.name, p))
 
-                # Get graph without the offending point
-                g2 = self.sim.graph.copy()
-                g2.delete_vertices(p)
+        if not self.has_move():
+            return
+        
+        p = self.move_queue.popleft()
+        
+        if self.is_free(p):
+            self.pos = p
+        else:
+            print('bot {} says node {} is occupied!'.format(self.name, p))
 
-                # Calculate shortest path
-                src = g2.vs.select(name=self.pos)[0]
-                target = g2.vs.select(name=self.current_goal)[0]
+            # Get graph without the offending point
+            g2 = self.sim.graph.copy()
 
-                print("bot: {}, src: {}, target: {}".format(self.name, src["name"], target["name"]))
+            # Get all neighbors of my current position
+            neighbors = self.sim.graph.vs.select(name=self.pos)[0].neighbors()
 
-                move_ids = g2.get_shortest_paths(src, to=target)
-                moves = [g2.vs[m]["name"] for m in move_ids[0]]
-                
-                # Clear current moves and add new
-                old_move_queue = self.move_queue
-                self.move_queue = deque()
-                for move in moves[1:]:
-                    self.add_move(move)
+            # Find which neighbors are occupied
+            occupied_neighbors = []
+            for n in neighbors:
+                if not self.is_free(n["name"]):
+                    occupied_neighbors.append(n["name"])
 
-                print old_move_queue, self.move_queue
+            print("Occupied neighbors of {}: {}".format(self.pos, occupied_neighbors))
 
-                # Move!
-                self.pos = self.move_queue.popleft()
+            g2.delete_vertices(occupied_neighbors)
+
+            old_move_queue = self.move_queue
+
+            # Calculate shortest path
+            moves = self.plan_path(g2, self.pos, self.current_goal)
+
+            #print old_move_queue, self.move_queue
+
+            # Move!
+            self.pos = self.move_queue.popleft()  
 
     def print_status(self):
 

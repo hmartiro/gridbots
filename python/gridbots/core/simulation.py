@@ -94,25 +94,6 @@ class Simulation:
 
         for bot in self.bots:
 
-            # If the bot has reached its goal
-            if bot.at_goal():
-
-                # If there are more goals
-                if bot.has_goal():
-
-                    # Get the next one
-                    goal = bot.pop_goal()
-
-                    # Calculate the shortest path to the goal
-                    src = self.graph.vs.select(name=bot.pos)[0]
-                    target = self.graph.vs.select(name=goal)[0]
-                    move_ids = self.graph.get_shortest_paths(src, to=target)
-                    moves = [self.graph.vs[m]["name"] for m in move_ids[0]]
-                    print moves
-                    # Add these as moves for the bot
-                    for move in moves[1:]:
-                        bot.add_move(move)
-
             # Move a step if it has one
             bot.update()
 
