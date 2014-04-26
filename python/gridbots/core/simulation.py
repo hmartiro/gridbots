@@ -11,17 +11,20 @@ from gridbots.core.bot import Bot
 class Simulation:
     """ The overall simulation class. """
 
-    def __init__(self, map_filename, renderer):
+    def __init__(self, simulation_file, renderer):
 
         print('Welcome to gridbots!')
+
+        # Read the simulation file
+        with open(simulation_file) as sim_file:
+            sim_data = yaml.load(sim_file.read())
+        map_filename = "maps/{}.yml".format(sim_data["map"])
 
         # Read the map file
         with open(map_filename) as map_file:
             map_data = yaml.load(map_file.read())
-        #print map_data
 
         # Extract data from the yaml
-        self.map_name = map_data['name']
         vertices = map_data['vertices']
         edges = map_data['edges']
 
@@ -58,7 +61,7 @@ class Simulation:
         self.bots = []
 
         # Iterate through the input file and create bots
-        for bot_name, bot_data in map_data['bots'].items():
+        for bot_name, bot_data in sim_data['bots'].items():
 
             # Create a bot
             bot = Bot(

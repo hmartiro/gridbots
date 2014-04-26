@@ -4,8 +4,6 @@ import math
 import numpy
 import pygame
 
-from gridbots.utils.vec2d import Vec2d
-
 # Screen width in pixels
 SCREEN_WIDTH = 600
 
@@ -13,8 +11,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 3
-REDRAW_SUBSTEPS = 22
+FRAMERATE = 4
+REDRAW_SUBSTEPS = 10
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -186,10 +184,10 @@ class PyGameDrawer():
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
 
         # Draw!
-        self.draw_circle(coords, 0.4, LIGHT_GRAY)
-        self.draw_circle(coords, 0.4 + 0.04, BLACK, width=0.04)
+        self.draw_circle(coords, 0.3, LIGHT_GRAY)
+        self.draw_circle(coords, 0.3 + 0.04, BLACK, width=0.04)
 
-        self.draw_text(coords, bot.name, size=0.6, color=BLACK)
+        self.draw_text(coords, bot.name, size=0.5, color=BLACK)
 
     def run(self):
 

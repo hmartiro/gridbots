@@ -1,0 +1,20 @@
+---
+map: "grid_5"
+
+bots: 
+  0:
+    position: 22
+    orientation: "N"
+    goals: [2]
+  1:
+    position: 10
+    orientation: "S"
+    goals: [14]
+  2:
+    position: 2
+    orientation: "W"
+    goals: [22]
+  3:
+    position: 14
+    orientation: "N"
+    goals: [10]
