@@ -9,9 +9,9 @@ bots:
   1:
     position: 24
     orientation: "S"
-    goals: [a]
+    goals: [0]
   2:
-    position: a
+    position: 0
     orientation: "W"
     goals: [24]
   3:

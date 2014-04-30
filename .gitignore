@@ -38,3 +38,8 @@ nosetests.xml
 *.sublime-project
 *.sublime-workspace
 docs/
+
+# Blender backups
+*.blend1
+*.blend2
+*.blend

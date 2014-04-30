@@ -1,0 +1,16 @@
+---
+map: "grid_10"
+
+bots: 
+  0:
+    position: 22
+    orientation: "N"
+    goals: [2, 10, 52, 90]
+  1:
+    position: 80
+    orientation: "S"
+    goals: [14, 70, 51, 2]
+  2:
+    position: 51
+    orientation: "W"
+    goals: [22, 0, 48, 40]

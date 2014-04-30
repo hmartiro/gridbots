@@ -52,7 +52,7 @@ class Simulation:
         for v, v_coord in zip(self.graph.vs, v_coords):
             v["coords"] = v_coord
 
-        print [v for v in self.graph.vs]
+        #print([v for v in self.graph.vs])
 
         self.graph.add_edges(edges)
 
@@ -117,7 +117,7 @@ class Simulation:
             print('=============================================')
             print('Simulation completed successfully!')
             self.stop()
-
+    
     def run(self):
 
         # Start the loop, this calls update

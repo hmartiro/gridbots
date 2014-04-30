@@ -83,4 +83,3 @@ bots:
   - rendering
 - Goal generation based on paths
 - Blender!
-- Allow for missing vertex IDs

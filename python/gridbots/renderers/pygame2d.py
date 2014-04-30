@@ -11,8 +11,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 4
-REDRAW_SUBSTEPS = 10
+FRAMERATE = 10
+REDRAW_SUBSTEPS = 4
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -38,13 +38,16 @@ def linmap(val, inMin, inMax, outMin, outMax):
 
 class PyGameDrawer():
     
-    def __init__(self, sim):
+    def __init__(self, sim, framerate=FRAMERATE, substeps=REDRAW_SUBSTEPS):
 
         # Reference to the simulation object
         self.sim = sim
 
         # Initialize the pygame library
         pygame.init()
+
+        self.framerate = framerate
+        self.substeps = substeps
 
         # Get map dimensions
         self.minX = self.sim.map_dimensions[0]
@@ -57,6 +60,11 @@ class PyGameDrawer():
         self.height = self.width * (self.maxY - self.minY) / (self.maxX - self.minX)
 
         self.scaling = math.sqrt((self.maxY - self.minY) * (self.maxX - self.minX))
+
+        print [self.minX, self.maxX], [self.minY, self.maxY]
+        print self.width, self.height, (self.maxX - self.minX), (self.maxY - self.minY)
+        #import os
+        #os.quit()
 
         # Add some room for margins
         self.margin = SCREEN_WIDTH * MARGIN / 2
@@ -103,10 +111,14 @@ class PyGameDrawer():
         p_center = self.to_pixel(center)
 
         # Calculate radius
+        radius *= math.pow(self.scaling / 10., .8)
         p_radius = self.scale((radius, radius))[0]
 
         # Calculate width
+        width *= math.pow(self.scaling / 10., .8)
         p_width = self.scale((width, width))[0]
+        if ((width > 0) and (p_width == 0)):
+            p_width = 1
 
         # Draw the circle
         pygame.draw.circle(self.screen, color, p_center, p_radius, p_width)
@@ -122,6 +134,7 @@ class PyGameDrawer():
 
     def draw_text(self, coords, text, size=.5, color=BLACK, font=None):
 
+        size *= math.pow(self.scaling / 10., .8)
         p_size = self.scale((size, size))[0]
 
         fontObj = pygame.font.Font(font, p_size)
@@ -141,7 +154,7 @@ class PyGameDrawer():
         # Instead of drawing one frame with the robot, interpolate
         # between the old and new robot positions so the simulation
         # plays a smooth movement
-        for t in range(REDRAW_SUBSTEPS):
+        for t in range(self.substeps):
 
             # Redraw the background
             self.screen.fill(BG_COLOR)
@@ -150,12 +163,12 @@ class PyGameDrawer():
             self.draw_map()
 
             for bot in self.sim.bots:
-                fraction = float(t+1)/REDRAW_SUBSTEPS
+                fraction = float(t+1)/self.substeps
                 self.draw_bot(bot, fraction)
 
             pygame.display.flip()
 
-            self.clock.tick(FRAMERATE * REDRAW_SUBSTEPS)
+            self.clock.tick(self.framerate * self.substeps)
 
     def draw_map(self):
 
@@ -171,8 +184,8 @@ class PyGameDrawer():
             self.draw_line(source, target, BLACK, width=2)
 
         for v in self.sim.graph.vs:
-           self.draw_circle(v["coords"], 0.1, BLACK)
-           self.draw_text(v["coords"], str(v["name"]), size=0.18, color=WHITE)
+           self.draw_circle(v["coords"], 0.4, BLACK)
+           self.draw_text(v["coords"], str(v["name"]), size=0.65, color=WHITE)
 
     def draw_bot(self, bot, fraction):
 
@@ -184,10 +197,12 @@ class PyGameDrawer():
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
 
         # Draw!
-        self.draw_circle(coords, 0.3, LIGHT_GRAY)
-        self.draw_circle(coords, 0.3 + 0.04, BLACK, width=0.04)
+        radius = 0.65
+        self.draw_circle(coords, radius, LIGHT_GRAY)
+        self.draw_circle(coords, radius + 0.02, BLACK, width=0.04)
 
-        self.draw_text(coords, bot.name, size=0.5, color=BLACK)
+        size = 0.90
+        self.draw_text(coords, bot.name, size=size, color=BLACK)
 
     def run(self):
 

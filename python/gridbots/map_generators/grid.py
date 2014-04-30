@@ -17,11 +17,17 @@ out = {}
 out['vertices'] = []
 out['edges'] = []
 
-g = Graph.Lattice([width, height], circular=False)
-
-plot(g)
+g = Graph.Lattice([width, height], nei=1, circular=False)
 
 layout = g.layout()
+
+# p1 = g.vs[0]
+# p2 = g.vs[width-1]
+# print layout.coords
+
+# #layout.rotate(30)
+
+plot(g)
 
 for inx, v in enumerate(layout):
     out['vertices'].append([inx, v])
