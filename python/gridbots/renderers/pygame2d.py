@@ -1,8 +1,11 @@
 
 import sys
 import math
-import numpy
+import yaml
 import pygame
+
+from gridbots.utils.map import read_map
+from gridbots.utils.map import get_bounding_box
 
 # Screen width in pixels
 SCREEN_WIDTH = 600
@@ -11,8 +14,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 10
-REDRAW_SUBSTEPS = 4
+FRAMERATE = 3
+REDRAW_SUBSTEPS = 15
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -38,33 +41,37 @@ def linmap(val, inMin, inMax, outMin, outMax):
 
 class PyGameDrawer():
     
-    def __init__(self, sim, framerate=FRAMERATE, substeps=REDRAW_SUBSTEPS):
+    def __init__(self, paths_name, framerate=FRAMERATE, substeps=REDRAW_SUBSTEPS):
 
-        # Reference to the simulation object
-        self.sim = sim
+        # Read the paths file
+        paths_file ='paths/{}.yml'.format(paths_name)
+        with open(paths_file) as pf:
+            paths_data = yaml.load(pf.read())
 
-        # Initialize the pygame library
-        pygame.init()
+        self.bots = paths_data["bots"]
+
+        self.graph = read_map(paths_data["map_name"])
+
+        self.frames = paths_data["frames"]
 
         self.framerate = framerate
         self.substeps = substeps
 
         # Get map dimensions
-        self.minX = self.sim.map_dimensions[0]
-        self.maxX = self.sim.map_dimensions[1]
-        self.minY = self.sim.map_dimensions[2] 
-        self.maxY = self.sim.map_dimensions[3]
+        self.bounding_box = get_bounding_box(self.graph)
+        self.minX = self.bounding_box[0]
+        self.maxX = self.bounding_box[1]
+        self.minY = self.bounding_box[2] 
+        self.maxY = self.bounding_box[3]
+
+        # Initialize the pygame library
+        pygame.init()
 
         # Calculate screen width based on the map proportions
         self.width = SCREEN_WIDTH
         self.height = self.width * (self.maxY - self.minY) / (self.maxX - self.minX)
 
         self.scaling = math.sqrt((self.maxY - self.minY) * (self.maxX - self.minX))
-
-        print [self.minX, self.maxX], [self.minY, self.maxY]
-        print self.width, self.height, (self.maxX - self.minX), (self.maxY - self.minY)
-        #import os
-        #os.quit()
 
         # Add some room for margins
         self.margin = SCREEN_WIDTH * MARGIN / 2
@@ -79,6 +86,8 @@ class PyGameDrawer():
 
         # Create clock to count frames
         self.clock = pygame.time.Clock()
+
+        self.frame = 0
 
     def to_pixel(self, coord):
 
@@ -144,12 +153,15 @@ class PyGameDrawer():
 
         self.screen.blit(textSurfaceObj, textRectObj)
 
-    def draw(self):
+    def draw(self, frame):
 
         # Check for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit()
+
+        if frame < 0:
+            return
 
         # Instead of drawing one frame with the robot, interpolate
         # between the old and new robot positions so the simulation
@@ -162,9 +174,9 @@ class PyGameDrawer():
             # Draw the map components
             self.draw_map()
 
-            for bot in self.sim.bots:
+            for bot in self.bots.keys():
                 fraction = float(t+1)/self.substeps
-                self.draw_bot(bot, fraction)
+                self.draw_bot(bot, fraction, frame)
 
             pygame.display.flip()
 
@@ -172,26 +184,23 @@ class PyGameDrawer():
 
     def draw_map(self):
 
-        # Draw the map outer limits
-        #center = (numpy.mean([self.minX, self.maxX]), numpy.mean([self.minY, self.maxY]))
-        #size = (self.maxX - self.minX, self.maxY - self.minY)
-        #self.draw_rect(center, size, (150, 150, 150), width=2)
-
-
-        for e in self.sim.graph.es:
-            source = self.sim.graph.vs[e.source]["coords"]
-            target = self.sim.graph.vs[e.target]["coords"]
+        for e in self.graph.es:
+            source = self.graph.vs[e.source]["coords"]
+            target = self.graph.vs[e.target]["coords"]
             self.draw_line(source, target, BLACK, width=2)
 
-        for v in self.sim.graph.vs:
+        for v in self.graph.vs:
            self.draw_circle(v["coords"], 0.4, BLACK)
            self.draw_text(v["coords"], str(v["name"]), size=0.65, color=WHITE)
 
-    def draw_bot(self, bot, fraction):
+    def draw_bot(self, bot, fraction, frame):
+
+        last_node = self.bots[bot][frame]
+        current_node = self.bots[bot][frame+1]
 
         # Get the old and new positions of the robot
-        c1 = self.sim.graph.vs.select(name=bot.last_pos)[0]["coords"]
-        c2 = self.sim.graph.vs.select(name=bot.pos)[0]["coords"]
+        c1 = self.graph.vs.select(name=last_node)[0]["coords"]
+        c2 = self.graph.vs.select(name=current_node)[0]["coords"]
 
         # Interpolate based on the fraction
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
@@ -202,25 +211,17 @@ class PyGameDrawer():
         self.draw_circle(coords, radius + 0.02, BLACK, width=0.04)
 
         size = 0.90
-        self.draw_text(coords, bot.name, size=size, color=BLACK)
+        self.draw_text(coords, bot, size=size, color=BLACK)
 
     def run(self):
-
-        self.running = True
-
-        while(self.running):
+        
+        for frame in range(self.frames):
 
             # Draw everything
-            self.draw()
+            self.draw(frame)
 
-            # Update simulation
-            self.sim.update()
-
-    def stop(self):
-        self.running = False
-
-    def resume(self):
-        self.running = True
+        while(True):
+            self.draw(-1)
 
     def quit(self):
         sys.exit()

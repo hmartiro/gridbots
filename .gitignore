@@ -43,3 +43,6 @@ docs/
 *.blend1
 *.blend2
 *.blend
+
+# Paths directory
+python/gridbots/paths/

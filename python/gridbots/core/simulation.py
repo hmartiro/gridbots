@@ -2,59 +2,36 @@
 
 """
 
+import os
 import yaml
 
-from igraph import Graph, summary, plot
-
 from gridbots.core.bot import Bot
+
+from gridbots.utils.map import read_map
 
 class Simulation:
     """ The overall simulation class. """
 
-    def __init__(self, simulation_file, renderer):
+    # Simulation states
+    STATUS = {
+        'in_progress': 0,
+        'success': 1,
+        'traffic_jam': 2
+    }
 
-        print('Welcome to gridbots!')
+    def __init__(self, sim_name):
 
         # Read the simulation file
-        with open(simulation_file) as sim_file:
-            sim_data = yaml.load(sim_file.read())
-        map_filename = "maps/{}.yml".format(sim_data["map"])
+        sim_file ='simulations/{}.yml'.format(sim_name)
+        with open(sim_file) as sf:
+            sim_data = yaml.load(sf.read())
 
-        # Read the map file
-        with open(map_filename) as map_file:
-            map_data = yaml.load(map_file.read())
+        # Store the simulation name and map name
+        self.sim_name = sim_name
+        self.map_name = sim_data["map"]
 
-        # Extract data from the yaml
-        vertices = map_data['vertices']
-        edges = map_data['edges']
-
-        # Find the outer dimensions of the map
-        min_x = min_y = float("+inf")
-        max_x = max_y = float("-inf")
-        for v_id, v in vertices:
-            if v[0] > max_x:
-                max_x = v[0]
-            if v[0] < min_x:
-                min_x = v[0]
-            if v[1] > max_y:
-                max_y = v[1]
-            if v[1] < min_y:
-                min_y = v[1]
-        self.map_dimensions = (min_x, max_x, min_y, max_y)
-
-        self.graph = Graph()
-
-        v_names = [v[0] for v in vertices]
-        v_coords = [v[1] for v in vertices]
-
-        self.graph.add_vertices(v_names)
-
-        for v, v_coord in zip(self.graph.vs, v_coords):
-            v["coords"] = v_coord
-
-        #print([v for v in self.graph.vs])
-
-        self.graph.add_edges(edges)
+        # Parse the map file
+        self.graph = read_map(self.map_name)
 
         print('----- Creating bots -----')
         # List of bots in the simulation
@@ -81,16 +58,13 @@ class Simulation:
         # Count frames
         self.frame = 0
 
-        # Create a renderer instance from the given class
-        self.renderer = renderer(self)
+        # Simulation status
+        self.status = self.STATUS["in_progress"]
 
     def __str__(self):
         return '[Simulation] Bots: {}'.format(len(bots))
 
     def update(self):
-
-        if not self.running:
-            return
 
         self.frame += 1
         print('----- frame: {} -----'.format(self.frame))
@@ -107,25 +81,63 @@ class Simulation:
 
         new_status = [(bot.pos, bot.current_goal) for bot in self.bots]
 
-        # Nothing has changed, but 
+        # Nothing has changed, but robots are not
+        # all at their goals!
         if (status == new_status):
+
             for bot in self.bots:
                 if not bot.at_goal():
-                    print('TRAFFIC JAM!!!!')
+                    self.status = self.STATUS["traffic_jam"]
+                    self.running = False
                     return
-            print('')
-            print('=============================================')
-            print('Simulation completed successfully!')
-            self.stop()
+
+            self.status = self.STATUS["success"]
+            self.running = False
     
     def run(self):
 
-        # Start the loop, this calls update
         self.running = True
-        self.renderer.run()
 
-    def stop(self):
-        self.running = False
+        while self.running:
+            self.update()
 
-    def resume(self):
-        self.running = True
+        paths_name = self.output()
+        return paths_name
+
+    def output(self):
+
+        print('')
+        print('===============================')
+
+        output = {}
+
+        if self.status == self.STATUS["success"]:
+            print('Simulation finished successfully!')
+        elif self.status == self.STATUS["traffic_jam"]:
+            print('ERROR: Simulation stuck in a traffic jam!')
+        elif self.status == self.STATUS["in_progress"]:
+            print('ERROR: Output called but simulation still in progress!')
+
+
+        output["status"] =  (s for s,val in self.STATUS.items() if val==self.status).next()
+
+        output["map_name"] = self.map_name
+        output["sim_name"] = self.sim_name
+
+        output["frames"] = len(self.bots[0].move_history) - 1
+
+        output["bots"] = {}
+        for bot in self.bots:
+            output["bots"][bot.name] = bot.move_history
+
+        # Create the paths directory if needed
+        paths_dir = "paths"
+        if not os.path.exists(paths_dir):
+            os.makedirs(paths_dir)
+
+        # Create and write to the paths file
+        paths_name = "paths_{}".format(self.sim_name)
+        with open("paths/{}.yml".format(paths_name), 'w') as t_file:
+            t_file.write(yaml.dump(output))
+
+        return paths_name

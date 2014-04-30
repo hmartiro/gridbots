@@ -3,6 +3,7 @@
 """
 
 import math
+
 from collections import deque
 
 class Bot:
@@ -35,6 +36,9 @@ class Bot:
 
         # What are my pending goals?
         self.goal_queue = deque()
+
+        # What has been my entire trajectory?
+        self.move_history = []
 
         # Where am I currently going?
         self.current_goal = self.pos
@@ -123,6 +127,8 @@ class Bot:
 
     def update(self):
 
+        self.move_history.append(self.pos)
+
         # If the bot has reached its goal
         if self.at_goal():
 
@@ -137,7 +143,7 @@ class Bot:
                 print moves
 
         self.last_pos = self.pos
-        print self.move_queue
+        #print self.move_queue
 
         if not self.has_move():
             return
