@@ -7,7 +7,7 @@ import yaml
 
 from gridbots.core.bot import Bot
 
-from gridbots.utils.map import read_map
+from gridbots.utils.map import read_map_as_graph
 
 class Simulation:
     """ The overall simulation class. """
@@ -31,7 +31,7 @@ class Simulation:
         self.map_name = sim_data["map"]
 
         # Parse the map file
-        self.graph = read_map(self.map_name)
+        self.graph = read_map_as_graph(self.map_name)
 
         print('----- Creating bots -----')
         # List of bots in the simulation

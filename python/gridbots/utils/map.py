@@ -4,25 +4,18 @@
 
 import yaml
 
-from igraph import Graph
-
-def read_map(map_name):
+def read_map_as_graph(map_name):
     """
-    Takes a map filename as an input and returns a Graph 
+    Takes a map filename and returns a Graph 
     representing the contents of that map.
 
     """
 
-    # Read the map file
-    map_filename = "maps/{}.yml".format(map_name)
-    with open(map_filename) as map_file:
-        map_data = yaml.load(map_file.read())
-
-    # Extract data from the yaml
-    vertices = map_data['vertices']
-    edges = map_data['edges']
+    # Extract data from the map file
+    vertices, edges = read_map(map_name)
 
     # Create a Graph object
+    from igraph import Graph
     graph = Graph()
 
     v_names = [v[0] for v in vertices]
@@ -36,6 +29,23 @@ def read_map(map_name):
     graph.add_edges(edges)
 
     return graph
+
+def read_map(map_name):
+    """
+    Takes a map filename and returns the edge
+    and vertex data of the map.
+
+    """
+        # Read the map file
+    map_filename = "maps/{}.yml".format(map_name)
+    with open(map_filename) as map_file:
+        map_data = yaml.load(map_file.read())
+
+    # Extract data from the yaml
+    vertices = map_data['vertices']
+    edges = map_data['edges']
+
+    return vertices, edges
 
 def get_bounding_box(graph):
     """

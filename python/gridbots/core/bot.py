@@ -140,7 +140,7 @@ class Bot:
 
                 # Calculate the shortest path to the goal
                 moves = self.plan_path(self.sim.graph, self.pos, goal)
-                print moves
+                print(moves)
 
         self.last_pos = self.pos
         #print self.move_queue
@@ -194,7 +194,7 @@ class Bot:
             print('source: {}, dest: {}'.format(self.pos, self.current_goal))
             moves = self.plan_path(g2, self.pos, self.current_goal)
 
-            print old_move_queue, self.move_queue
+            print(old_move_queue, self.move_queue)
 
             # Move!
             self.pos = self.move_queue.popleft()  

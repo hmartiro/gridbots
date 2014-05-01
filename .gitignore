@@ -42,7 +42,7 @@ docs/
 # Blender backups
 *.blend1
 *.blend2
-*.blend
+#*.blend
 
 # Paths directory
 python/gridbots/paths/

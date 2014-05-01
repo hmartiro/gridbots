@@ -1,10 +1,13 @@
+"""
+
+"""
 
 import sys
 import math
 import yaml
 import pygame
 
-from gridbots.utils.map import read_map
+from gridbots.utils.map import read_map_as_graph
 from gridbots.utils.map import get_bounding_box
 
 # Screen width in pixels
@@ -50,7 +53,7 @@ class PyGameDrawer():
 
         self.bots = paths_data["bots"]
 
-        self.graph = read_map(paths_data["map_name"])
+        self.graph = read_map_as_graph(paths_data["map_name"])
 
         self.frames = paths_data["frames"]
 
@@ -86,8 +89,6 @@ class PyGameDrawer():
 
         # Create clock to count frames
         self.clock = pygame.time.Clock()
-
-        self.frame = 0
 
     def to_pixel(self, coord):
 
