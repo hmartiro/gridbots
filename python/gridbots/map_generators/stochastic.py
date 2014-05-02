@@ -14,7 +14,7 @@ nodes = int(sys.argv[1])
 connectivity = float(sys.argv[2])
 
 out = {}
-out['vertices'] = []
+out['vertices'] = {}
 out['edges'] = []
 
 g = Graph.GRG(nodes, connectivity)
@@ -22,7 +22,7 @@ g = Graph.GRG(nodes, connectivity)
 plot(g)
 
 for v in g.vs:
-    out['vertices'].append([v.index, [v["x"], v["y"]]])
+    out['vertices'][str(v.index)] = [v["x"], v["y"]]
 
 for e in g.es:
     out['edges'].append([e.source, e.target])

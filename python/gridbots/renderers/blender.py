@@ -71,8 +71,13 @@ class BlenderDrawer():
         print(self.S.objects)
 
         for bot_name, bot in self.bots.items():
+            
             node1 = self.bot_data[bot_name][self.frame]
             node2 = self.bot_data[bot_name][self.frame+1]
+
+            print(self.vertices[node1])
+            print(self.vertices[node2])
+            #print(self.vertices)
 
             bot.position = (node1/10., node2/10., 0)
 

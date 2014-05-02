@@ -43,14 +43,14 @@ class Simulation:
             # Create a bot
             bot = Bot(
                     name=bot_name,
-                    position=bot_data['position'],
+                    position=str(bot_data['position']),
                     orientation=bot_data['orientation'],
                     sim=self
                 )
 
             # Queue all goal positions
             for vertex in bot_data['goals']:
-                bot.add_goal(vertex)
+                bot.add_goal(str(vertex))
 
             # Add it to our list
             self.bots.append(bot)

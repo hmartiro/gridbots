@@ -1,0 +1,4 @@
+pyaml
+python-igraph
+pygame
+

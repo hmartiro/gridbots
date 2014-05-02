@@ -18,15 +18,13 @@ def read_map_as_graph(map_name):
     from igraph import Graph
     graph = Graph()
 
-    v_names = [v[0] for v in vertices]
-    v_coords = [v[1] for v in vertices]
+    graph.add_vertices(vertices.keys())
 
-    graph.add_vertices(v_names)
+    for v in graph.vs:
+        v["coords"] = vertices[v["name"]]
 
-    for v, v_coord in zip(graph.vs, v_coords):
-        v["coords"] = v_coord
-
-    graph.add_edges(edges)
+    for edge in edges:
+        graph.add_edge(graph.vs.find(name=str(edge[0])), graph.vs.find(name=str(edge[1])))
 
     return graph
 

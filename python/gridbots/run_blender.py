@@ -10,7 +10,8 @@ if __name__ == '__main__':
     sim = Simulation(sim_name=sys.argv[1])
     paths_name = sim.run()
 
-    call(["blenderplayer", "gridbots.blend", "-", paths_name])
+    os.environ['PYTHONPATH'] = "/home/hayk/gridbots/python"
+    call(["blenderplayer", "gridbots.blend", "-", paths_name], env=os.environ)
 
 renderer = None
 def set_renderer(r):

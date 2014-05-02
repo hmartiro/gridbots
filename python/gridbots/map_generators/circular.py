@@ -14,7 +14,7 @@ width = int(sys.argv[1])
 height = int(sys.argv[2])
 
 out = {}
-out['vertices'] = []
+out['vertices'] = {}
 out['edges'] = []
 
 g = Graph.Lattice([width, height], circular=True)
@@ -24,7 +24,7 @@ plot(g)
 layout = g.layout()
 
 for inx, v in enumerate(layout):
-    out['vertices'].append([inx, v])
+    out['vertices'][str(inx)] = v
 
 for e in g.es:
     out['edges'].append([e.source, e.target])

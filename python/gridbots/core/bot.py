@@ -112,7 +112,7 @@ class Bot:
         queue.
 
         """
-
+        
         src = graph.vs.select(name=current)[0]
         target = graph.vs.select(name=goal)[0]
 
