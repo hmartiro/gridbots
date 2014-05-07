@@ -7,8 +7,8 @@ import math
 import yaml
 import pygame
 
-from gridbots.utils.map import read_map_as_graph
-from gridbots.utils.map import get_bounding_box
+from gridbots.utils.graph import read_graph
+from gridbots.utils.graph import get_bounding_box
 
 # Screen width in pixels
 SCREEN_WIDTH = 600
@@ -53,7 +53,7 @@ class PyGameDrawer():
 
         self.bots = paths_data["bots"]
 
-        self.graph = read_map_as_graph(paths_data["map_name"])
+        self.map = read_graph("maps/{}.yml".format(paths_data["map_name"]))
 
         self.frames = paths_data["frames"]
 
@@ -61,7 +61,7 @@ class PyGameDrawer():
         self.substeps = substeps
 
         # Get map dimensions
-        self.bounding_box = get_bounding_box(self.graph)
+        self.bounding_box = get_bounding_box(self.map)
         self.minX = self.bounding_box[0]
         self.maxX = self.bounding_box[1]
         self.minY = self.bounding_box[2] 
@@ -185,12 +185,12 @@ class PyGameDrawer():
 
     def draw_map(self):
 
-        for e in self.graph.es:
-            source = self.graph.vs[e.source]["coords"]
-            target = self.graph.vs[e.target]["coords"]
+        for e in self.map.es:
+            source = self.map.vs[e.source]["coords"]
+            target = self.map.vs[e.target]["coords"]
             self.draw_line(source, target, BLACK, width=2)
 
-        for v in self.graph.vs:
+        for v in self.map.vs:
            self.draw_circle(v["coords"], 0.4, BLACK)
            self.draw_text(v["coords"], str(v["name"]), size=0.65, color=WHITE)
 
@@ -200,8 +200,8 @@ class PyGameDrawer():
         current_node = self.bots[bot][frame+1]
 
         # Get the old and new positions of the robot
-        c1 = self.graph.vs.select(name=last_node)[0]["coords"]
-        c2 = self.graph.vs.select(name=current_node)[0]["coords"]
+        c1 = self.map.vs.select(name=last_node)[0]["coords"]
+        c2 = self.map.vs.select(name=current_node)[0]["coords"]
 
         # Interpolate based on the fraction
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]

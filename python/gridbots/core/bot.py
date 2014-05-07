@@ -139,7 +139,7 @@ class Bot:
                 goal = self.pop_goal()
 
                 # Calculate the shortest path to the goal
-                moves = self.plan_path(self.sim.graph, self.pos, goal)
+                moves = self.plan_path(self.sim.map, self.pos, goal)
                 print(moves)
 
         self.last_pos = self.pos
@@ -156,10 +156,10 @@ class Bot:
             print('bot {} says node {} is occupied!'.format(self.name, p))
 
             # Get graph without the offending point
-            g2 = self.sim.graph.copy()
+            g2 = self.sim.map.copy()
 
             # Get all neighbors of my current position
-            neighbors = [n["name"] for n in self.sim.graph.vs.select(name=self.pos)[0].neighbors()]
+            neighbors = [n["name"] for n in self.sim.map.vs.select(name=self.pos)[0].neighbors()]
 
             # Find which neighbors are occupied
             occupied_neighbors = []

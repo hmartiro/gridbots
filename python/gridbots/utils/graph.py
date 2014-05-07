@@ -4,15 +4,15 @@
 
 import yaml
 
-def read_map_as_graph(map_name):
+def read_graph(filename):
     """
-    Takes a map filename and returns a Graph 
-    representing the contents of that map.
+    Takes a filename and returns a Graph 
+    representing the contents of that file.
 
     """
 
     # Extract data from the map file
-    vertices, edges = read_map(map_name)
+    vertices, edges = read_graph_data(filename)
 
     # Create a Graph object
     from igraph import Graph
@@ -24,31 +24,30 @@ def read_map_as_graph(map_name):
         v["coords"] = vertices[v["name"]]
 
     for edge in edges:
-        graph.add_edge(graph.vs.find(name=str(edge[0])), graph.vs.find(name=str(edge[1])))
+        graph.add_edge(graph.vs.find(name=edge[0]), graph.vs.find(name=edge[1]))
 
     return graph
 
-def read_map(map_name):
+def read_graph_data(filename):
     """
-    Takes a map filename and returns the edge
-    and vertex data of the map.
+    Takes a filename and returns the edge
+    and vertex data of the file.
 
     """
         # Read the map file
-    map_filename = "maps/{}.yml".format(map_name)
-    with open(map_filename) as map_file:
-        map_data = yaml.load(map_file.read())
+    with open(filename) as map_file:
+        data = yaml.load(map_file.read())
 
     # Extract data from the yaml
-    vertices = map_data['vertices']
-    edges = map_data['edges']
+    vertices = data['vertices']
+    edges = data['edges']
 
     return vertices, edges
 
 def get_bounding_box(graph):
     """
-    Given a map Graph, return the bounding box of
-    the coordinates of the nodes in that map.
+    Given a Graph, return the bounding box of
+    the coordinates of the nodes.
 
     """
 

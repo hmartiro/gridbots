@@ -7,7 +7,8 @@ import yaml
 
 from gridbots.core.bot import Bot
 
-from gridbots.utils.map import read_map_as_graph
+from gridbots.utils.graph import read_graph
+from gridbots.utils.planning import plan_paths
 
 class Simulation:
     """ The overall simulation class. """
@@ -26,12 +27,19 @@ class Simulation:
         with open(sim_file) as sf:
             sim_data = yaml.load(sf.read())
 
-        # Store the simulation name and map name
+        # Store names
         self.sim_name = sim_name
+        self.structure_name = sim_data["structure"]
         self.map_name = sim_data["map"]
 
+        # Store waypoints
+        self.waypoints = sim_data["waypoints"]
+
         # Parse the map file
-        self.graph = read_map_as_graph(self.map_name)
+        self.map = read_graph("maps/{}.yml".format(self.map_name))
+
+        # Parse the structure file
+        self.structure = read_graph("structures/{}.yml".format(self.structure_name))
 
         print('----- Creating bots -----')
         # List of bots in the simulation
@@ -43,17 +51,20 @@ class Simulation:
             # Create a bot
             bot = Bot(
                     name=bot_name,
-                    position=str(bot_data['position']),
+                    position=bot_data['position'],
                     orientation=bot_data['orientation'],
                     sim=self
                 )
 
-            # Queue all goal positions
-            for vertex in bot_data['goals']:
-                bot.add_goal(str(vertex))
-
             # Add it to our list
             self.bots.append(bot)
+
+            # Queue all goal positions
+            #for vertex in bot_data['goals']:
+            #    bot.add_goal(vertex)
+
+        # Path planning to build structure
+        plan_paths(self.bots, self.map, self.waypoints, self.structure)
 
         # Count frames
         self.frame = 0

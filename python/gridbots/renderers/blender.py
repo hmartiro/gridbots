@@ -6,8 +6,8 @@ import math
 import yaml
 import time
 
-from gridbots.utils.map import read_map
-from gridbots.utils.map import get_bounding_box
+from gridbots.utils.graph import read_graph_data
+from gridbots.utils.graph import get_bounding_box
 
 import bge
 
@@ -37,7 +37,7 @@ class BlenderDrawer():
             paths_data = yaml.load(pf.read())
 
         # Get map data
-        self.vertices, self.edges = read_map(paths_data["map_name"])
+        self.vertices, self.edges = read_graph_data("maps/{}.yml".format(paths_data["map_name"]))
 
         self.framerate = framerate
         self.substeps = int(float(BLENDER_FPS) / float(self.framerate))
@@ -87,8 +87,8 @@ class BlenderDrawer():
             node1 = self.bot_data[bot_name][self.frame]
             node2 = self.bot_data[bot_name][self.frame+1]
 
-            c1 = self.vertices[str(node1)]
-            c2 = self.vertices[str(node2)]
+            c1 = self.vertices[node1]
+            c2 = self.vertices[node2]
 
             fraction = self.substep / float(self.substeps)
 
