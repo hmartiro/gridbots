@@ -25,15 +25,15 @@ class Simulation:
         # Read the simulation file
         sim_file ='simulations/{}.yml'.format(sim_name)
         with open(sim_file) as sf:
-            sim_data = yaml.load(sf.read())
+            self.sim_data = yaml.load(sf.read())
 
         # Store names
         self.sim_name = sim_name
-        self.structure_name = sim_data["structure"]
-        self.map_name = sim_data["map"]
+        self.structure_name = self.sim_data["structure"]
+        self.map_name = self.sim_data["map"]
 
         # Store waypoints
-        self.waypoints = sim_data["waypoints"]
+        self.waypoints = self.sim_data["waypoints"]
 
         # Parse the map file
         self.map = read_graph("maps/{}.yml".format(self.map_name))
@@ -46,7 +46,7 @@ class Simulation:
         self.bots = []
 
         # Iterate through the input file and create bots
-        for bot_name, bot_data in sim_data['bots'].items():
+        for bot_name, bot_data in self.sim_data['bots'].items():
 
             # Create a bot
             bot = Bot(
@@ -64,7 +64,7 @@ class Simulation:
             #    bot.add_goal(vertex)
 
         # Path planning to build structure
-        plan_paths(self.bots, self.map, self.waypoints, self.structure)
+        plan_paths(self.bots, self.map, self.structure, self.sim_data)
 
         # Count frames
         self.frame = 0

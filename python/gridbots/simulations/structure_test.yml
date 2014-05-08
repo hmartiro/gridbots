@@ -19,9 +19,24 @@ bots:
     position: 0
     orientation: "N"
 
+build_order:
+  - grab_rod
+  - grab_glue
+  - attach_rod
+
 waypoints:
-  build_station: 14
-  rod_feeds: [22]
-  glue_wells: [2]
-  rotation_stations: []
-  indexing_stations: []
+  grab_rod:
+    0:
+      position: 22
+      wait_time: 0.5
+  grab_glue:
+    0: 
+      position: 2
+      wait_time: 1.0
+    1: 
+      position: 4
+      wait_time: 1.0
+  attach_rod:
+    0:
+      position: 14
+      wait_time: 0.5
