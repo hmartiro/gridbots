@@ -12,8 +12,12 @@ http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/
 
 ### Definitions
 *Gridbots* - The name of the simulation platform  
-*Bot* - A single microbot consisting of a base, magnet, and end-effectors  
-*Map* - The grid of wiring that defines the locations microbots can travel  
+*Bot* - A single microbot consisting of a base, magnets, and end-effectors  
+*Map* - A set of vertices and edges that define a graph corresponding to the nodes the microbots can travel between
+*Simulation* - A definition of simulation criteria, including a map, bots, waypoints, and a goal
+*Structure* - A set of vertices and edges that define a graph corresponding to the desired truss structure to be built
+*Path* - An output trajectory for a bot during a simulation
+*Renderer* - An entity that takes the Map and Path for a certain simulation and visualizes the data in some way
 
 ### Algorithms and Data Structures
 The core of this problem is representing the space in which the bots can move, the goals that they need to collectively accomplish, and the path-planning and coordination required to achieve those goals. Efficiency is critical to exploring the scalability of the system.
@@ -21,6 +25,7 @@ The core of this problem is representing the space in which the bots can move, t
 Due to the unique nature of the actuation system, the map consists of a set of discrete coordinates that microbots can occupy and a set of transition paths between coordinates. Based on these parameters, it makes sense to not perform path-planning using XY coordinates, but instead represent the map as an undirected graph. Each coordinate is represented as a vertex of the graph, and each transition is given by an edge. The graph is currently unweighted (assuming all transitions take equal time), but it is simple to weight by XY distance.
 
 The location of each microbot, resource, and goal can be represented with a vertex ID (along with orientation). Shortest-path planning is easy using Dijkstra's algorithm, and the resulting path is represented as a list of vertices. Obstacles can be represented by removing a vertex. All calculations happen on the graph, and XY coordinates are only used for rendering.
+
 
 ### Implementation
 The platform is implemented in Python, with a focus on simplicity and modularity. We want to define specific components of functionality (initialization, planning, rendering) and maintain abstraction between them.
@@ -39,47 +44,9 @@ The renderer is responsible for producing the output for the simulation. There a
 
 ###### Input File
 
+* UPDATE *
 Simulations are run by creating a Simulation class with the desired renderer and specifying an input file. The input file defines the map, microbots, resources, and goals in a standard YAML format. A vertex is specified by an id and coordinates, an edge by two vertex ids, a bot by its starting vertex, orientation, etc. Representation of resources and desired structures is not defined yet.
 
-```
----
-name: test_map
 
-vertices: 
-    - [0, [0.0, 10.0]]
-    - [1, [5.0, 10.0]]
-    - [2, [10.0, 10.0]]
-    - [3, [0.0, 0.0]]
-    - [4, [5.0, 0.0]]
-    - [5, [10.0, 0.0]]
-    - [6, [15.0, 5.0]]
+### How the task allocation will work
 
-edges:
-    - [0, 1]
-    - [1, 2]
-    - [0, 3]
-    - [1, 4]
-    - [2, 5]
-    - [3, 4]
-    - [4, 5]
-    - [2, 6]
-    - [5, 6]
-
-bots:
-    0:
-        position: 0
-        orientation: "N"
-        goals: [6, 1, 4, 5, 1, 6 ,0]
-```
-
-### TODO List
-
-- Multi-bot avoidance
-- Permanent obstacle capability
-- Tasks (get resources, place into structure)
-- End effectors
-  - input of 
-  - rotation points
-  - rendering
-- Goal generation based on paths
-- Blender!

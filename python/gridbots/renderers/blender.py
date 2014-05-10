@@ -5,6 +5,7 @@
 import math
 import yaml
 import time
+import sys
 
 from gridbots.utils.graph import read_graph_data
 from gridbots.utils.graph import get_bounding_box
@@ -75,6 +76,34 @@ class BlenderDrawer():
             self.nodes[name] = self.S.addObject('Node', self.C.owner)
             self.nodes[name].position = (coords[0], coords[1], 0.)
 
+        self.b_edges = []
+        for e in self.edges:
+
+            b_edge = self.S.addObject('Edge', self.C.owner)
+            self.b_edges.append(b_edge)
+
+            v1 = self.vertices[e[0]]
+            v2 = self.vertices[e[1]]
+
+            x1 = v1[0]
+            x2 = v2[0]
+            y1 = v1[1]
+            y2 = v2[1]
+
+            mX = (x1 + x2)/2.
+            mY = (y1 + y2)/2.
+            #print("x: {}, y: {}".format(mX, mY))
+            b_edge.position = (mX, mY, 0.)
+
+            # Get angle
+            # (v2[0]-v1[0] / (v2[0] - v1[0])
+            
+            rad = math.acos((v2[0] - v1[0])/math.sqrt((v2[0] - v1[0])**2 + (v2[1] - v1[1])**2))
+            deg = rad * 180 / math.pi
+            print(deg)
+            b_edge.applyRotation((0., 0., deg))
+            #print(help(b_edge.applyRotation))
+            
     def update(self):
 
         if(self.frame > self.frames - 1):
