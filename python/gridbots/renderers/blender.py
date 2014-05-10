@@ -90,19 +90,16 @@ class BlenderDrawer():
             y1 = v1[1]
             y2 = v2[1]
 
+            # Set position
             mX = (x1 + x2)/2.
             mY = (y1 + y2)/2.
-            #print("x: {}, y: {}".format(mX, mY))
             b_edge.position = (mX, mY, 0.)
 
-            # Get angle
-            # (v2[0]-v1[0] / (v2[0] - v1[0])
-            
-            rad = math.acos((v2[0] - v1[0])/math.sqrt((v2[0] - v1[0])**2 + (v2[1] - v1[1])**2))
-            deg = rad * 180 / math.pi
-            print(deg)
-            b_edge.applyRotation((0., 0., deg))
-            #print(help(b_edge.applyRotation))
+            # Set rotation
+            dX = x2 - x1
+            dY = y2 - y1
+            rad = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
+            b_edge.applyRotation((0., 0., rad))
             
     def update(self):
 
