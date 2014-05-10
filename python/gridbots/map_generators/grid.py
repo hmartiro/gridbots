@@ -17,22 +17,36 @@ out = {}
 out['vertices'] = {}
 out['edges'] = []
 
-g = Graph.Lattice([width, height], nei=1, circular=False)
+for i in range(height):
+    for j in range(width):
 
-layout = g.layout()
+        v = i*width + j
+        coords = [float(j), height-1-float(i)]
 
-# p1 = g.vs[0]
-# p2 = g.vs[width-1]
-# print layout.coords
+        out['vertices'][v] = coords
 
-# #layout.rotate(30)
+        if j > 0:
+            out['edges'].append([v-1, v])
 
-plot(g)
+        if i > 0:
+            out['edges'].append([v, v-width])
 
-for inx, v in enumerate(layout):
-    out['vertices'][str(inx)] = v
+# g = Graph.Lattice([width, height], nei=1, circular=False)
 
-for e in g.es:
-    out['edges'].append([e.source, e.target])
+# layout = g.layout()
+
+# # p1 = g.vs[0]
+# # p2 = g.vs[width-1]
+# # print layout.coords
+
+# # #layout.rotate(30)
+
+# plot(g)
+
+# for inx, v in enumerate(layout):
+#     out['vertices'].append([inx, v])
+
+# for e in g.es:
+#     out['edges'].append([e.source, e.target])
 
 print yaml.dump(out)
