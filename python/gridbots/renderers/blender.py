@@ -13,7 +13,7 @@ from gridbots.utils.graph import get_bounding_box
 import bge
 
 # Must match that of the BGE!! (fps)
-BLENDER_FPS = 40
+BLENDER_FPS = 35
 
 # Desired framerate of simulation (fps)
 FRAMERATE = 5
@@ -59,6 +59,12 @@ class BlenderDrawer():
         # Top-level BGE objects
         self.C = bge.logic.getCurrentController()
         self.S = bge.logic.getCurrentScene()
+
+        # Set framerate settings
+        bge.logic.setMaxPhysicsFrame(1)
+        bge.logic.setMaxLogicFrame(1)
+        bge.logic.setLogicTicRate(BLENDER_FPS)
+        bge.logic.setPhysicsTicRate(BLENDER_FPS)
 
         # Which simulation frame are we on?
         self.frame = 0

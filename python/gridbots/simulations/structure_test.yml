@@ -1,19 +1,19 @@
 ---
-map: "grid_5"
+map: "grid_10"
 structure: "box_1_1_2"
 
 bots: 
   0:
-    position: 20
+    position: 80
     orientation: "N"
   1:
-    position: 15
+    position: 60
     orientation: "N"
   2:
-    position: 10
+    position: 40
     orientation: "N"
   3:
-    position: 5
+    position: 20
     orientation: "N"
   4:
     position: 0
@@ -27,16 +27,16 @@ build_order:
 waypoints:
   grab_rod:
     0:
-      position: 22
+      position: 35
       wait_time: 0.5
   grab_glue:
     0: 
-      position: 2
+      position: 1
       wait_time: 1.0
     1: 
-      position: 4
+      position: 99
       wait_time: 1.0
   attach_rod:
     0:
-      position: 14
+      position: 71
       wait_time: 0.5

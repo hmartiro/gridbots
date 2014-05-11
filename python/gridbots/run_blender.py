@@ -11,7 +11,7 @@ if __name__ == '__main__':
     paths_name = sim.run()
 
     os.environ['PYTHONPATH'] = "/home/hayk/gridbots/python"
-    call(["blenderplayer", "gridbots.blend", "-", paths_name], env=os.environ)
+    call(["blenderplayer", "-m", "16", "gridbots.blend", "-", paths_name], env=os.environ)
 
 renderer = None
 def set_renderer(r):
@@ -27,8 +27,8 @@ def start_rendering():
     #sys.path.append('/usr/local/lib/python3.3/dist-packages')
     #sys.path.append('/usr/lib/python3/dist-packages')
     
-    if len(sys.argv) >= 4:
-        paths_name = sys.argv[3]
+    if len(sys.argv) >= 6:
+        paths_name = sys.argv[5]
     else:
         paths_name = 'paths_two_cross'
 
