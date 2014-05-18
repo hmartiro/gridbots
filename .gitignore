@@ -46,3 +46,7 @@ docs/
 
 # Paths directory
 python/gridbots/paths/
+
+# Pictures
+*.png
+
