@@ -50,3 +50,5 @@ python/gridbots/paths/
 # Pictures
 *.png
 
+# IntelliJ
+.idea/
