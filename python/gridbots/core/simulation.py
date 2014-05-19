@@ -10,6 +10,7 @@ from gridbots.core.bot import Bot
 from gridbots.utils.graph import read_graph
 from gridbots.utils.planning import plan_paths
 
+
 class Simulation:
     """ The overall simulation class. """
 
@@ -23,7 +24,7 @@ class Simulation:
     def __init__(self, sim_name):
 
         # Read the simulation file
-        sim_file ='simulations/{}.yml'.format(sim_name)
+        sim_file = 'simulations/{}.yml'.format(sim_name)
         with open(sim_file) as sf:
             self.sim_data = yaml.load(sf.read())
 
@@ -50,27 +51,27 @@ class Simulation:
 
             # Create a bot
             bot = Bot(
-                    name=bot_name,
-                    position=bot_data['position'],
-                    orientation=bot_data['orientation'],
-                    sim=self
-                )
+                name=bot_name,
+                position=bot_data['position'],
+                sim=self
+            )
 
             # Add it to our list
             self.bots.append(bot)
 
             # Queue all goal positions
-            #for vertex in bot_data['goals']:
-            #    bot.add_goal(vertex)
+            bot.goal = bot_data['goal']
 
         # Path planning to build structure
-        plan_paths(self.bots, self.map, self.structure, self.sim_data)
+        #plan_paths(self.bots, self.map, self.structure, self.sim_data)
 
         # Count frames
         self.frame = 0
 
         # Simulation status
         self.status = self.STATUS["in_progress"]
+
+        self.running = False
 
     def __str__(self):
         return '[Simulation] Bots: {}'.format(len(bots))
@@ -80,24 +81,21 @@ class Simulation:
         self.frame += 1
         print('----- frame: {} -----'.format(self.frame))
 
-        status = [(bot.pos, bot.current_goal) for bot in self.bots]
+        status = [(bot.pos, bot.goal) for bot in self.bots]
 
         for bot in self.bots:
 
             # Move a step if it has one
             bot.update()
 
-            # Output the bot's current status
-            bot.print_status()
-
-        new_status = [(bot.pos, bot.current_goal) for bot in self.bots]
+        new_status = [(bot.pos, bot.goal) for bot in self.bots]
 
         # Nothing has changed, but robots are not
         # all at their goals!
-        if (status == new_status):
+        if status == new_status:
 
             for bot in self.bots:
-                if not bot.at_goal():
+                if bot.has_goal():
                     self.status = self.STATUS["traffic_jam"]
                     self.running = False
                     return
@@ -129,8 +127,7 @@ class Simulation:
         elif self.status == self.STATUS["in_progress"]:
             print('ERROR: Output called but simulation still in progress!')
 
-
-        output["status"] =  (s for s,val in self.STATUS.items() if val==self.status).next()
+        output["status"] = (s for s,val in self.STATUS.items() if val==self.status).next()
 
         output["map_name"] = self.map_name
         output["sim_name"] = self.sim_name

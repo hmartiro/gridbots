@@ -3,6 +3,7 @@
 """
 
 import yaml
+import random
 
 def read_graph(filename):
     """
@@ -28,6 +29,7 @@ def read_graph(filename):
 
     return graph
 
+
 def read_graph_data(filename):
     """
     Takes a filename and returns the edge
@@ -43,6 +45,7 @@ def read_graph_data(filename):
     edges = data['edges']
 
     return vertices, edges
+
 
 def get_bounding_box(graph):
     """
@@ -69,3 +72,35 @@ def get_bounding_box(graph):
             min_y = y
     
     return [min_x, max_x, min_y, max_y]
+
+
+def find_shortest_path(graph, src, dest):
+    """
+    Given a graph, a source node, and a destination node,
+    return an optimal path to the destination. If no path exists,
+    returns None.
+
+    """
+    n_src = graph.vs.find(name=src)
+    n_target = graph.vs.find(name=dest)
+
+    # Get all the shortest paths
+    all_path_ids = graph.get_shortest_paths(n_src, to=n_target)
+
+    # If there is no path, return None
+    if len(all_path_ids) == 0:
+        return None
+
+    # Choose one at random
+    random_index = random.randint(0, len(all_path_ids) - 1)
+    random_path_ids = all_path_ids[random_index]
+
+    # Convert IDs to vertex names
+    moves = [graph.vs[m]["name"] for m in random_path_ids]
+
+    return moves
+
+
+def get_neighbors(graph, node):
+
+    return [n["name"] for n in graph.vs.find(name=node).neighbors()]

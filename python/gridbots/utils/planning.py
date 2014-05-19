@@ -18,9 +18,9 @@ def plan_paths(bots, map, structure, simulation_data):
     for bot in bots:
         for build_step in build_order:
             waypoint = waypoints[build_step][0]
-            bot.add_goal(waypoint['position'])
+            #bot.add_goal(waypoint['position'])
 
     # At the end, bring all bots back to their initial positions
-    for bot in bots:
-        bot.add_goal(bot.pos)
+    #for bot in bots:
+    #    bot.add_goal(bot.pos)
     

@@ -6,18 +6,7 @@ bots:
   0:
     position: 80
     orientation: "N"
-  1:
-    position: 60
-    orientation: "N"
-  2:
-    position: 40
-    orientation: "N"
-  3:
-    position: 20
-    orientation: "N"
-  4:
-    position: 0
-    orientation: "N"
+    goal: 35
 
 build_order:
   - grab_rod

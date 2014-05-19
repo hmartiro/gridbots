@@ -2,9 +2,12 @@
 
 """
 
-import math
+from gridbots import utils
 
-from collections import deque
+import random
+import logging
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
 
 class Bot:
     """
@@ -12,200 +15,317 @@ class Bot:
 
     """
 
-    # Dictionary of robot orientations
-    ORIENTATION = {
-            'N': 0*math.pi/2., 
-            'S': 1*math.pi/2., 
-            'E': 2*math.pi/2., 
-            'W': 3*math.pi/2.
-        }
+    class State():
+        """ State definitions of the bot state machine.
+        """
+        # Physical states
+        at_home = 1
+        on_track = 2
+        finished = 3
+        traffic_jam = 4
+        stuck = 5
 
-    def __init__(self, name, position, orientation, sim):
+        # Internal states
+        calculating_path = 6
+        checking_nodes = 7
 
-        # What is my name
+    def __init__(self, name, position, sim):
+
+        # Bot name
         self.name = str(name)
 
-        # Which vertex am I at?
+        # Current node
         self.pos = position
 
-        # Which way am I pointing?
-        self.orientation = self.ORIENTATION[orientation]
-
-        # What are my next moves?
-        self.move_queue = deque()
-
-        # What are my pending goals?
-        self.goal_queue = deque()
-
-        # What has been my entire trajectory?
-        self.move_history = []
-
-        # Where am I currently going?
-        self.current_goal = self.pos
-
-        # Where was my last position?
+        # Last position
         self.last_pos = self.pos
+
+        # Home position
+        self.home_pos = self.pos
+
+        # Current goal node
+        self.goal = None
+
+        # Planned path to the goal
+        self.moves = []
+
+        # Full trajectory of motion
+        self.move_history = []
 
         # Save a reference to the simulation
         self.sim = sim
 
-        print('Bot {} initialized at vertex {}.'.format(self.name, self.pos))
+        # State machine dictionary
+        self.state_machine = {
+            Bot.State.at_home: self.state_at_home,
+            Bot.State.calculating_path: self.state_calculating_path,
+            Bot.State.checking_nodes: self.state_checking_nodes,
+            Bot.State.on_track: self.state_on_track,
+            Bot.State.finished: self.state_finished,
+            Bot.State.traffic_jam: self.state_traffic_jam,
+            Bot.State.stuck: self.state_stuck,
+        }
+
+        # State variable
+        self.state = Bot.State.at_home
+
+        # Whether the robot has made a physical decision to
+        # move or wait for the turn
+        self.turn_over = False
+
+        # Graph which can have nodes removed for obstacle avoidance
+        self.graph = self.sim.map.copy()
+
+        # Check to see if the graph has been modified, to reset it
+        self.graph_modified = False
+
+        logging.info('Bot {} initialized at vertex {}.'.format(self.name, self.pos))
 
     def __repr__(self):
-        return '[Bot] Position: {}, Next: {}'.format(self.pos, self.move_queue)
-
-    def add_goal(self, new_goal_position):
-        self.goal_queue.append(new_goal_position)
-
-    def has_goal(self):
-        return len(self.goal_queue) != 0
-    
-    def pop_goal(self):
-
-        self.current_goal = self.goal_queue.popleft()
-        return self.current_goal
-
-    def add_move(self, new_position):
-        self.move_queue.append(new_position)
+        """ String representation of the bot.
+        """
+        return '[Bot] Position: {}, Next: {}, State: {}'.format(self.pos, self.moves, self.state)
 
     def has_move(self):
-        return len(self.move_queue) != 0
+        """ Do I have a move planned?
+        """
+        return len(self.moves) > 0
+
+    def next_move(self):
+        """ What is my next move?
+        """
+        return self.moves[0]
+
+    def at_home(self):
+        """ Am I at my home position?
+        """
+        return self.pos == self.home_pos
+
+    def has_goal(self):
+        """ Do I have a goal position?
+        """
+        return self.goal is not None
 
     def at_goal(self):
-
-        at_goal = (self.pos == self.current_goal)
-
-        if at_goal:
-            assert not self.has_move()
-
-        return at_goal
-
-    def is_free(self, node):
+        """ Am I at my goal position?
         """
-        Is the given node currently unoccupied?
+        return self.pos == self.goal
 
+    def assign_goal(self, node):
+        """ Set my new goal position, and recalculate my path.
         """
+        self.goal = node
+        self.state = Bot.State.calculating_path
 
-        for bot in self.sim.bots:
-
-            if(bot.pos == node):
-                return False
-
-        return True
-
-    def rotate(self, rad):
-        self.orientation += rad
-
-    def get_obstacles(self):
-
-        finished_bots = []
-        for bot in self.sim.bots:
-            if bot.at_goal() and not bot.has_goal():
-                finished_bots.append(bot.pos)
-
-        return finished_bots
-
-    def plan_path(self, graph, current, goal):
+    def move(self):
+        """ Move to my next position.
         """
-        Given a graph, a starting node, and a goal node,
-        calculate the shortest path and add it to the move
-        queue.
-
-        """
-        
-        src = graph.vs.select(name=current)[0]
-        target = graph.vs.select(name=goal)[0]
-
-        move_ids = graph.get_shortest_paths(src, to=target)
-        moves = [graph.vs[m]["name"] for m in move_ids[0]]
-
-        self.move_queue = deque()
-        for move in moves[1:]:
-            self.add_move(move)
-
-        return moves
-
-    def update(self):
-
-        self.move_history.append(self.pos)
-
-        # If the bot has reached its goal
-        if self.at_goal():
-
-            # If there are more goals
-            if self.has_goal():
-
-                # Get the next one
-                goal = self.pop_goal()
-
-                # Calculate the shortest path to the goal
-                moves = self.plan_path(self.sim.map, self.pos, goal)
-                print(moves)
+        self.turn_over = True
 
         self.last_pos = self.pos
-        #print self.move_queue
+        self.pos = self.moves.pop(0)
+        logging.debug('Moving from {} to {}'.format(self.last_pos, self.pos))
 
-        if not self.has_move():
-            return
-        
-        p = self.move_queue.popleft()
-        
-        if self.is_free(p):
-            self.pos = p
+    def wait(self):
+        """ Do nothing for this turn.
+        """
+        self.turn_over = True
+        logging.info('Waiting for this turn'.format(self.name))
+
+    def permanent_obstacles(self):
+        """ Return a list of bots who are waiting at their home positions.
+        """
+        return [b.pos for b in self.sim.bots if b.state == Bot.State.at_home]
+
+    def occupied_neighbors(self, node):
+        """ Return a list of neighbor nodes that are occupied.
+        """
+        neighbors = utils.graph.get_neighbors(self.graph, node)
+        return [n for n in neighbors if not self.is_node_free(n)]
+
+    def free_neighbors(self, node):
+        """ Return a list of neighbor nodes that are free.
+        """
+        neighbors = utils.graph.get_neighbors(self.graph, node)
+        return [n for n in neighbors if self.is_node_free(n)]
+
+    def is_node_free(self, node):
+        """ Is the given node occupied by a bot?
+        """
+        return all([(bot.pos != node) for bot in self.sim.bots if bot is not self])
+
+    def remove_nodes(self, nodes):
+        """ Remove the given nodes from my graph.
+        """
+        self.graph.delete_vertices(self.graph.vs.select(name_in=nodes))
+
+    # -----------------------------------------------------------
+
+    def state_at_home(self):
+
+        logging.debug("State: at_home")
+
+        if self.has_goal():
+            return Bot.State.calculating_path
         else:
-            print('bot {} says node {} is occupied!'.format(self.name, p))
+            self.wait()
+            return Bot.State.at_home
 
-            # Get graph without the offending point
-            g2 = self.sim.map.copy()
+    def state_calculating_path(self):
 
-            # Get all neighbors of my current position
-            neighbors = [n["name"] for n in self.sim.map.vs.select(name=self.pos)[0].neighbors()]
+        logging.debug("State: calculating_path")
 
-            # Find which neighbors are occupied
-            occupied_neighbors = []
-            for n in neighbors:
-                if not self.is_free(n):
-                    occupied_neighbors.append(n)
+        # Reset the graph
+        self.graph = self.sim.map.copy()
 
-            print("Neighbors of {}: {}. Occupied: {}".format(self.pos, neighbors, occupied_neighbors))
+        # List of obstacles
+        obstacles = []
 
-            # Check if path is completely blocked
-            if occupied_neighbors == neighbors:
-                self.move_queue.appendleft(p)
-                print('Completely trapped, waiting!')
-                return 
+        # Neighboring nodes currently occupied
+        obstacles.extend(self.occupied_neighbors(self.pos))
 
-            g2.delete_vertices(g2.vs.select(name_in=occupied_neighbors))
+        # Bots at their home positions
+        obstacles.extend(self.permanent_obstacles())
 
-            obstacles = self.get_obstacles()
-            g2.delete_vertices(g2.vs.select(name_in=obstacles))
+        # Remove the obstacles from the graph
+        self.remove_nodes(obstacles)
 
-            print("Deleting nodes {} because bots are at goals".format(obstacles))
-            
-            # Check if goal is still in the graph
-            if self.current_goal in occupied_neighbors:
-                #print('{} not found in graph, deleted {}!'.format(self.current_goal, occupied_neighbors))
-                self.move_queue.appendleft(p)
-                return
+        # Go to the goal or towards home position if no goal
+        dest_node = self.goal or self.home_pos
 
-            old_move_queue = self.move_queue
+        # Get the optimal path to the destination
+        if dest_node not in obstacles:
+            path = utils.graph.find_shortest_path(self.graph, self.pos, dest_node)
 
-            # Calculate shortest path
-            print('source: {}, dest: {}'.format(self.pos, self.current_goal))
-            moves = self.plan_path(g2, self.pos, self.current_goal)
+        # If the destination is an obstacle, no path found
+        else:
+            logging.debug('Destination node is currently an obstacle!')
+            path = None
 
-            print(old_move_queue, self.move_queue)
+        # If there is a path, we're good to go
+        if path:
 
-            # Move!
-            self.pos = self.move_queue.popleft()  
+            self.moves = path[1:]
 
-    def print_status(self):
+            # If we have moves
+            if self.moves:
+                assert self.is_node_free(self.next_move())
+                return Bot.State.on_track
 
-        # If I still have moves
-        if self.has_move():
-            print('Bot {} is at vertex {}, reaching goal of {} in {} moves.'.format(self.name, self.pos, self.current_goal, len(self.move_queue)))
+            # Otherwise, we should be at the goal
+            else:
+                assert self.pos == (self.goal or self.home_pos)
+                self.goal = None
+                return Bot.State.finished
 
-        # If I am at my goal
-        if self.at_goal():
-            print('Bot {} is at goal of vertex {}!'.format(self.name, self.pos))
-    
+        # Otherwise, check options
+        else:
+            return Bot.State.checking_nodes
+
+    def state_checking_nodes(self):
+
+        logging.debug("State: checking_nodes")
+
+        # If I am able to move in some direction
+        if self.free_neighbors(self.pos):
+            return Bot.State.traffic_jam
+
+        # If I am completely stuck
+        else:
+            return Bot.State.stuck
+
+    def state_on_track(self):
+
+        logging.debug("State: on_track")
+
+        # If the next node is free, go to it
+        if self.is_node_free(self.next_move()):
+
+            self.move()
+
+            # Check if I have reached the goal
+            if self.has_goal() and self.at_goal():
+                return Bot.State.finished
+
+            # Otherwise if no goal, check if I've reached home
+            elif not self.has_goal() and self.at_home():
+                self.goal = None
+                return Bot.State.finished
+
+            # Otherwise, keep moving
+            else:
+                return Bot.State.on_track
+
+        # I've hit an obstacle, recalculate path
+        else:
+            return Bot.State.calculating_path
+
+    def state_finished(self):
+
+        logging.debug("State: finished")
+
+        # If I made it home
+        if self.at_home():
+            return Bot.State.at_home
+
+        # Otherwise, head towards home
+        else:
+            return Bot.State.calculating_path
+
+    def state_traffic_jam(self):
+
+        logging.debug("State: traffic_jam")
+
+        # Get a list of the free neighboring nodes
+        free_neighbors = self.free_neighbors(self.pos)
+
+        # Choose one at random
+        random_neighbor = free_neighbors[random.randint(0, len(free_neighbors)-1)]
+
+        # Add it as the path
+        self.moves = [random_neighbor]
+
+        # Move to it
+        self.move()
+
+        # Recalculate situation
+        return Bot.State.calculating_path
+
+    def state_stuck(self):
+
+        logging.debug("State: stuck")
+
+        # If I have any moves, recalculate path
+        if self.free_neighbors(self.pos):
+            return Bot.State.calculating_path
+
+        # Otherwise, just wait
+        else:
+            self.wait()
+            return Bot.State.stuck
+
+    # -----------------------------------------------------------
+
+    def update(self):
+        """ Run the bot state machine until it makes a physical move.
+        """
+
+        # Logging header
+        logging.info('################### Bot {}'.format(self.name, self.pos))
+
+        # Record my current position
+        self.move_history.append(self.pos)
+
+        # Run the state machine until the 'turn' is over
+        self.turn_over = False
+        while not self.turn_over:
+            self.state = self.state_machine[self.state]()
+
+        if self.has_goal():
+            logging.info('At {}, moving to goal ({}) with planned moves {}'.format(self.pos, self.goal, self.moves))
+        elif self.at_goal():
+            logging.info('At goal ({})'.format(self.pos))
+        elif not self.at_home():
+            logging.info('At {}, moving to home ({}) with planned moves {}'.format(self.pos, self.home_pos, self.moves))
+        else:
+            logging.info('At home ({})'.format(self.pos))
