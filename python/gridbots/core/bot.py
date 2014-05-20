@@ -6,7 +6,6 @@ from gridbots import utils
 
 import random
 import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
 class Bot:
@@ -78,6 +77,9 @@ class Bot:
 
         # Check to see if the graph has been modified, to reset it
         self.graph_modified = False
+
+        # Is this bot available or assigned to a job?
+        self.job = None
 
         logging.info('Bot {} initialized at vertex {}.'.format(self.name, self.pos))
 

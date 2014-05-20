@@ -4,10 +4,8 @@ structure: "box_1_1_2"
 bots:
   1:
     position: 24
-    goal: 1
   2:
     position: 20
-    goal: 1
   3:
     position: 12
     goal: 12

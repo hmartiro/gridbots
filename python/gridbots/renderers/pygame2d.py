@@ -115,7 +115,7 @@ class PyGameDrawer():
         rect = pygame.Rect(p_top_left[0], p_top_left[1], p_size[0], p_size[1])
         pygame.draw.rect(self.screen, color, rect, width)
 
-    def draw_circle(self, center, radius, color, width=0):
+    def draw_circle(self, center, radius, color, width=0.):
 
         # Calculate center
         p_center = self.to_pixel(center)
@@ -159,7 +159,7 @@ class PyGameDrawer():
         # Check for events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                quit()
+                sys.exit()
 
         if frame < 0:
             return
@@ -191,8 +191,8 @@ class PyGameDrawer():
             self.draw_line(source, target, BLACK, width=2)
 
         for v in self.map.vs:
-           self.draw_circle(v["coords"], 0.4, BLACK)
-           self.draw_text(v["coords"], str(v["name"]), size=0.65, color=WHITE)
+            self.draw_circle(v["coords"], 0.4, BLACK)
+            self.draw_text(v["coords"], str(v["name"]), size=0.65, color=WHITE)
 
     def draw_bot(self, bot, fraction, frame):
 
@@ -221,8 +221,5 @@ class PyGameDrawer():
             # Draw everything
             self.draw(frame)
 
-        while(True):
+        while True:
             self.draw(-1)
-
-    def quit(self):
-        sys.exit()

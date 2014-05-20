@@ -5,8 +5,6 @@ structure: "box_1_1_2"
 bots: 
   0:
     position: 80
-    orientation: "N"
-    goal: 35
 
 build_order:
   - grab_rod
@@ -29,3 +27,8 @@ waypoints:
     0:
       position: 71
       wait_time: 0.5
+
+jobs:
+  - [grab_rod, grab_glue, attach_rod]
+  - [grab_rod, grab_glue, attach_rod]
+  - [grab_rod, grab_glue, attach_rod]

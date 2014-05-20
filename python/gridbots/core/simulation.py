@@ -4,6 +4,7 @@
 
 import os
 import yaml
+import logging
 
 from gridbots.core.bot import Bot
 
@@ -42,7 +43,7 @@ class Simulation:
         # Parse the structure file
         self.structure = read_graph("structures/{}.yml".format(self.structure_name))
 
-        print('----- Creating bots -----')
+        logging.info('----- Creating bots -----')
         # List of bots in the simulation
         self.bots = []
 
@@ -59,11 +60,8 @@ class Simulation:
             # Add it to our list
             self.bots.append(bot)
 
-            # Queue all goal positions
-            bot.goal = bot_data['goal']
-
         # Path planning to build structure
-        #plan_paths(self.bots, self.map, self.structure, self.sim_data)
+        plan_paths(self.bots, self.map, self.structure, self.sim_data)
 
         # Count frames
         self.frame = 0
@@ -74,12 +72,12 @@ class Simulation:
         self.running = False
 
     def __str__(self):
-        return '[Simulation] Bots: {}'.format(len(bots))
+        return '[Simulation] Bots: {}'.format(len(self.bots))
 
     def update(self):
 
         self.frame += 1
-        print('----- frame: {} -----'.format(self.frame))
+        logging.info('----- frame: {} -----'.format(self.frame))
 
         status = [(bot.pos, bot.goal) for bot in self.bots]
 
@@ -115,17 +113,17 @@ class Simulation:
 
     def output(self):
 
-        print('')
-        print('===============================')
+        logging.info('')
+        logging.info('===============================')
 
         output = {}
 
         if self.status == self.STATUS["success"]:
-            print('Simulation finished successfully!')
+            logging.info('Simulation finished successfully!')
         elif self.status == self.STATUS["traffic_jam"]:
-            print('ERROR: Simulation stuck in a traffic jam!')
+            logging.error('Simulation stuck in a traffic jam!')
         elif self.status == self.STATUS["in_progress"]:
-            print('ERROR: Output called but simulation still in progress!')
+            logging.error('Output called but simulation still in progress!')
 
         output["status"] = (s for s,val in self.STATUS.items() if val==self.status).next()
 
