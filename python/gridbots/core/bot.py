@@ -28,10 +28,13 @@ class Bot:
         calculating_path = 6
         checking_nodes = 7
 
-    def __init__(self, name, position, sim):
+    def __init__(self, name, position, bot_type, sim):
 
         # Bot name
         self.name = str(name)
+
+        # Bot type
+        self.type = bot_type
 
         # Current node
         self.pos = position
@@ -81,12 +84,10 @@ class Bot:
         # Is this bot available or assigned to a job?
         self.job = None
 
-        logging.info('Bot {} initialized at vertex {}.'.format(self.name, self.pos))
-
     def __repr__(self):
         """ String representation of the bot.
         """
-        return '[Bot] Position: {}, Next: {}, State: {}'.format(self.pos, self.moves, self.state)
+        return '<Bot> Position: {}, Next: {}, State: {}'.format(self.pos, self.moves, self.state)
 
     def has_move(self):
         """ Do I have a move planned?

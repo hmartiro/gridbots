@@ -2,33 +2,65 @@
 map: "grid_10"
 structure: "box_1_1_2"
 
+bot_types:
+
+  horizontal:
+    - grab_rod_horizontal
+    - grab_glue_horizontal
+    - attach_rod
+
+  vertical:
+    - grab_rod_vertical
+    - grab_glue_vertical
+    - attach_rod
+
 bots: 
   0:
-    position: 80
+    position: 0
+    type: horizontal
+  1:
+    position: 1
+    type: horizontal
+  2:
+    position: 2
+    type: vertical
 
-build_order:
-  - grab_rod
-  - grab_glue
-  - attach_rod
+stations:
+  grab_rod_horizontal:
+    - position: 38
+      time: 0.5
 
-waypoints:
-  grab_rod:
-    0:
-      position: 35
-      wait_time: 0.5
-  grab_glue:
-    0: 
-      position: 1
-      wait_time: 1.0
-    1: 
-      position: 99
-      wait_time: 1.0
+    - position: 62
+      time: 0.5
+
+    - position: 99
+      time: 0.5
+
+  grab_rod_vertical:
+    - position: 59
+      time: 0.5
+
+  grab_glue_horizontal:
+    - position: 1
+      time: 1.0
+
+  grab_glue_vertical:
+    - position: 99
+      time: 1.0
+
   attach_rod:
-    0:
-      position: 71
-      wait_time: 0.5
+    - position: 71
+      time: 0.5
 
 jobs:
-  - [grab_rod, grab_glue, attach_rod]
-  - [grab_rod, grab_glue, attach_rod]
-  - [grab_rod, grab_glue, attach_rod]
+  - bot_type: horizontal
+    operations: [grab_rod_horizontal, grab_glue, attach_rod]
+    platform: 0
+
+  - bot_type: horizontal
+    operations: [grab_rod_horizontal, grab_glue, attach_rod]
+    platform: 0
+
+  - bot_type: vertical
+    operations: [grab_rod_vertical, grab_glue, attach_rod]
+    platform: 0

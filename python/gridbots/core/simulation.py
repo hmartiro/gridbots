@@ -7,9 +7,10 @@ import yaml
 import logging
 
 from gridbots.core.bot import Bot
+from gridbots.core.job import Job
+from gridbots.core.job import Station
 
-from gridbots.utils.graph import read_graph
-from gridbots.utils.planning import plan_paths
+from gridbots import utils
 
 
 class Simulation:
@@ -29,39 +30,67 @@ class Simulation:
         with open(sim_file) as sf:
             self.sim_data = yaml.load(sf.read())
 
-        # Store names
+        # Get names
         self.sim_name = sim_name
         self.structure_name = self.sim_data["structure"]
         self.map_name = self.sim_data["map"]
 
-        # Store waypoints
-        self.waypoints = self.sim_data["waypoints"]
-
         # Parse the map file
-        self.map = read_graph("maps/{}.yml".format(self.map_name))
+        self.map = utils.graph.read_graph("maps/{}.yml".format(self.map_name))
 
         # Parse the structure file
-        self.structure = read_graph("structures/{}.yml".format(self.structure_name))
+        self.structure = utils.graph.read_graph("structures/{}.yml".format(self.structure_name))
 
-        logging.info('----- Creating bots -----')
-        # List of bots in the simulation
-        self.bots = []
+        # Iterate through the waypoints and create Stations
+        self.stations = utils.parse.parse_stations(self.sim_data['stations'])
+
+        # Create jobs from list (temporary)
+        self.job_queue = utils.parse.parse_jobs(self.sim_data['jobs'])
 
         # Iterate through the input file and create bots
-        for bot_name, bot_data in self.sim_data['bots'].items():
+        self.bots = utils.parse.parse_bots(
+            self.sim_data['bots'],
+            self
+        )
 
-            # Create a bot
-            bot = Bot(
-                name=bot_name,
-                position=bot_data['position'],
-                sim=self
-            )
+        logging.debug('Simulating {}'.format(
+            self.sim_name
+        ))
 
-            # Add it to our list
-            self.bots.append(bot)
+        logging.debug("----- STRUCTURE -----")
+        logging.info('Build a truss with {} rods and {} nodes.'.format(
+            len(self.structure.es),
+            len(self.structure.vs),
+            ))
+
+        logging.debug("----- MAP -----")
+        logging.info('Map {} has {} nodes'.format(
+            self.map_name,
+            len(self.map.vs)
+        ))
+
+        logging.debug("----- BOTS -----")
+        for bot in self.bots:
+            logging.debug(bot)
+
+        logging.debug("----- STATIONS -----")
+        for station_type in self.stations.keys():
+            logging.debug('* {}'.format(station_type))
+            for station in self.stations[station_type]:
+                logging.debug('  {}'.format(station))
+
+        logging.debug("------ JOBS -----")
+        for job in self.job_queue:
+            logging.debug(job)
 
         # Path planning to build structure
-        plan_paths(self.bots, self.map, self.structure, self.sim_data)
+        utils.planning.plan_paths(
+            structure=self.structure,
+            graph=self.map,
+            bots=self.bots,
+            stations=self.stations,
+            jobs=self.job_queue
+        )
 
         # Count frames
         self.frame = 0

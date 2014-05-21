@@ -17,8 +17,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 2
-REDRAW_SUBSTEPS = 10
+FRAMERATE = 10
+REDRAW_SUBSTEPS = 4
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)

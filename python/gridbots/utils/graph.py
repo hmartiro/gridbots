@@ -5,6 +5,7 @@
 import yaml
 import random
 
+
 def read_graph(filename):
     """
     Takes a filename and returns a Graph 
