@@ -191,8 +191,8 @@ class PyGameDrawer():
             self.draw_line(source, target, BLACK, width=2)
 
         for v in self.map.vs:
-            self.draw_circle(v["coords"], 0.4, BLACK)
-            self.draw_text(v["coords"], str(v["name"]), size=0.65, color=WHITE)
+            self.draw_circle(v["coords"], 0.3, BLACK)
+            self.draw_text(v["coords"], str(v["name"]), size=0.45, color=WHITE)
 
     def draw_bot(self, bot, fraction, frame):
 
@@ -207,7 +207,7 @@ class PyGameDrawer():
         coords = [linmap(fraction, 0, 1, c1[0], c2[0]), linmap(fraction, 0, 1, c1[1], c2[1])]
 
         # Draw!
-        radius = 0.65
+        radius = 0.50
         self.draw_circle(coords, radius, LIGHT_GRAY)
         self.draw_circle(coords, radius + 0.02, BLACK, width=0.04)
 

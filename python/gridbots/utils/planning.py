@@ -14,9 +14,7 @@ def plan_paths(graph, bots, stations, jobs):
 
     logging.info('------ TASK PLANNING ------')
 
-    #print([j.finished for j in jobs])
-
-    for job in jobs:
+    for job in jobs[:]:
 
         # Get the current operation
         op = job.current_op()
@@ -99,7 +97,8 @@ def plan_paths(graph, bots, stations, jobs):
                 fastest_station.pos,
                 fastest_station.type
             ))
-            job.bot.goal = fastest_station.pos
+            #job.bot.goal = fastest_station.pos
+            job.bot.assign_goal(fastest_station.pos)
             job.bot.job = job
             op.started = True
         else:

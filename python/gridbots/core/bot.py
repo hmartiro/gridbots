@@ -261,7 +261,6 @@ class Bot:
 
             # Otherwise if no goal, check if I've reached home
             elif not self.has_goal() and self.at_home():
-                self.goal = None
                 return Bot.State.finished
 
             # Otherwise, keep moving
