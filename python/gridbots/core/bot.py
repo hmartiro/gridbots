@@ -305,15 +305,15 @@ class Bot:
     def state_stuck(self):
 
         logging.debug("State: stuck")
-
+        print('neighbors: {}'.format(self.free_neighbors(self.pos)))
         # If I have any moves, recalculate path
-        if self.free_neighbors(self.pos):
-            return Bot.State.calculating_path
-
-        # Otherwise, just wait
-        else:
-            self.wait()
-            return Bot.State.stuck
+        # if self.free_neighbors(self.pos):
+        #     return Bot.State.calculating_path
+        #
+        # # Otherwise, just wait
+        # else:
+        self.wait()
+        return Bot.State.calculating_path
 
     # -----------------------------------------------------------
 

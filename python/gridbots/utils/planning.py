@@ -78,7 +78,7 @@ def plan_paths(graph, bots, stations, jobs):
                 continue
 
             distances[station] = len(path)
-            logging.debug('distance to station at {}: {}'.format(station.pos, distances[station]))
+            #logging.debug('distance to station at {}: {}'.format(station.pos, distances[station]))
 
         # Find fastest station by adding travel time to wait time
         # at arrival

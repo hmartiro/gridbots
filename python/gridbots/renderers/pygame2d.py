@@ -17,8 +17,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 15
-REDRAW_SUBSTEPS = 3
+FRAMERATE = 12
+REDRAW_SUBSTEPS = 4
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -34,6 +34,7 @@ BLUE = (0, 0, 255)
 
 ###############################
 
+
 def linmap(val, inMin, inMax, outMin, outMax):
     """
     Simple linear mapping utility.
@@ -41,6 +42,7 @@ def linmap(val, inMin, inMax, outMin, outMax):
     return (val-inMin)/(inMax-inMin) * (outMax-outMin) + outMin
 
 ###############################
+
 
 class PyGameDrawer():
     

@@ -49,7 +49,7 @@ bots:
 
 stations:
   grab_rod_horizontal:
-    - position: 29
+    - position: 39
       time: 0.5
 
   grab_rod_vertical:
@@ -61,14 +61,13 @@ stations:
       time: 1.0
 
   grab_glue_vertical:
-    - position: 39
+    - position: 49
       time: 1.0
 
   attach_rod:
     - position: 93
       time: 0.5
 
-  attach_rod:
     - position: 96
       time: 0.5
 

@@ -16,7 +16,7 @@ import bge
 BLENDER_FPS = 35
 
 # Desired framerate of simulation (fps)
-FRAMERATE = 5
+FRAMERATE = 10
 
 ###############################
 
@@ -46,6 +46,8 @@ class BlenderDrawer():
         self.bot_data = paths_data["bots"]
 
         self.frames = paths_data["frames"]
+
+        self.stations = paths_data["stations"]
 
         # Get map dimensions
         #self.bounding_box = get_bounding_box(self.graph)
@@ -106,7 +108,18 @@ class BlenderDrawer():
             dY = y2 - y1
             rad = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
             b_edge.applyRotation((0., 0., rad))
-            
+
+        self.b_stations = []
+        for station_type in self.stations:
+
+            for station in self.stations[station_type]:
+
+                b_station = self.S.addObject(station_type, self.C.owner)
+                self.b_stations.append(b_station)
+
+                c = self.vertices[station.pos]
+                b_station.position = (c[0], c[1], 0)
+
     def update(self):
 
         if(self.frame > self.frames - 1):

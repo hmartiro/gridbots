@@ -134,8 +134,8 @@ class Simulation:
                     self.status = self.STATUS["success"]
                     break
 
-            #if self.frame == 300:
-            #    break
+            if self.frame == 1000:
+                break
 
         # Add the last frame to the move history
         for bot in self.bots:
@@ -164,6 +164,8 @@ class Simulation:
         output["sim_name"] = self.sim_name
 
         output["frames"] = len(self.bots[0].move_history) - 1
+
+        output["stations"] = self.stations
 
         output["bots"] = {}
         for bot in self.bots:

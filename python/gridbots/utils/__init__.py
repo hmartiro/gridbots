@@ -1,6 +1,6 @@
-import graph
-import planning
-import parse
+from . import graph
+from . import planning
+from . import parse
 import logging
 
 # Set up logging
