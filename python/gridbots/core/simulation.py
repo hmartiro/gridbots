@@ -83,15 +83,6 @@ class Simulation:
         for job in self.job_queue:
             logging.debug(job)
 
-        # Path planning to build structure
-        utils.planning.plan_paths(
-            structure=self.structure,
-            graph=self.map,
-            bots=self.bots,
-            stations=self.stations,
-            jobs=self.job_queue
-        )
-
         # Count frames
         self.frame = 0
 
@@ -103,39 +94,52 @@ class Simulation:
     def __str__(self):
         return '[Simulation] Bots: {}'.format(len(self.bots))
 
+    def plan_tasks(self):
+
+        # Task planning for jobs
+        utils.planning.plan_paths(
+            graph=self.map,
+            bots=self.bots,
+            stations=self.stations,
+            jobs=self.job_queue
+        )
+
     def update(self):
 
         self.frame += 1
         logging.info('----- frame: {} -----'.format(self.frame))
 
-        status = [(bot.pos, bot.goal) for bot in self.bots]
+        self.plan_tasks()
 
         for bot in self.bots:
 
             # Move a step if it has one
             bot.update()
 
-        new_status = [(bot.pos, bot.goal) for bot in self.bots]
+            if bot.at_goal():
+                bot.last_at_goal = self.frame
+            print('Last at goal: {}'.format(bot.last_at_goal))
 
-        # Nothing has changed, but robots are not
-        # all at their goals!
-        if status == new_status:
-
-            for bot in self.bots:
-                if bot.has_goal():
-                    self.status = self.STATUS["traffic_jam"]
-                    self.running = False
-                    return
-
-            self.status = self.STATUS["success"]
-            self.running = False
-    
     def run(self):
 
         self.running = True
 
         while self.running:
+
             self.update()
+
+            if all([j.finished for j in self.job_queue]):
+                if all([b.at_home() for b in self.bots]):
+                    logging.info('ALL JOBS COMPLETE!!')
+                    self.status = self.STATUS["success"]
+                    break
+
+            #if self.frame == 300:
+            #    break
+
+        # Add the last frame to the move history
+        for bot in self.bots:
+            bot.move_history.append(bot.pos)
 
         paths_name = self.output()
         return paths_name
@@ -154,7 +158,7 @@ class Simulation:
         elif self.status == self.STATUS["in_progress"]:
             logging.error('Output called but simulation still in progress!')
 
-        output["status"] = (s for s,val in self.STATUS.items() if val==self.status).next()
+        output["status"] = (s for s, val in self.STATUS.items() if val == self.status).next()
 
         output["map_name"] = self.map_name
         output["sim_name"] = self.sim_name

@@ -17,8 +17,8 @@ SCREEN_WIDTH = 600
 MARGIN = 0.2
 
 # Simulation framerate
-FRAMERATE = 10
-REDRAW_SUBSTEPS = 4
+FRAMERATE = 15
+REDRAW_SUBSTEPS = 3
 
 # Drawing colors
 BG_COLOR = (100, 100, 100)
@@ -161,6 +161,8 @@ class PyGameDrawer():
             if event.type == pygame.QUIT:
                 sys.exit()
 
+        self.clock.tick(self.framerate * self.substeps)
+
         if frame < 0:
             return
 
@@ -180,8 +182,6 @@ class PyGameDrawer():
                 self.draw_bot(bot, fraction, frame)
 
             pygame.display.flip()
-
-            self.clock.tick(self.framerate * self.substeps)
 
     def draw_map(self):
 

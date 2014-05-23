@@ -84,10 +84,19 @@ class Bot:
         # Is this bot available or assigned to a job?
         self.job = None
 
+        # Remove
+        self.last_at_goal = None
+
     def __repr__(self):
         """ String representation of the bot.
         """
-        return '<Bot> Position: {}, Next: {}, State: {}'.format(self.pos, self.moves, self.state)
+        return '<Bot {}> Type: {}, Position: {}, State: {}, Job: {}'.format(
+            self.name,
+            self.type,
+            self.pos,
+            self.state,
+            self.job
+        )
 
     def has_move(self):
         """ Do I have a move planned?
