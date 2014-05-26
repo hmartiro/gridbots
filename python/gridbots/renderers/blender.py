@@ -78,7 +78,9 @@ class BlenderDrawer():
 
         self.bots = {}
         for bot in self.bot_data.keys():
-            self.bots[bot] = self.S.addObject('Robot', self.C.owner)
+            self.bots[bot] = self.S.addObject(self.bot_data[bot]['type'], self.C.owner)
+            self.bots[bot].orientation = (0, 0, math.pi/2)
+            #print(dir(self.bots[bot]))
 
         # Draw nodes
         self.nodes = {}
@@ -131,8 +133,8 @@ class BlenderDrawer():
 
         for bot_name, bot in self.bots.items():
             
-            node1 = self.bot_data[bot_name][self.frame]
-            node2 = self.bot_data[bot_name][self.frame+1]
+            node1 = self.bot_data[bot_name]['move_history'][self.frame]
+            node2 = self.bot_data[bot_name]['move_history'][self.frame+1]
 
             c1 = self.vertices[node1]
             c2 = self.vertices[node2]

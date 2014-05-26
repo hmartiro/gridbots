@@ -166,13 +166,16 @@ class Simulation:
         output["map_name"] = self.map_name
         output["sim_name"] = self.sim_name
 
-        output["frames"] = len(self.bots[0].move_history) - 1
+        output["frames"] = len(self.bots[0].move_history)
 
         output["stations"] = self.stations
 
         output["bots"] = {}
         for bot in self.bots:
-            output["bots"][bot.name] = bot.move_history
+            output["bots"][bot.name] = {}
+            output["bots"][bot.name]['type'] = bot.type
+            output["bots"][bot.name]['move_history'] = bot.move_history
+            output["bots"][bot.name]['move_history'].append(bot.move_history[-1])
 
         # Create the paths directory if needed
         paths_dir = "paths"
