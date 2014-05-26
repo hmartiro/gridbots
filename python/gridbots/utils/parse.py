@@ -3,17 +3,19 @@
 """
 
 
-def parse_jobs(jobs_data):
+def parse_jobs(jobs_data, job_types):
 
     from gridbots.core.job import Job
 
     job_queue = []
     for j_data in jobs_data:
 
+        job_type = job_types[j_data['type']]
+
         job = Job(
-            operations=j_data['operations'],
+            operations=job_type['operations'],
             platform_z=j_data['platform'],
-            bot_type=j_data['bot_type']
+            bot_type=job_type['bot_type']
         )
         job_queue.append(job)
 

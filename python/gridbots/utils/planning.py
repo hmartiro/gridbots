@@ -105,3 +105,59 @@ def plan_paths(graph, bots, stations, jobs):
             logging.error('No way to accomplish {} found!'.format(op))
             continue
 
+
+def create_job_queue(structure, job_types):
+    """
+    Given a goal structure return a queue of jobs that
+    will build the structure.
+
+    """
+    job_queue = []
+
+    def coords_from_edge(e):
+        """ Get the vertex coordinates of an edge.
+        """
+        src = structure.vs.find(name=e.source)['coords']
+        dest = structure.vs.find(name=e.target)['coords']
+        return src, dest
+
+    # Create a list of the edges in the structure
+    edges = list(structure.es)
+
+    # Sort edges by min Z coordinate, ascending
+    edges.sort(key=lambda x: min([v[2] for v in coords_from_edge(x)]))
+
+    # Sort edges by max Z coordinate, ascending
+    edges.sort(key=lambda x: max([v[2] for v in coords_from_edge(x)]))
+
+    # Iterate through the edges
+    for e in edges:
+
+        #print(min(coords_from_edge(e)), max(coords_from_edge(e)))
+
+        # Get the edge coordinates
+        c_src, c_dest = coords_from_edge(e)
+        print(c_src, c_dest)
+        # Find the type of rod
+        if c_src[0] == c_dest[0] and c_src[1] == c_dest[1]:
+            job_name = 'rod_z'
+        elif c_src[0] == c_dest[0] and c_src[2] == c_dest[2]:
+            job_name = 'rod_y'
+        elif c_src[1] == c_dest[1] and c_src[2] == c_dest[2]:
+            job_name = 'rod_x'
+        else:
+            raise NotImplementedError('Can only handle lattice structures!')
+
+        job_type = job_types[job_name]
+
+        job = Job(
+            operations=job_type['operations'],
+            platform_z=0,
+            bot_type=job_type['bot_type']
+        )
+        job_queue.append(job)
+
+    for j in job_queue:
+        logging.info(j.operations)
+
+    return job_queue

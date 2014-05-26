@@ -45,7 +45,10 @@ class Simulation:
         self.stations = utils.parse.parse_stations(self.sim_data['stations'])
 
         # Create jobs from list (temporary)
-        self.job_queue = utils.parse.parse_jobs(self.sim_data['jobs'])
+        self.job_queue = utils.planning.create_job_queue(
+            self.structure,
+            self.sim_data['job_types']
+        )
 
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
@@ -134,8 +137,8 @@ class Simulation:
                     self.status = self.STATUS["success"]
                     break
 
-            if self.frame == 1000:
-                break
+            #if self.frame == 1000:
+            #    break
 
         # Add the last frame to the move history
         for bot in self.bots:

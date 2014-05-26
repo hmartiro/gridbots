@@ -13,12 +13,13 @@ from gridbots.utils.graph import get_bounding_box
 import bge
 
 # Must match that of the BGE!! (fps)
-BLENDER_FPS = 35
+BLENDER_FPS = 40
 
 # Desired framerate of simulation (fps)
 FRAMERATE = 10
 
 ###############################
+
 
 def linmap(val, inMin, inMax, outMin, outMax):
     """
@@ -27,6 +28,7 @@ def linmap(val, inMin, inMax, outMin, outMax):
     return (val-inMin)/(inMax-inMin) * (outMax-outMin) + outMin
 
 ###############################
+
 
 class BlenderDrawer():
 
@@ -122,7 +124,7 @@ class BlenderDrawer():
 
     def update(self):
 
-        if(self.frame > self.frames - 1):
+        if self.frame > self.frames - 1:
             return
 
         print('------- frame {} -------'.format(self.frame))
@@ -144,6 +146,6 @@ class BlenderDrawer():
 
         self.substep += 1
 
-        if(self.substep == self.substeps):
+        if self.substep == self.substeps:
             self.substep = 0
             self.frame += 1

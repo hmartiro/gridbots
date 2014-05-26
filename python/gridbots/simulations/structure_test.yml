@@ -2,147 +2,84 @@
 map: "grid_10"
 structure: "box_1_1_2"
 
+# Types of robots this map contains
 bot_types:
 
-  horizontal:
-    - grab_rod_horizontal
-    - grab_glue_horizontal
-    - attach_rod
+  builder_x:
+    speed: 1.0
+    radius: 0.05
 
-  vertical:
-    - grab_rod_vertical
-    - grab_glue_vertical
-    - attach_rod
+  builder_y:
+    speed: 1.0
+    radius: 0.05
 
+  builder_z:
+    speed: 1.0
+    radius: 0.05
+
+# Types of jobs to be performed
+job_types:
+
+  rod_x:
+    operations: [grab_rod_x, grab_glue_x, attach_rod]
+    bot_type: builder_x
+
+  rod_y:
+    operations: [grab_rod_y, grab_glue_y, attach_rod]
+    bot_type: builder_y
+
+  rod_z:
+    operations: [grab_rod_z, grab_glue_z, attach_rod]
+    bot_type: builder_z
+
+# Definition of bots in this map, by name
 bots: 
   0:
     position: 0
-    type: horizontal
+    type: builder_x
   1:
-    position: 1
-    type: vertical
-  2:
-    position: 2
-    type: horizontal
-  3:
-    position: 3
-    type: vertical
-  4:
     position: 4
-    type: horizontal
-  5:
-    position: 5
-    type: vertical
-  6:
-    position: 6
-    type: horizontal
-  7:
-    position: 7
-    type: vertical
-  8:
+    type: builder_y
+  2:
     position: 8
-    type: horizontal
-  9:
-    position: 9
-    type: vertical
+    type: builder_z
 
-
+# Definition of stations in this map, type
 stations:
-  grab_rod_horizontal:
-    - position: 39
+  grab_rod_x:
+    - position: 42
       time: 0.5
 
-  grab_rod_vertical:
-    - position: 30
+  grab_rod_y:
+    - position: 45
       time: 0.5
 
-  grab_glue_horizontal:
-    - position: 40
+  grab_rod_z:
+    - position: 48
+      time: 0.5
+
+  grab_glue_x:
+    - position: 62
       time: 1.0
 
-  grab_glue_vertical:
-    - position: 49
+  grab_glue_y:
+    - position: 65
+      time: 1.0
+
+  grab_glue_z:
+    - position: 68
       time: 1.0
 
   attach_rod:
-    - position: 93
+    - position: 95
       time: 0.5
 
-    - position: 96
-      time: 0.5
-
+# Definition of jobs to be performed
 jobs:
-  - bot_type: horizontal
-    operations: [grab_rod_horizontal, grab_glue_horizontal, attach_rod]
+  - type: rod_x
+    edge: [2, 14]
     platform: 0
 
-  - bot_type: horizontal
-    operations: [grab_rod_horizontal, grab_glue_horizontal, attach_rod]
+  - type: rod_y
+    edge: [4, 9]
     platform: 0
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_horizontal, grab_glue_horizontal, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_horizontal, grab_glue_horizontal, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_horizontal, grab_glue_horizontal, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_horizontal, grab_glue_horizontal, attach_rod]
-    platform: 0
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-
-  - bot_type: vertical
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
-  - bot_type: horizontal
-    operations: [grab_rod_vertical, grab_glue_vertical, attach_rod]
-    platform: 0
-
