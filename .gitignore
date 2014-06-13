@@ -52,3 +52,5 @@ python/gridbots/paths/
 
 # IntelliJ
 .idea/
+
+*.autosave

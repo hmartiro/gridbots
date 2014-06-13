@@ -1,5 +1,5 @@
 ---
-map: "real_map_10_10"
+map: "dave_demo_map"
 structure: "box_1_1_2"
 
 # Types of robots this map contains
@@ -35,63 +35,74 @@ job_types:
 # Definition of bots in this map, by name
 bots:
 
-  bob:
-    position: 0
+  x1:
+    position: 2
     type: builder_x
-  joe:
-    position: 3
+  y1:
+    position: 4
     type: builder_y
-  moe:
+  z1:
     position: 6
     type: builder_z
 
-  lou:
-    position: 1
+
+  x2:
+    position: 22
     type: builder_x
-  art:
-    position: 4
+  y2:
+    position: 24
     type: builder_y
-  kev:
-    position: 7
+  z2:
+    position: 26
     type: builder_z
 
-  tim:
-    position: 2
-    type: builder_x
-  greg:
-    position: 5
-    type: builder_y
-  geoff:
-    position: 8
-    type: builder_z
+#  x3:
+#    position: 12
+#    type: builder_x
+#  y3:
+#    position: 14
+#    type: builder_y
+#  z3:
+#    position: 16
+#    type: builder_z
+#
+#  x4:
+#    position: 32
+#    type: builder_x
+#  y4:
+#    position: 34
+#    type: builder_y
+#  z4:
+#    position: 36
+#    type: builder_z
 
 
 # Definition of stations in this map, type
 stations:
   grab_rod_x:
-    - position: grab_rod_x_1
-      time: 0.5
+    - position: grab_rod_1
+      time: 2.0
 
   grab_rod_y:
-    - position: grab_rod_y_1
-      time: 0.5
+    - position: grab_rod_3
+      time: 2.0
 
   grab_rod_z:
-    - position: grab_rod_z_1
-      time: 0.5
+    - position: grab_rod_2
+      time: 2.0
 
   grab_glue_x:
-    - position: 62
-      time: 1.0
+    - position: 94
+      time: 2.0
 
   grab_glue_y:
-    - position: 65
-      time: 1.0
+    - position: 85
+      time: 2.0
 
   grab_glue_z:
-    - position: 68
-      time: 1.0
+    - position: 96
+      time: 2.0
 
   attach_rod:
     - position: attach_rod_1
-      time: 0.5
+      time: 2.0

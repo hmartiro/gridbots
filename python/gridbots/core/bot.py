@@ -84,9 +84,6 @@ class Bot:
         # Is this bot available or assigned to a job?
         self.job = None
 
-        # Remove
-        self.last_at_goal = None
-
     def __repr__(self):
         """ String representation of the bot.
         """
@@ -279,7 +276,7 @@ class Bot:
         if self.at_home():
             return Bot.State.at_home
 
-        # Otherwise, head towards home
+        # Otherwise, see if i'm doing an operation
         else:
             return Bot.State.calculating_path
 
@@ -295,6 +292,7 @@ class Bot:
 
         # Add it as the path
         self.moves = [random_neighbor]
+        #self.moves = [free_neighbors[-1]]
 
         # Move to it
         self.move()

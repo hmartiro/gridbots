@@ -1,8 +1,12 @@
 import os
 import sys
 
-from subprocess import call
+if __name__ != '__main__':
+    sys.path.insert(0, '/usr/local/lib/python3.4/dist-packages')
+    print(sys.path)
+    print('HELLOOOOOOOOO!!')
 
+from subprocess import call
 from gridbots.core.simulation import Simulation
 
 if __name__ == '__main__':
@@ -10,8 +14,9 @@ if __name__ == '__main__':
     sim = Simulation(sim_name=sys.argv[1])
     paths_name = sim.run()
 
-    os.environ['PYTHONPATH'] = "/home/hayk/gridbots/python"
-    call(["blenderplayer", "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)
+    os.environ['PYTHONPATH'] = "/home/hayk/Projects/gridbots/python"
+    blenderplayer_path = "/usr/local/blender-2.70a-linux-glibc211-x86_64/blenderplayer"
+    call([blenderplayer_path, "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)
 
 renderer = None
 def set_renderer(r):
@@ -23,9 +28,6 @@ def get_renderer():
 def start_rendering():
 
     from gridbots.renderers.blender import BlenderDrawer
-    
-    #sys.path.append('/usr/local/lib/python3.3/dist-packages')
-    #sys.path.append('/usr/lib/python3/dist-packages')
     
     if len(sys.argv) >= 9:
         paths_name = sys.argv[8]

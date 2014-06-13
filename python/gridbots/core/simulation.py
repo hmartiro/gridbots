@@ -6,10 +6,6 @@ import os
 import yaml
 import logging
 
-from gridbots.core.bot import Bot
-from gridbots.core.job import Job
-from gridbots.core.job import Station
-
 from gridbots import utils
 
 
@@ -22,6 +18,9 @@ class Simulation:
         'success': 1,
         'traffic_jam': 2
     }
+
+    # Physical time passed per frame (seconds)
+    TIME_PER_FRAME = 0.1
 
     def __init__(self, sim_name):
 
@@ -89,6 +88,9 @@ class Simulation:
         # Count frames
         self.frame = 0
 
+        # Simulation time
+        self.time = 0
+
         # Simulation status
         self.status = self.STATUS["in_progress"]
 
@@ -110,7 +112,9 @@ class Simulation:
     def update(self):
 
         self.frame += 1
-        logging.info('----- frame: {} -----'.format(self.frame))
+        self.time += self.TIME_PER_FRAME
+
+        logging.info('----- frame: {} time: {} -----'.format(self.frame, self.time))
 
         self.plan_tasks()
 
@@ -119,9 +123,12 @@ class Simulation:
             # Move a step if it has one
             bot.update()
 
-            if bot.at_goal():
-                bot.last_at_goal = self.frame
-            print('Last at goal: {}'.format(bot.last_at_goal))
+        for station_type in self.stations:
+            for station in self.stations[station_type]:
+                station.wait_time -= self.TIME_PER_FRAME
+                if station.wait_time < 0:
+                    station.wait_time = 0.0
+                print('{}, wait time {}'.format(station, station.wait_time))
 
     def run(self):
 
