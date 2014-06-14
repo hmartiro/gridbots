@@ -48,5 +48,19 @@ The renderer is responsible for producing the output for the simulation. There a
 Simulations are run by creating a Simulation class with the desired renderer and specifying an input file. The input file defines the map, microbots, resources, and goals in a standard YAML format. A vertex is specified by an id and coordinates, an edge by two vertex ids, a bot by its starting vertex, orientation, etc. Representation of resources and desired structures is not defined yet.
 
 
-### How the task allocation will work
+### Structure planning
 
+Truss structure is defined as a graph in 3D
+- assume XZ plane for now
+- assume cubic lattice only for now
+
+- Sort edges by minimum z value, with the lowest first
+- Sort again by maximum z value, with the lowest first
+- Take next edge
+  - set platform location to min Z value
+  - create job w/ rod info and XZ info
+    - rod orientation
+    - rod length
+    - glue requirements
+    - X position
+    - Z position

@@ -2,6 +2,24 @@
 
 """
 
+import logging
+
+
+class Structure:
+
+    def __init__(self, graph):
+
+        self.x = 0
+        self.y = 0
+        self.z = 0
+
+        self.g = graph
+
+        self.jobs_todo = []
+        self.jobs_done = []
+
+        self.completion_times = {}
+
 
 class Station:
 
@@ -40,7 +58,7 @@ class Operation:
 
 class Job:
 
-    def __init__(self, operations, bot_type, platform_z):
+    def __init__(self, operations, bot_type, edge):
 
         self.operations = []
         for op_name in operations:
@@ -55,8 +73,8 @@ class Job:
 
         self.bot_type = bot_type
 
-        # Platform position for dropoff
-        self.platform_z = platform_z
+        # Which truss am I building?
+        self.edge = edge
 
         # Robot currently assigned to the job
         self.bot = None

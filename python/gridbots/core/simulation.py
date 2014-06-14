@@ -7,6 +7,7 @@ import yaml
 import logging
 
 from gridbots import utils
+from gridbots.core.job import Structure
 
 
 class Simulation:
@@ -38,16 +39,18 @@ class Simulation:
         self.map = utils.graph.read_graph("maps/{}.yml".format(self.map_name))
 
         # Parse the structure file
-        self.structure = utils.graph.read_graph("structures/{}.yml".format(self.structure_name))
+        structure_graph = utils.graph.read_graph("structures/{}.yml".format(self.structure_name))
+        self.structure = Structure(structure_graph)
 
         # Iterate through the waypoints and create Stations
         self.stations = utils.parse.parse_stations(self.sim_data['stations'])
 
-        # Create jobs from list (temporary)
         self.job_queue = utils.planning.create_job_queue(
             self.structure,
             self.sim_data['job_types']
         )
+
+        self.job_queue = self.structure.jobs_todo
 
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
@@ -61,8 +64,8 @@ class Simulation:
 
         logging.debug("----- STRUCTURE -----")
         logging.info('Build a truss with {} rods and {} nodes.'.format(
-            len(self.structure.es),
-            len(self.structure.vs),
+            len(self.structure.g.es),
+            len(self.structure.g.vs),
             ))
 
         logging.debug("----- MAP -----")
@@ -103,10 +106,11 @@ class Simulation:
 
         # Task planning for jobs
         utils.planning.plan_paths(
+            time=self.time,
             graph=self.map,
             bots=self.bots,
             stations=self.stations,
-            jobs=self.job_queue
+            structure=self.structure
         )
 
     def update(self):
@@ -176,6 +180,7 @@ class Simulation:
         output["frames"] = len(self.bots[0].move_history)
 
         output["stations"] = self.stations
+        output["structure"] = self.structure.completion_times
 
         output["bots"] = {}
         for bot in self.bots:

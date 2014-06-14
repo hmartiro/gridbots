@@ -3,8 +3,6 @@ import sys
 
 if __name__ != '__main__':
     sys.path.insert(0, '/usr/local/lib/python3.4/dist-packages')
-    print(sys.path)
-    print('HELLOOOOOOOOO!!')
 
 from subprocess import call
 from gridbots.core.simulation import Simulation
@@ -19,11 +17,16 @@ if __name__ == '__main__':
     call([blenderplayer_path, "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)
 
 renderer = None
+
+
 def set_renderer(r):
     global renderer
     renderer = r
+
+
 def get_renderer():
     return renderer
+
 
 def start_rendering():
 
@@ -36,6 +39,7 @@ def start_rendering():
 
     renderer = BlenderDrawer(paths_name=paths_name)
     set_renderer(renderer)
+
 
 def render_frame():
     

@@ -2,6 +2,7 @@
 
 """
 
+
 import logging
 
 from gridbots.core.job import Job, Operation, Station
@@ -10,11 +11,11 @@ from gridbots.utils.graph import find_shortest_path
 LINEAR_SPEED = 1.0
 
 
-def plan_paths(graph, bots, stations, jobs):
+def plan_paths(time, graph, bots, stations, structure):
 
     logging.info('------ TASK PLANNING ------')
 
-    for job in jobs[:]:
+    for job in structure.jobs_todo[:]:
 
         # Get the current operation
         op = job.current_op()
@@ -36,7 +37,10 @@ def plan_paths(graph, bots, stations, jobs):
 
         # If the job is finished, move on
         if job.finished:
-            jobs.remove(job)
+            structure.jobs_todo.remove(job)
+            structure.jobs_done.append(job)
+            structure.completion_times[time] = job.edge
+
             job.bot.job = None
             logging.debug('{} is completed, bot {} is free'.format(
                           job,
@@ -112,17 +116,16 @@ def create_job_queue(structure, job_types):
     will build the structure.
 
     """
-    job_queue = []
 
     def coords_from_edge(e):
         """ Get the vertex coordinates of an edge.
         """
-        src = structure.vs.find(name=e.source)['coords']
-        dest = structure.vs.find(name=e.target)['coords']
+        src = structure.g.vs.find(name=e.source)['coords']
+        dest = structure.g.vs.find(name=e.target)['coords']
         return src, dest
 
     # Create a list of the edges in the structure
-    edges = list(structure.es)
+    edges = list(structure.g.es)
 
     # Sort edges by min Z coordinate, ascending
     edges.sort(key=lambda x: min([v[2] for v in coords_from_edge(x)]))
@@ -152,12 +155,12 @@ def create_job_queue(structure, job_types):
 
         job = Job(
             operations=job_type['operations'],
-            platform_z=0,
-            bot_type=job_type['bot_type']
+            bot_type=job_type['bot_type'],
+            edge=[c_src, c_dest]
         )
-        job_queue.append(job)
+        structure.jobs_todo.append(job)
 
-    for j in job_queue:
+    for j in structure.jobs_todo:
         logging.info(j.operations)
 
-    return job_queue
+    return structure.jobs_todo
