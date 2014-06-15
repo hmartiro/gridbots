@@ -149,13 +149,13 @@ class Bot:
     def occupied_neighbors(self, node):
         """ Return a list of neighbor nodes that are occupied.
         """
-        neighbors = utils.graph.get_neighbors(self.graph, node)
+        neighbors = self.graph.neighbors(node)
         return [n for n in neighbors if not self.is_node_free(n)]
 
     def free_neighbors(self, node):
         """ Return a list of neighbor nodes that are free.
         """
-        neighbors = utils.graph.get_neighbors(self.graph, node)
+        neighbors = self.graph.neighbors(node)
         return [n for n in neighbors if self.is_node_free(n)]
 
     def is_node_free(self, node):
@@ -166,7 +166,7 @@ class Bot:
     def remove_nodes(self, nodes):
         """ Remove the given nodes from my graph.
         """
-        self.graph.delete_vertices(self.graph.vs.select(name_in=nodes))
+        self.graph.remove_nodes_from(nodes)
 
     # -----------------------------------------------------------
 

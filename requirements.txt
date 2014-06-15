@@ -1,4 +1,5 @@
 pyaml
-python-igraph
-pygame
+networkx
+matplotlib
+
 

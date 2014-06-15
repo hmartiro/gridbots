@@ -101,7 +101,7 @@ class BlenderDrawer():
             b_edge.position = (midpoint[0], midpoint[1], 0)
 
             # Set rotation
-            rad = get_angle(v1, v2)
+            rad = get_angle_2D(v1, v2)
             b_edge.applyRotation((0., 0., rad))
 
         self.b_stations = []

@@ -64,14 +64,14 @@ class Simulation:
 
         logging.debug("----- STRUCTURE -----")
         logging.info('Build a truss with {} rods and {} nodes.'.format(
-            len(self.structure.g.es),
-            len(self.structure.g.vs),
+            len(self.structure.g.edges()),
+            len(self.structure.g.nodes()),
             ))
 
         logging.debug("----- MAP -----")
-        logging.info('Map {} has {} nodes'.format(
+        logging.info('Map {} has {} nodes.'.format(
             self.map_name,
-            len(self.map.vs)
+            len(self.map.nodes())
         ))
 
         logging.debug("----- BOTS -----")
@@ -172,7 +172,7 @@ class Simulation:
         elif self.status == self.STATUS["in_progress"]:
             logging.error('Output called but simulation still in progress!')
 
-        output["status"] = (s for s, val in self.STATUS.items() if val == self.status).next()
+        output["status"] = [s for s, val in self.STATUS.items() if val == self.status][0]
 
         output["map_name"] = self.map_name
         output["sim_name"] = self.sim_name

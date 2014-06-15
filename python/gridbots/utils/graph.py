@@ -16,17 +16,17 @@ def read_graph(filename):
     # Extract data from the map file
     vertices, edges = read_graph_data(filename)
 
+    import networkx as nx
     # Create a Graph object
-    from igraph import Graph
-    graph = Graph()
+    graph = nx.Graph()
 
-    graph.add_vertices(vertices.keys())
+    # Add vertices
+    for v in vertices:
+        graph.add_node(v, coords=vertices[v])
 
-    for v in graph.vs:
-        v["coords"] = vertices[v["name"]]
-
-    for edge in edges:
-        graph.add_edge(graph.vs.find(name=edge[0]), graph.vs.find(name=edge[1]))
+    # Add edges
+    for e in edges:
+        graph.add_edge(e[0], e[1])
 
     return graph
 
@@ -48,31 +48,31 @@ def read_graph_data(filename):
     return vertices, edges
 
 
-def get_bounding_box(graph):
-    """
-    Given a Graph, return the bounding box of
-    the coordinates of the nodes.
-
-    """
-
-    min_x = min_y = float("+inf")
-    max_x = max_y = float("-inf")
-
-    for v in graph.vs:
-
-        x = v["coords"][0]
-        y = v["coords"][1]
-
-        if x > max_x:
-            max_x = x
-        if x < min_x:
-            min_x = x
-        if y > max_y:
-            max_y = y
-        if y < min_y:
-            min_y = y
-    
-    return [min_x, max_x, min_y, max_y]
+# def get_bounding_box(graph):
+#     """
+#     Given a Graph, return the bounding box of
+#     the coordinates of the nodes.
+#
+#     """
+#
+#     min_x = min_y = float("+inf")
+#     max_x = max_y = float("-inf")
+#
+#     for v in graph.vs:
+#
+#         x = v["coords"][0]
+#         y = v["coords"][1]
+#
+#         if x > max_x:
+#             max_x = x
+#         if x < min_x:
+#             min_x = x
+#         if y > max_y:
+#             max_y = y
+#         if y < min_y:
+#             min_y = y
+#
+#     return [min_x, max_x, min_y, max_y]
 
 
 def find_shortest_path(graph, src, dest):
@@ -82,26 +82,13 @@ def find_shortest_path(graph, src, dest):
     returns None.
 
     """
-    n_src = graph.vs.find(name=src)
-    n_target = graph.vs.find(name=dest)
-
+    import networkx as nx
     # Get all the shortest paths
-    all_path_ids = graph.get_shortest_paths(n_src, to=n_target)
-
-    # If there is no path, return None
-    if len(all_path_ids) == 0:
+    try:
+        all_paths = list(nx.all_shortest_paths(graph, src, dest))
+    except nx.NetworkXNoPath:
         return None
 
     # Choose one at random
-    random_index = random.randint(0, len(all_path_ids) - 1)
-    random_path_ids = all_path_ids[random_index]
-
-    # Convert IDs to vertex names
-    moves = [graph.vs[m]["name"] for m in random_path_ids]
-
-    return moves
-
-
-def get_neighbors(graph, node):
-
-    return [n["name"] for n in graph.vs.find(name=node).neighbors()]
+    random_index = random.randint(0, len(all_paths) - 1)
+    return all_paths[random_index]

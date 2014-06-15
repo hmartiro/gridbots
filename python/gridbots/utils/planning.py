@@ -78,7 +78,7 @@ def plan_paths(frame, graph, bots, stations, structure):
             path = find_shortest_path(graph, job.bot.pos, station.pos)
 
             if not path:
-                logging.warn("No path to station for {} found!".format(op.name))
+                logging.warning("No path to station for {} found!".format(op.name))
                 continue
 
             distances[station] = len(path)
@@ -120,12 +120,12 @@ def create_job_queue(structure, job_types):
     def coords_from_edge(e):
         """ Get the vertex coordinates of an edge.
         """
-        src = structure.g.vs.find(name=e.source)['coords']
-        dest = structure.g.vs.find(name=e.target)['coords']
+        src = structure.g.node[e[0]]['coords']
+        dest = structure.g.node[e[1]]['coords']
         return src, dest
 
     # Create a list of the edges in the structure
-    edges = list(structure.g.es)
+    edges = list(structure.g.edges())
 
     # Sort edges by min Z coordinate, ascending
     edges.sort(key=lambda x: min([v[2] for v in coords_from_edge(x)]))
