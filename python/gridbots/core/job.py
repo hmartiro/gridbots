@@ -18,7 +18,7 @@ class Structure:
         self.jobs_todo = []
         self.jobs_done = []
 
-        self.completion_times = {}
+        self.completion_times = []
 
 
 class Station:

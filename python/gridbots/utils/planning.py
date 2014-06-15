@@ -11,7 +11,7 @@ from gridbots.utils.graph import find_shortest_path
 LINEAR_SPEED = 1.0
 
 
-def plan_paths(time, graph, bots, stations, structure):
+def plan_paths(frame, graph, bots, stations, structure):
 
     logging.info('------ TASK PLANNING ------')
 
@@ -39,7 +39,7 @@ def plan_paths(time, graph, bots, stations, structure):
         if job.finished:
             structure.jobs_todo.remove(job)
             structure.jobs_done.append(job)
-            structure.completion_times[time] = job.edge
+            structure.completion_times.append([frame, (tuple(job.edge[0]), tuple(job.edge[1]))])
 
             job.bot.job = None
             logging.debug('{} is completed, bot {} is free'.format(

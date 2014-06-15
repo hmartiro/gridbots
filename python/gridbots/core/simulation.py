@@ -106,7 +106,7 @@ class Simulation:
 
         # Task planning for jobs
         utils.planning.plan_paths(
-            time=self.time,
+            frame=self.frame,
             graph=self.map,
             bots=self.bots,
             stations=self.stations,

@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     os.environ['PYTHONPATH'] = "/home/hayk/Projects/gridbots/python"
     blenderplayer_path = "/usr/local/blender-2.70a-linux-glibc211-x86_64/blenderplayer"
-    call([blenderplayer_path, "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)
+    #call([blenderplayer_path, "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)
 
 renderer = None
 

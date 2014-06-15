@@ -4,11 +4,9 @@
 
 import math
 import yaml
-import time
-import sys
+import mathutils
 
 from gridbots.utils.graph import read_graph_data
-from gridbots.utils.graph import get_bounding_box
 
 import bge
 
@@ -50,6 +48,8 @@ class BlenderDrawer():
         self.frames = paths_data["frames"]
 
         self.stations = paths_data["stations"]
+
+        self.structure = paths_data["structure"]
 
         # Get map dimensions
         #self.bounding_box = get_bounding_box(self.graph)
@@ -97,20 +97,11 @@ class BlenderDrawer():
             v1 = self.vertices[e[0]]
             v2 = self.vertices[e[1]]
 
-            x1 = v1[0]
-            x2 = v2[0]
-            y1 = v1[1]
-            y2 = v2[1]
-
-            # Set position
-            mX = (x1 + x2)/2.
-            mY = (y1 + y2)/2.
-            b_edge.position = (mX, mY, 0.)
+            midpoint = interpolate(v1, v2, 0.5)
+            b_edge.position = (midpoint[0], midpoint[1], 0)
 
             # Set rotation
-            dX = x2 - x1
-            dY = y2 - y1
-            rad = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
+            rad = get_angle(v1, v2)
             b_edge.applyRotation((0., 0., rad))
 
         self.b_stations = []
@@ -123,6 +114,8 @@ class BlenderDrawer():
 
                 c = self.vertices[station.pos]
                 b_station.position = (c[0], c[1], 0)
+
+        self.b_structure = {}
 
     def update(self):
 
@@ -146,8 +139,52 @@ class BlenderDrawer():
 
             bot.position = (x, y, 0.)
 
+        for frame, edge in self.structure:
+
+            if frame <= self.frame:
+
+                if edge not in self.b_structure.keys():
+                    self.b_structure[edge] = self.S.addObject('Edge', self.C.owner)
+
+                    midpoint = tuple(interpolate(edge[0], edge[1], 0.5))
+                    self.b_structure[edge].position = midpoint
+                    print((edge[0], edge[1]))
+                    rad = get_angle(edge[0], edge[1])
+                    self.b_structure[edge].applyRotation((0, 0, rad))
+                    print(midpoint)
+                    print(rad)
         self.substep += 1
 
         if self.substep == self.substeps:
             self.substep = 0
             self.frame += 1
+
+
+def interpolate(start, end, fraction):
+    """
+    Interpolate between two vectors
+    """
+    return [n + fraction * (p-n) for n, p in zip(start, end)]
+
+
+def get_angle(p, q):
+    """
+    Return the rotation angle between two 3D vectors, in radians.
+    """
+    dX = q[0] - p[0]
+    dY = q[1] - p[1]
+    dZ = q[2] - p[2]
+
+    radX
+    radZ = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
+    return rad
+
+
+def get_angle_2D(p, q):
+    """
+    Return the direction, in radians, of the vector specified by the points p, q.
+    """
+    dX = q[0] - p[0]
+    dY = q[1] - p[1]
+    rad = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
+    return rad
