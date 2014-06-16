@@ -1,3 +1,5 @@
+from . import simulation
+
 import logging
 
 # Set up logging

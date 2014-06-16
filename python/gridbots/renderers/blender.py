@@ -2,9 +2,10 @@
 
 """
 
+import sys
 import math
 import yaml
-import mathutils
+import mathutils as mu
 
 from gridbots.utils.graph import read_graph_data
 
@@ -15,17 +16,6 @@ BLENDER_FPS = 40
 
 # Desired framerate of simulation (fps)
 FRAMERATE = 10
-
-###############################
-
-
-def linmap(val, inMin, inMax, outMin, outMax):
-    """
-    Simple linear mapping utility.
-    """
-    return (val-inMin)/(inMax-inMin) * (outMax-outMin) + outMin
-
-###############################
 
 
 class BlenderDrawer():
@@ -39,6 +29,10 @@ class BlenderDrawer():
 
         # Get map data
         self.vertices, self.edges = read_graph_data("maps/{}.yml".format(paths_data["map_name"]))
+
+        # Convert vertex data to 3D mathutils.Vectors
+        for v_name, v in self.vertices.items():
+            self.vertices[v_name] = mu.Vector(v).to_3d()
 
         self.framerate = framerate
         self.substeps = int(float(BLENDER_FPS) / float(self.framerate))
@@ -86,7 +80,7 @@ class BlenderDrawer():
         self.nodes = {}
         for name, coords in self.vertices.items():
             self.nodes[name] = self.S.addObject('Node', self.C.owner)
-            self.nodes[name].position = (coords[0], coords[1], 0.)
+            self.nodes[name].position = coords
 
         self.b_edges = []
         for e in self.edges:
@@ -97,12 +91,13 @@ class BlenderDrawer():
             v1 = self.vertices[e[0]]
             v2 = self.vertices[e[1]]
 
-            midpoint = interpolate(v1, v2, 0.5)
-            b_edge.position = (midpoint[0], midpoint[1], 0)
+            midpoint = v1.lerp(v2, 0.5)
+            b_edge.position = midpoint
 
             # Set rotation
-            rad = get_angle_2D(v1, v2)
-            b_edge.applyRotation((0., 0., rad))
+            unit = mu.Vector((1, 0, 0))
+            quat = unit.rotation_difference(v2-v1)
+            b_edge.applyRotation(quat.to_euler('XYZ'))
 
         self.b_stations = []
         for station_type in self.stations:
@@ -112,8 +107,7 @@ class BlenderDrawer():
                 b_station = self.S.addObject(station_type, self.C.owner)
                 self.b_stations.append(b_station)
 
-                c = self.vertices[station.pos]
-                b_station.position = (c[0], c[1], 0)
+                b_station.position = self.vertices[station.pos]
 
         self.b_structure = {}
 
@@ -121,8 +115,6 @@ class BlenderDrawer():
 
         if self.frame > self.frames - 1:
             return
-
-        print('------- frame {} -------'.format(self.frame))
 
         for bot_name, bot in self.bots.items():
             
@@ -134,57 +126,51 @@ class BlenderDrawer():
 
             fraction = self.substep / float(self.substeps)
 
-            x = c1[0] * (1-fraction) + c2[0] * fraction
-            y = c1[1] * (1-fraction) + c2[1] * fraction
-
-            bot.position = (x, y, 0.)
+            pos = c1.lerp(c2, fraction)
+            bot.position = pos
 
         for frame, edge in self.structure:
 
             if frame <= self.frame:
 
                 if edge not in self.b_structure.keys():
+
                     self.b_structure[edge] = self.S.addObject('Edge', self.C.owner)
 
-                    midpoint = tuple(interpolate(edge[0], edge[1], 0.5))
-                    self.b_structure[edge].position = midpoint
-                    print((edge[0], edge[1]))
-                    rad = get_angle(edge[0], edge[1])
-                    self.b_structure[edge].applyRotation((0, 0, rad))
-                    print(midpoint)
-                    print(rad)
+                    v1 = mu.Vector(edge[0])
+                    v2 = mu.Vector(edge[1])
+                    midpoint = v1.lerp(v2, 0.5)
+                    self.b_structure[edge].position = midpoint + mu.Vector((0, 0, 2))
+
+                    unit = mu.Vector((1, 0, 0))
+                    quat = unit.rotation_difference(v2-v1)
+
+                    self.b_structure[edge].applyRotation(quat.to_euler('XYZ'))
+
         self.substep += 1
 
         if self.substep == self.substeps:
+            print('------- frame {} -------'.format(self.frame))
             self.substep = 0
             self.frame += 1
 
+# --------------------------------------------------
 
-def interpolate(start, end, fraction):
-    """
-    Interpolate between two vectors
-    """
-    return [n + fraction * (p-n) for n, p in zip(start, end)]
+renderer = None
 
 
-def get_angle(p, q):
-    """
-    Return the rotation angle between two 3D vectors, in radians.
-    """
-    dX = q[0] - p[0]
-    dY = q[1] - p[1]
-    dZ = q[2] - p[2]
+def start_rendering():
 
-    radX
-    radZ = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
-    return rad
+    global renderer
+
+    if len(sys.argv) >= 9:
+        paths_name = sys.argv[8]
+    else:
+        paths_name = 'paths_two_cross'
+
+    renderer = BlenderDrawer(paths_name=paths_name)
 
 
-def get_angle_2D(p, q):
-    """
-    Return the direction, in radians, of the vector specified by the points p, q.
-    """
-    dX = q[0] - p[0]
-    dY = q[1] - p[1]
-    rad = math.acos((dX)/math.sqrt((dX)**2 + (dY)**2))
-    return rad
+def render_frame():
+
+    renderer.update()

@@ -56,16 +56,16 @@ bots:
     position: 26
     type: builder_z
 
-#  x3:
-#    position: 12
-#    type: builder_x
-#  y3:
-#    position: 14
-#    type: builder_y
-#  z3:
-#    position: 16
-#    type: builder_z
-#
+  x3:
+    position: 12
+    type: builder_x
+  y3:
+    position: 14
+    type: builder_y
+  z3:
+    position: 16
+    type: builder_z
+
 #  x4:
 #    position: 32
 #    type: builder_x

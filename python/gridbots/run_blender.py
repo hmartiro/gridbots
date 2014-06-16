@@ -1,10 +1,14 @@
+"""
+
+"""
+
 import os
 import sys
 
-if __name__ != '__main__':
-    sys.path.insert(0, '/usr/local/lib/python3.4/dist-packages')
-
 from subprocess import call
+from subprocess import check_output
+
+import gridbots
 from gridbots.core.simulation import Simulation
 
 if __name__ == '__main__':
@@ -12,35 +16,18 @@ if __name__ == '__main__':
     sim = Simulation(sim_name=sys.argv[1])
     paths_name = sim.run()
 
-    os.environ['PYTHONPATH'] = "/home/hayk/Projects/gridbots/python"
-    blenderplayer_path = "/usr/local/blender-2.70a-linux-glibc211-x86_64/blenderplayer"
-    call([blenderplayer_path, "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)
+    # Get blenderplayer symbolic link (usually "/usr/local/bin/blenderplayer")
+    bp_link = check_output(['which', 'blenderplayer'])[:-1]
 
-renderer = None
+    # Get absolute location of blenderplayer
+    # (usually like "/usr/local/blender-2.70a-linux-glibc211-x86_64/blenderplayer")
+    # For some reason, it throws an error when using a symlink
+    bp_exec = check_output(['readlink', bp_link])[:-1]
 
+    # Construct the required python path of the blenderplayer executable
+    gridbots_dir = os.path.dirname(os.path.dirname(os.path.realpath(gridbots.__file__)))
+    site_packages_dir = '/home/hayk/.virtualenvs/gridbots3/lib/python3.4/site-packages/'
+    os.environ['PYTHONPATH'] = "{}:{}".format(gridbots_dir, site_packages_dir)
 
-def set_renderer(r):
-    global renderer
-    renderer = r
-
-
-def get_renderer():
-    return renderer
-
-
-def start_rendering():
-
-    from gridbots.renderers.blender import BlenderDrawer
-    
-    if len(sys.argv) >= 9:
-        paths_name = sys.argv[8]
-    else:
-        paths_name = 'paths_two_cross'
-
-    renderer = BlenderDrawer(paths_name=paths_name)
-    set_renderer(renderer)
-
-
-def render_frame():
-    
-    renderer.update()
+    # Execute blenderplayer
+    call([bp_exec, "-m", "2", "-w", "800", "600", "gridbots.blend", "-", paths_name], env=os.environ)

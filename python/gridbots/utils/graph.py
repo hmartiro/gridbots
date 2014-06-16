@@ -4,7 +4,7 @@
 
 import yaml
 import random
-
+import networkx as nx
 
 def read_graph(filename):
     """

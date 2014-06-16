@@ -1,3 +1,5 @@
+from . import blender
+
 import logging
 
 # Set up logging
