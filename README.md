@@ -1,23 +1,32 @@
 gridbots
 ========
 
-Gridbots is a simulation and path-planning platform for the microbot construction project being developed at SRI:
+Gridbots is a simulation and path-planning platform for the microbot construction project being developed at SRI International. They are pioneering a system of ant-sized robots that move at incredible speeds, swarm over surfaces, and use tools to construct macro-scale structures. This unique technology has potential to improve the manufacturing of everything from small biomedical devices to airplane wings.
 
 http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/
+https://www.youtube.com/watch?v=uL6e3co4Qqc
+http://techxplore.com/news/2014-04-sri-microrobots-fast-building-factory-approach.html
+
+The Gridbots project aims to build a set of algorithms that coordinate thousands of micro robots towards a unified goal. It tackles the problems of path-planning, obstacle avoidance, data modeling, task allocation, and makespan optimization.
 
 ### Goals
 * Understand and optimize the process of constructing structures with microbots.
 * Visualize the process real-time in 2D and 3D.
-* Given a desired structure and grid, output the necessary microbots and control trajectories to build it.
+* Given a starting condition and goal structure, generate the output trajectories to build it.
 
 ### Definitions
-*Gridbots* - The name of the simulation platform  
+*Gridbots* - The name of this simulation platform 
 *Bot* - A single microbot consisting of a base, magnets, and end-effectors  
-*Map* - A set of vertices and edges that define a graph corresponding to the nodes the microbots can travel between
-*Simulation* - A definition of simulation criteria, including a map, bots, waypoints, and a goal
-*Structure* - A set of vertices and edges that define a graph corresponding to the desired truss structure to be built
-*Path* - An output trajectory for a bot during a simulation
-*Renderer* - An entity that takes the Map and Path for a certain simulation and visualizes the data in some way
+*Node* - A single location in space that a bot can occupy
+*Edge* - A pathway that a bot can traverse between Nodes
+*Map* - Navigable space of the bots, defined by a set of Nodes and Edges between them
+*Structure* - The desired output structure (ex: a carbon fiber truss)
+*Job* - The procedure of building a single component of the final structure
+*Operation* - A single concrete step out of multiple that make up a Job (ex: applying glue)
+*Station* - A Node at which an Operation can be completed (ex: a glue station)
+*Simulation* - A specification of a Map, Bots, Stations, and Structure that define a simulation scenario
+*Path* - Output of a Simulation, a set of trajectories for each bot that build the Structure
+*Renderer* - An entity that takes the Paths for a certain Simulation and visualizes the data
 
 ### Algorithms and Data Structures
 The core of this problem is representing the space in which the bots can move, the goals that they need to collectively accomplish, and the path-planning and coordination required to achieve those goals. Efficiency is critical to exploring the scalability of the system.

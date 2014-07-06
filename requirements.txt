@@ -1,5 +1,3 @@
 pyaml
 networkx
 matplotlib
-
-
