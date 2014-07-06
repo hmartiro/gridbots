@@ -3,16 +3,18 @@ gridbots
 
 Gridbots is a simulation and path-planning platform for the microbot construction project being developed at SRI International. They are pioneering a system of ant-sized robots that move at incredible speeds, swarm over surfaces, and use tools to construct macro-scale structures. This unique technology has potential to improve the manufacturing of everything from small biomedical devices to airplane wings.
 
-http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/
-https://www.youtube.com/watch?v=uL6e3co4Qqc
-http://techxplore.com/news/2014-04-sri-microrobots-fast-building-factory-approach.html
+* [New York Times](http://bits.blogs.nytimes.com/2014/04/19/a-swarm-of-tiny-ant-sized-robots-at-your-service/?_php=true&_type=blogs&_r=0)
+* [Engadget](http://www.engadget.com/2014/04/17/sri-microbots/)
+* [Wired](http://www.wired.co.uk/news/archive/2014-04/16/magnetic-microrobot-swarms)
+* [Scientific American](http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/)
+* [IEEE Spectrum](http://spectrum.ieee.org/automaton/robotics/industrial-robots/watch-sris-nimble-microrobots-cooperate-to-build-structures)
 
 The Gridbots project aims to build a set of algorithms that coordinate thousands of micro robots towards a unified goal. It tackles the problems of path-planning, obstacle avoidance, data modeling, task allocation, and makespan optimization.
 
 ### Goals
 * Understand and optimize the process of constructing structures with microbots.
 * Visualize the process real-time in 2D and 3D.
-* Given a starting condition and goal structure, generate the output trajectories to build it.
+* Given available tools and goal structure, generate the output trajectories to build it.
 
 ### Definitions
 *Gridbots* - The name of this simulation platform 
