@@ -29,4 +29,4 @@ for inx, v in enumerate(layout):
 for e in g.es:
     out['edges'].append([e.source, e.target])
 
-print yaml.dump(out)
+print(yaml.dump(out))

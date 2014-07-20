@@ -14,8 +14,8 @@ def parse_jobs(jobs_data, job_types):
 
         job = Job(
             operations=job_type['operations'],
-            platform_z=j_data['platform'],
-            bot_type=job_type['bot_type']
+            bot_type=job_type['bot_type'],
+            edge=None  # TODO
         )
         job_queue.append(job)
 

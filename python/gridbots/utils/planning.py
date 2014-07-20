@@ -5,13 +5,19 @@
 
 import logging
 
-from gridbots.core.job import Job, Operation, Station
+from gridbots.core.job import Job
 from gridbots.utils.graph import find_shortest_path
 
 LINEAR_SPEED = 1.0
 
 
 def plan_paths(frame, graph, bots, stations, structure):
+
+    """
+    Main path planning procedure. Takes information about the state of the simulation
+    and allocates Jobs and Operations to Bots.
+
+    """
 
     logging.info('------ TASK PLANNING ------')
 
@@ -111,6 +117,7 @@ def plan_paths(frame, graph, bots, stations, structure):
 
 
 def create_job_queue(structure, job_types):
+
     """
     Given a goal structure return a queue of jobs that
     will build the structure.

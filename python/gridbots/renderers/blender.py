@@ -2,11 +2,13 @@
 
 """
 
+import os
 import sys
 import math
 import yaml
 import mathutils as mu
 
+import gridbots
 from gridbots.utils.graph import read_graph_data
 
 import bge
@@ -20,15 +22,22 @@ FRAMERATE = 10
 
 class BlenderDrawer():
 
+    """
+    Three-dimensional renderer class for gridbots simulations. Takes in a paths file and
+    uses the Blender Game Engine to show a realistic 3D simulation.
+
+    """
+
     def __init__(self, paths_name, framerate=FRAMERATE):
 
         # Read the paths file
-        paths_file ='paths/{}.yml'.format(paths_name)
+        paths_file = os.path.join(gridbots.path, 'paths', '{}.yml'.format(paths_name))
         with open(paths_file) as pf:
             paths_data = yaml.load(pf.read())
 
         # Get map data
-        self.vertices, self.edges = read_graph_data("maps/{}.yml".format(paths_data["map_name"]))
+        map_file = os.path.join(gridbots.path, 'maps', '{}.yml'.format(paths_data["map_name"]))
+        self.vertices, self.edges = read_graph_data(map_file)
 
         # Convert vertex data to 3D mathutils.Vectors
         for v_name, v in self.vertices.items():
@@ -154,12 +163,21 @@ class BlenderDrawer():
             self.substep = 0
             self.frame += 1
 
+
 # --------------------------------------------------
 
+
+# Must use a global variable here because of the way Blender
+# makes calls to these functions.
 renderer = None
 
 
 def start_rendering():
+
+    """
+    Called by Blender once to create and initialize the renderer.
+
+    """
 
     global renderer
 
@@ -172,5 +190,11 @@ def start_rendering():
 
 
 def render_frame():
+
+    """
+    Called each frame of the Blender Game Engine. This call updates all
+    objects before Blender renders the frame.
+
+    """
 
     renderer.update()

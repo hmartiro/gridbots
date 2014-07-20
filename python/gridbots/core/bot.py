@@ -9,14 +9,19 @@ import logging
 
 
 class Bot:
+
     """
     Micro robot that has a position in the map and an orientation.
 
     """
 
     class State():
-        """ State definitions of the bot state machine.
+
         """
+        State definitions of the bot state machine.
+
+        """
+
         # Physical states
         at_home = 1
         on_track = 2
@@ -330,11 +335,14 @@ class Bot:
         while not self.turn_over:
             self.state = self.state_machine[self.state]()
 
+        # Log state information
         if self.has_goal():
-            logging.info('At {}, moving to goal ({}) with planned moves {}'.format(self.pos, self.goal, self.moves))
+            logging.info('At {}, moving to goal ({}) with planned moves {}'.format(
+                self.pos, self.goal, self.moves))
         elif self.at_goal():
             logging.info('At goal ({})'.format(self.pos))
         elif not self.at_home():
-            logging.info('At {}, moving to home ({}) with planned moves {}'.format(self.pos, self.home_pos, self.moves))
+            logging.info('At {}, moving to home ({}) with planned moves {}'.format(
+                self.pos, self.home_pos, self.moves))
         else:
             logging.info('At home ({})'.format(self.pos))

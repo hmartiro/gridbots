@@ -6,12 +6,18 @@ import os
 import yaml
 import logging
 
+import gridbots
 from gridbots import utils
 from gridbots.core.job import Structure
 
 
 class Simulation:
-    """ The overall simulation class. """
+
+    """
+    Top-level simulation class. Takes a simulation file as input and outputs a paths
+    file specifying the trajectories of all bots and resources.
+
+    """
 
     # Simulation states
     STATUS = {
@@ -25,9 +31,10 @@ class Simulation:
 
     def __init__(self, sim_name):
 
+        sim_path = os.path.join(gridbots.path, 'simulations', '{}.yml'.format(sim_name))
+
         # Read the simulation file
-        sim_file = 'simulations/{}.yml'.format(sim_name)
-        with open(sim_file) as sf:
+        with open(sim_path) as sf:
             self.sim_data = yaml.load(sf.read())
 
         # Get names
@@ -36,10 +43,13 @@ class Simulation:
         self.map_name = self.sim_data["map"]
 
         # Parse the map file
-        self.map = utils.graph.read_graph("maps/{}.yml".format(self.map_name))
+        map_path = os.path.join(gridbots.path, 'maps', '{}.yml'.format(self.map_name))
+        self.map = utils.graph.read_graph(map_path)
 
         # Parse the structure file
-        structure_graph = utils.graph.read_graph("structures/{}.yml".format(self.structure_name))
+        structure_path = os.path.join(gridbots.path, 'structures',
+                                      '{}.yml'.format(self.structure_name))
+        structure_graph = utils.graph.read_graph(structure_path)
         self.structure = Structure(structure_graph)
 
         # Iterate through the waypoints and create Stations
@@ -196,7 +206,8 @@ class Simulation:
 
         # Create and write to the paths file
         paths_name = "paths_{}".format(self.sim_name)
-        with open("paths/{}.yml".format(paths_name), 'w') as t_file:
+        paths_path = os.path.join(gridbots.path, 'paths', '{}.yml'.format(paths_name))
+        with open(paths_path, 'w') as t_file:
             t_file.write(yaml.dump(output))
 
         return paths_name

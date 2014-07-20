@@ -2,6 +2,8 @@
 
 """
 
+# TODO make this work again or find a better (faster) 2D renderer
+
 import sys
 import math
 import yaml

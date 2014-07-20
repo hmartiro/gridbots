@@ -2,8 +2,6 @@
 
 """
 
-import logging
-
 
 class Structure:
 

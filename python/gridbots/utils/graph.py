@@ -6,7 +6,9 @@ import yaml
 import random
 import networkx as nx
 
+
 def read_graph(filename):
+
     """
     Takes a filename and returns a Graph 
     representing the contents of that file.
@@ -16,7 +18,6 @@ def read_graph(filename):
     # Extract data from the map file
     vertices, edges = read_graph_data(filename)
 
-    import networkx as nx
     # Create a Graph object
     graph = nx.Graph()
 
@@ -32,6 +33,7 @@ def read_graph(filename):
 
 
 def read_graph_data(filename):
+
     """
     Takes a filename and returns the edge
     and vertex data of the file.
@@ -46,6 +48,25 @@ def read_graph_data(filename):
     edges = data['edges']
 
     return vertices, edges
+
+
+def find_shortest_path(graph, src, dest):
+    """
+    Given a graph, a source node, and a destination node,
+    return an optimal path to the destination. If no path exists,
+    returns None.
+
+    """
+
+    # Get all the shortest paths
+    try:
+        all_paths = list(nx.all_shortest_paths(graph, src, dest))
+    except nx.NetworkXNoPath:
+        return None
+
+    # Choose one at random
+    random_index = random.randint(0, len(all_paths) - 1)
+    return all_paths[random_index]
 
 
 # def get_bounding_box(graph):
@@ -73,22 +94,3 @@ def read_graph_data(filename):
 #             min_y = y
 #
 #     return [min_x, max_x, min_y, max_y]
-
-
-def find_shortest_path(graph, src, dest):
-    """
-    Given a graph, a source node, and a destination node,
-    return an optimal path to the destination. If no path exists,
-    returns None.
-
-    """
-    import networkx as nx
-    # Get all the shortest paths
-    try:
-        all_paths = list(nx.all_shortest_paths(graph, src, dest))
-    except nx.NetworkXNoPath:
-        return None
-
-    # Choose one at random
-    random_index = random.randint(0, len(all_paths) - 1)
-    return all_paths[random_index]
