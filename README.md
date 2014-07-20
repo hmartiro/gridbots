@@ -13,9 +13,9 @@ devices to airplane wings.
 * [Scientific American](http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/)
 * [IEEE Spectrum](http://spectrum.ieee.org/automaton/robotics/industrial-robots/watch-sris-nimble-microrobots-cooperate-to-build-structures)
 
-The Gridbots project aims to build a set of algorithms and strategies that coordinate thousands 
-of micro robots towards a unified goal. It tackles the problems of path-planning, obstacle 
-avoidance, data modeling, task allocation, and makespan optimization. 
+The Gridbots project aims to build a set of algorithms and strategies that coordinate thousands
+of micro robots towards a unified goal. It tackles the problems of path-planning, obstacle
+avoidance, data modeling, task allocation, and makespan optimization.
 
 ### Goals
 * Understand and optimize the process of constructing structures with microbots.
@@ -23,29 +23,29 @@ avoidance, data modeling, task allocation, and makespan optimization.
 * Given available tools and a goal structure, generate an instruction set to build it.
 
 ### Definitions
-*Gridbots* - The name of this simulation platform 
-*Bot* - A single micro robot consisting of a base, magnets, and end-effectors  
-*Node* - A single location in space that a bot can occupy
-*Edge* - A pathway that a bot can traverse between Nodes
-*Map* - Navigable space of the bots, defined by a set of Nodes and Edges between them
-*Structure* - The desired output structure (ex: a carbon fiber truss)
-*Job* - The procedure of building a single component of the final structure
-*Operation* - A single concrete step out of multiple that make up a Job (ex: applying glue)
-*Station* - A Node at which an Operation can be completed (ex: a glue station)
-*Simulation* - A specification of a Map, Bots, Stations, and Structure that define a simulation scenario
-*Path* - Output of a Simulation, a set of trajectories for each bot that build the Structure
-*Renderer* - An entity that takes the Paths for a certain Simulation and visualizes the process
+- *Gridbots* - The name of this simulation platform
+- *Bot* - A single micro robot consisting of a base, magnets, and end-effectors
+- *Node* - A single location in space that a bot can occupy
+- *Edge* - A pathway that a bot can traverse between Nodes
+- *Map* - Navigable space of the bots, defined by a set of Nodes and Edges between them
+- *Structure* - The desired output structure (ex: a carbon fiber truss)
+- *Job* - The procedure of building a single component of the final structure
+- *Operation* - A single concrete step out of multiple that make up a Job (ex: applying glue)
+- *Station* - A Node at which an Operation can be completed (ex: a glue station)
+- *Simulation* - A specification of a Map, Bots, Stations, and Structure that define a simulation scenario
+- *Path* - Output of a Simulation, a set of trajectories for each bot that build the Structure
+- *Renderer* - An entity that takes the Paths for a certain Simulation and visualizes the process
 
 ### Algorithms and Data Structures
-The core of this problem is representing the space in which the bots can move, the goals that they 
-need to collectively accomplish, and the path-planning and coordination required to achieve those 
+The core of this problem is representing the space in which the bots can move, the goals that they
+need to collectively accomplish, and the path-planning and coordination required to achieve those
 goals. Computational efficiency is critical to exploring the scalability of the system.
 
-Due to the unique nature of the actuation system, the map consists of a set of discrete coordinates 
-that microbots can occupy and a set of transition paths between coordinates. Thus, it makes sense 
-not to approach path-planning using XY coordinates, but instead represent the map as a graph data 
-structure where bots occupy nodes and move along edges. The graph is currently unweighted (assuming 
-all transitions take equal time), and undirected (all paths are bidirectional), but it is easy to 
+Due to the unique nature of the actuation system, the map consists of a set of discrete coordinates
+that microbots can occupy and a set of transition paths between coordinates. Thus, it makes sense
+not to approach path-planning using XY coordinates, but instead represent the map as a graph data
+structure where bots occupy nodes and move along edges. The graph is currently unweighted (assuming
+all transitions take equal time), and undirected (all paths are bidirectional), but it is easy to
 weight by XY distance and use directed edges.
 
 The location of each bot and meaningful point on the map can be represented with node IDs. Nodes 
