@@ -13,7 +13,7 @@ devices to airplane wings.
 * [Scientific American](http://www.scientificamerican.com/article/sri-magnetic-microbot-construction/)
 * [IEEE Spectrum](http://spectrum.ieee.org/automaton/robotics/industrial-robots/watch-sris-nimble-microrobots-cooperate-to-build-structures)
 
-The Gridbots project aims to build a set of algorithms for this platform that coordinate thousands 
+The Gridbots project aims to build a set of algorithms and strategies that coordinate thousands 
 of micro robots towards a unified goal. It tackles the problems of path-planning, obstacle 
 avoidance, data modeling, task allocation, and makespan optimization. 
 
