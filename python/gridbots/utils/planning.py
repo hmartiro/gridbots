@@ -29,7 +29,7 @@ def plan_paths(frame, graph, bots, stations, structure):
 
         # Check to see if the bot is finished
         if op.started:
-            if job.bot and job.bot.at_goal():
+            if job.bot and (job.bot.at_goal() or not job.bot.has_goal()):
                 job.finish_op()
 
         # If the op is in progress, move on
@@ -147,7 +147,8 @@ def create_job_queue(structure, job_types):
 
         # Get the edge coordinates
         c_src, c_dest = coords_from_edge(e)
-        print(c_src, c_dest)
+        logging.error('Check edge from {} -> {}'.format(c_src, c_dest))
+
         # Find the type of rod
         if c_src[0] == c_dest[0] and c_src[1] == c_dest[1]:
             job_name = 'rod_z'
