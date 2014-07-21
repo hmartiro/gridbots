@@ -18,6 +18,9 @@ class Structure:
 
         self.completion_times = []
 
+        # History of structure locations
+        self.move_history = []
+
 
 class Station:
 

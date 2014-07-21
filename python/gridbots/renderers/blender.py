@@ -54,6 +54,8 @@ class BlenderDrawer():
 
         self.structure = paths_data["structure"]
 
+        self.structure_pos = paths_data['structure_move_history']
+
         # Get map dimensions
         #self.bounding_box = get_bounding_box(self.graph)
         #self.minX = self.bounding_box[0]
@@ -149,7 +151,11 @@ class BlenderDrawer():
                     v1 = mu.Vector(edge[0])
                     v2 = mu.Vector(edge[1])
                     midpoint = v1.lerp(v2, 0.5)
-                    self.b_structure[edge].position = midpoint + mu.Vector((0, 0, 2))
+                    self.b_structure[edge].position = midpoint
+
+                    # TODO interpolate frames like for bots
+                    base_pos = mu.Vector(self.structure_pos[self.frame])
+                    self.b_structure[edge].position = self.b_structure[edge].position + base_pos
 
                     unit = mu.Vector((1, 0, 0))
                     quat = unit.rotation_difference(v2-v1)

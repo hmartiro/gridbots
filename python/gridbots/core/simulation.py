@@ -151,17 +151,25 @@ class Simulation:
 
         self.plan_tasks()
 
+        # Run state machine for each bot
         for bot in self.bots:
-
-            # Move a step if it has one
             bot.update()
 
+        # Update structure location
+        try:
+            structure_station = self.stations['attach_rod'][0]
+            coords = self.map.node[structure_station.pos]['coords']
+        except KeyError:
+            coords = [0, 0]
+        self.structure.move_history.append([coords[0], coords[1], 0])
+
+        # Print wait times for each station
         for station_type in self.stations:
             for station in self.stations[station_type]:
                 station.wait_time -= self.TIME_PER_FRAME
                 if station.wait_time < 0:
                     station.wait_time = 0.0
-                print('{}, wait time {}'.format(station, station.wait_time))
+                logging.debug('{}, wait time {}'.format(station, station.wait_time))
 
     def run(self):
 
@@ -187,6 +195,16 @@ class Simulation:
 
             if self.interactive:
                 input('Enter to continue: ')
+
+        # Update structure location
+        # TODO this is a copy of update function
+        try:
+            structure_station = self.stations['attach_rod'][0]
+            coords = self.map.node[structure_station.pos]['coords']
+        except KeyError:
+            coords = [0, 0]
+        self.structure.move_history.append([coords[0], coords[1], 0])
+
         # Add the last frame to the move history
         for bot in self.bots:
             bot.move_history.append(bot.pos)
@@ -223,6 +241,8 @@ class Simulation:
 
         output["stations"] = self.stations
         output["structure"] = self.structure.completion_times
+
+        output['structure_move_history'] = self.structure.move_history
 
         output["bots"] = {}
         for bot in self.bots:
