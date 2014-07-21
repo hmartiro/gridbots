@@ -9,7 +9,7 @@
 #
 # Expecting a YAML file (.yml) in gridbots/maps
 # ---------------------------------------------------------
-map: "grid_5"
+map: "dave_demo_map"
 
 
 # Name of the file that defines the target truss structure
@@ -17,7 +17,7 @@ map: "grid_5"
 #
 # Expecting a YAML file (.yml) in gridbots/structures
 # ---------------------------------------------------------
-structure: "x_y_lines"
+structure: "box_1_1_2"
 
 
 # Classification of bot types, by name
@@ -37,6 +37,10 @@ bot_types:
     speed: 1.0
     radius: 0.05
 
+  builder_z:
+    speed: 1.0
+    radius: 0.05
+
 
 # Classification of required job types, by name
 # ---------------------------------------------------------
@@ -48,12 +52,16 @@ bot_types:
 job_types:
 
   rod_x:
-    operations: [grab_rod_x, attach_rod_x]
+    operations: [grab_rod_x, grab_glue_x, attach_rod]
     bot_type: builder_x
 
   rod_y:
-    operations: [grab_rod_y,  attach_rod_y]
+    operations: [grab_rod_y, grab_glue_y, attach_rod]
     bot_type: builder_y
+
+  rod_z:
+    operations: [grab_rod_z, grab_glue_z, attach_rod]
+    bot_type: builder_z
 
 
 # Definition of bots in this map, by name
@@ -69,15 +77,51 @@ bots:
     position: 2
     type: builder_x
   y1:
-    position: 10
+    position: 4
     type: builder_y
+  z1:
+    position: 6
+    type: builder_z
 
-  x2:
-    position: 23
-    type: builder_x
-  y2:
-    position: 19
-    type: builder_y
+#  x2:
+#    position: 22
+#    type: builder_x
+#  y2:
+#    position: 24
+#    type: builder_y
+#  z2:
+#    position: 26
+#    type: builder_z
+#
+#  x3:
+#    position: 12
+#    type: builder_x
+#  y3:
+#    position: 14
+#    type: builder_y
+#  z3:
+#    position: 16
+#    type: builder_z
+
+#  x4:
+#    position: 32
+#    type: builder_x
+#  y4:
+#    position: 34
+#    type: builder_y
+#  z4:
+#    position: 36
+#    type: builder_z
+#
+#  x5:
+#    position: 42
+#    type: builder_x
+#  y5:
+#    position: 44
+#    type: builder_y
+#  z5:
+#    position: 46
+#    type: builder_z
 
 
 # Definition of stations in this map, by type
@@ -90,17 +134,29 @@ bots:
 
 stations:
   grab_rod_x:
-    - position: 2
+    - position: grab_rod_1
       time: 2.0
 
   grab_rod_y:
-    - position: 10
+    - position: grab_rod_3
       time: 2.0
 
-  attach_rod_x:
-    - position: 22
+  grab_rod_z:
+    - position: grab_rod_2
       time: 2.0
 
-  attach_rod_y:
-    - position: 14
+  grab_glue_x:
+    - position: 94
+      time: 2.0
+
+  grab_glue_y:
+    - position: 85
+      time: 2.0
+
+  grab_glue_z:
+    - position: 96
+      time: 2.0
+
+  attach_rod:
+    - position: attach_rod_1
       time: 2.0
