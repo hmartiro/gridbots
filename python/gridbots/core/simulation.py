@@ -31,6 +31,12 @@ class Simulation:
 
     def __init__(self, sim_name, interactive=False):
 
+        """
+        Read in all simulation data from the given file and linked files. This includes
+        the map graph, the target structure graph, bots, stations, and job types.
+
+        """
+
         sim_path = os.path.join(gridbots.path, 'simulations', '{}.yml'.format(sim_name))
 
         # Read the simulation file
@@ -112,6 +118,12 @@ class Simulation:
         self.interactive = interactive
 
     def __str__(self):
+
+        """
+        String representation of the simulation object.
+
+        """
+
         return '[Simulation] Bots: {}'.format(len(self.bots))
 
     def plan_tasks(self):
@@ -126,6 +138,11 @@ class Simulation:
         )
 
     def update(self):
+
+        """
+        Process one frame for all bots, including path planning and motion.
+
+        """
 
         self.frame += 1
         self.time += self.TIME_PER_FRAME
@@ -147,6 +164,11 @@ class Simulation:
                 print('{}, wait time {}'.format(station, station.wait_time))
 
     def run(self):
+
+        """
+        Main loop, update until all jobs are complete.
+
+        """
 
         self.running = True
 
@@ -173,6 +195,12 @@ class Simulation:
         return paths_name
 
     def output(self):
+
+        """
+        Write the results of the simulation, along with the trajectories of all
+        bots and resources, to a paths file.
+
+        """
 
         logging.info('')
         logging.info('===============================')
