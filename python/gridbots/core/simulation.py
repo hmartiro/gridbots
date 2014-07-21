@@ -29,7 +29,7 @@ class Simulation:
     # Physical time passed per frame (seconds)
     TIME_PER_FRAME = 0.1
 
-    def __init__(self, sim_name):
+    def __init__(self, sim_name, interactive=False):
 
         sim_path = os.path.join(gridbots.path, 'simulations', '{}.yml'.format(sim_name))
 
@@ -109,6 +109,8 @@ class Simulation:
 
         self.running = False
 
+        self.interactive = interactive
+
     def __str__(self):
         return '[Simulation] Bots: {}'.format(len(self.bots))
 
@@ -161,6 +163,8 @@ class Simulation:
             #if self.frame == 1000:
             #    break
 
+            if self.interactive:
+                input('Enter to continue: ')
         # Add the last frame to the move history
         for bot in self.bots:
             bot.move_history.append(bot.pos)

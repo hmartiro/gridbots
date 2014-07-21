@@ -32,7 +32,10 @@ if __name__ == '__main__':
         print('Usage: python -m gridbots.run [sim_name]')
         sys.exit(1)
 
-    sim = Simulation(sim_name)
+    # If enabled, waits for a return to be pressed for each frame
+    interactive = '-i' in sys.argv
+
+    sim = Simulation(sim_name, interactive=interactive)
     paths_name = sim.run()
 
     # Get blenderplayer symbolic link (usually "/usr/local/bin/blenderplayer")
