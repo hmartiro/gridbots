@@ -73,12 +73,12 @@ Install Python packages. Note, this may take a long time if numpy has to be comp
 
 Run:
 
-    cd python/gridbots
+    cd gridbots
     ./run.py [sim_name]
 
 This will run the simulation in the given file and open a window to play back the results.
 
-**Note:** I recommend adding `/path/to/gridbots/python` to your
+**Note:** I recommend adding `/path/to/gridbots/` to your
 PYTHONPATH environment variable. Then, you can run gridbots from any directory:
 
     python -m gridbots.run [sim_name]

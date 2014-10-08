@@ -4,6 +4,8 @@
 
 import sys
 import yaml
+
+# TODO networkx
 from igraph import Graph, plot
 
 if len(sys.argv) != 3:

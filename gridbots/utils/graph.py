@@ -54,7 +54,8 @@ def find_shortest_path(graph, src, dest):
     """
     Given a graph, a source node, and a destination node,
     return an optimal path to the destination. If no path exists,
-    returns None.
+    returns None. If there are multiple, chooses randomly between
+    them.
 
     """
 

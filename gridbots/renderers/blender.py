@@ -31,12 +31,12 @@ class BlenderDrawer():
     def __init__(self, paths_name, framerate=FRAMERATE):
 
         # Read the paths file
-        paths_file = os.path.join(gridbots.path, 'paths', '{}.yml'.format(paths_name))
+        paths_file = os.path.join(gridbots.path, 'spec', 'paths', '{}.yml'.format(paths_name))
         with open(paths_file) as pf:
             paths_data = yaml.load(pf.read())
 
         # Get map data
-        map_file = os.path.join(gridbots.path, 'maps', '{}.yml'.format(paths_data["map_name"]))
+        map_file = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(paths_data["map_name"]))
         self.vertices, self.edges = read_graph_data(map_file)
 
         # Convert vertex data to 3D mathutils.Vectors

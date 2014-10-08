@@ -35,6 +35,8 @@ class Bot:
 
     def __init__(self, name, position, bot_type, sim):
 
+        self.logger = logging.getLogger(__name__)
+
         # Bot name
         self.name = str(name)
 
@@ -138,13 +140,13 @@ class Bot:
 
         self.last_pos = self.pos
         self.pos = self.moves.pop(0)
-        logging.debug('Moving from {} to {}'.format(self.last_pos, self.pos))
+        self.logger.debug('Moving from {} to {}'.format(self.last_pos, self.pos))
 
     def wait(self):
         """ Do nothing for this turn.
         """
         self.turn_over = True
-        logging.info('Waiting for this turn'.format(self.name))
+        self.logger.info('Waiting for this turn'.format(self.name))
 
     def permanent_obstacles(self):
         """ Return a list of bots who are waiting at their home positions.
@@ -177,7 +179,7 @@ class Bot:
 
     def state_at_home(self):
 
-        logging.debug("State: at_home")
+        self.logger.debug("State: at_home")
 
         if self.has_goal():
             return Bot.State.calculating_path
@@ -187,7 +189,7 @@ class Bot:
 
     def state_calculating_path(self):
 
-        logging.debug("State: calculating_path")
+        self.logger.debug("State: calculating_path")
 
         # Reset the graph
         self.graph = self.sim.map.copy()
@@ -213,7 +215,7 @@ class Bot:
 
         # If the destination is an obstacle, no path found
         else:
-            logging.debug('Destination node is currently an obstacle!')
+            self.logger.debug('Destination node is currently an obstacle!')
             path = None
 
         # If there is a path, we're good to go
@@ -238,7 +240,7 @@ class Bot:
 
     def state_checking_nodes(self):
 
-        logging.debug("State: checking_nodes")
+        self.logger.debug("State: checking_nodes")
 
         # If I am able to move in some direction
         if self.free_neighbors(self.pos):
@@ -250,7 +252,7 @@ class Bot:
 
     def state_on_track(self):
 
-        logging.debug("State: on_track")
+        self.logger.debug("State: on_track")
 
         # If the next node is free, go to it
         if self.is_node_free(self.next_move()):
@@ -275,7 +277,7 @@ class Bot:
 
     def state_finished(self):
 
-        logging.debug("State: finished")
+        self.logger.debug("State: finished")
 
         # If I made it home
         if self.at_home():
@@ -287,7 +289,7 @@ class Bot:
 
     def state_traffic_jam(self):
 
-        logging.debug("State: traffic_jam")
+        self.logger.debug("State: traffic_jam")
 
         # Get a list of the free neighboring nodes
         free_neighbors = self.free_neighbors(self.pos)
@@ -307,7 +309,7 @@ class Bot:
 
     def state_stuck(self):
 
-        logging.debug("State: stuck")
+        self.logger.debug("State: stuck")
         print('neighbors: {}'.format(self.free_neighbors(self.pos)))
         # If I have any moves, recalculate path
         # if self.free_neighbors(self.pos):
@@ -325,7 +327,7 @@ class Bot:
         """
 
         # Logging header
-        logging.info('################### Bot {}'.format(self.name, self.pos))
+        self.logger.info('################### Bot {}'.format(self.name, self.pos))
 
         # Record my current position
         self.move_history.append(self.pos)
@@ -337,12 +339,12 @@ class Bot:
 
         # Log state information
         if self.has_goal():
-            logging.info('At {}, moving to goal ({}) with planned moves {}'.format(
+            self.logger.info('At {}, moving to goal ({}) with planned moves {}'.format(
                 self.pos, self.goal, self.moves))
         elif self.at_goal():
-            logging.info('At goal ({})'.format(self.pos))
+            self.logger.info('At goal ({})'.format(self.pos))
         elif not self.at_home():
-            logging.info('At {}, moving to home ({}) with planned moves {}'.format(
+            self.logger.info('At {}, moving to home ({}) with planned moves {}'.format(
                 self.pos, self.home_pos, self.moves))
         else:
-            logging.info('At home ({})'.format(self.pos))
+            self.logger.info('At home ({})'.format(self.pos))

@@ -37,7 +37,7 @@ class Simulation:
 
         """
 
-        sim_path = os.path.join(gridbots.path, 'simulations', '{}.yml'.format(sim_name))
+        sim_path = os.path.join(gridbots.path, 'spec', 'simulations', '{}.yml'.format(sim_name))
 
         # Read the simulation file
         with open(sim_path) as sf:
@@ -49,11 +49,11 @@ class Simulation:
         self.map_name = self.sim_data["map"]
 
         # Parse the map file
-        map_path = os.path.join(gridbots.path, 'maps', '{}.yml'.format(self.map_name))
+        map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(self.map_name))
         self.map = utils.graph.read_graph(map_path)
 
         # Parse the structure file
-        structure_path = os.path.join(gridbots.path, 'structures',
+        structure_path = os.path.join(gridbots.path, 'spec', 'structures',
                                       '{}.yml'.format(self.structure_name))
         structure_graph = utils.graph.read_graph(structure_path)
         self.structure = Structure(structure_graph)
@@ -252,13 +252,13 @@ class Simulation:
             output["bots"][bot.name]['move_history'].append(bot.move_history[-1])
 
         # Create the paths directory if needed
-        paths_dir = "paths"
+        paths_dir = "spec/paths"
         if not os.path.exists(paths_dir):
             os.makedirs(paths_dir)
 
         # Create and write to the paths file
         paths_name = "paths_{}".format(self.sim_name)
-        paths_path = os.path.join(gridbots.path, 'paths', '{}.yml'.format(paths_name))
+        paths_path = os.path.join(gridbots.path, 'spec', 'paths', '{}.yml'.format(paths_name))
         with open(paths_path, 'w') as t_file:
             t_file.write(yaml.dump(output))
 
