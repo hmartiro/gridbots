@@ -134,11 +134,11 @@ def create_job_queue(structure, job_types):
     # Create a list of the edges in the structure
     edges = list(structure.g.edges())
 
-    # Sort edges by min Z coordinate, ascending
-    edges.sort(key=lambda x: min([v[2] for v in coords_from_edge(x)]))
+    # Sort edges by min X coordinate, ascending
+    edges.sort(key=lambda x: min([-v[0] for v in coords_from_edge(x)]))
 
-    # Sort edges by max Z coordinate, ascending
-    edges.sort(key=lambda x: max([v[2] for v in coords_from_edge(x)]))
+    # Sort edges by max X coordinate, ascending
+    edges.sort(key=lambda x: max([-v[0] for v in coords_from_edge(x)]))
 
     # Iterate through the edges
     for e in edges:

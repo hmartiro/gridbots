@@ -69,6 +69,17 @@ class BlenderDrawer():
         self.C = bge.logic.getCurrentController()
         self.S = bge.logic.getCurrentScene()
 
+        # Camera object
+        self.camera = self.S.objects['Camera']
+
+        # Mouse information
+        self.mouse = self.S.objects['Navigator'].controllers['Mouse'].sensors['Mouse']
+        self.keyboard = self.S.objects['Navigator'].controllers['Keyboard'].sensors['Keyboard']
+        self.mouse_x = 0.0
+        self.mouse_y = 0.0
+        self.mouse_left = False
+        self.mouse_right = False
+
         # Set framerate settings
         bge.logic.setMaxPhysicsFrame(1)
         bge.logic.setMaxLogicFrame(1)
@@ -110,6 +121,10 @@ class BlenderDrawer():
             quat = unit.rotation_difference(v2-v1)
             b_edge.applyRotation(quat.to_euler('XYZ'))
 
+            # Set scale
+            dist = (v2-v1).magnitude
+            b_edge.localScale = [dist, 1, 1]
+
         self.b_stations = []
         for station_type in self.stations:
 
@@ -123,6 +138,8 @@ class BlenderDrawer():
         self.b_structure = {}
 
     def update(self):
+
+        self.handle_camera()
 
         if self.frame > self.frames - 1:
             return
@@ -146,7 +163,7 @@ class BlenderDrawer():
 
                 if edge not in self.b_structure.keys():
 
-                    self.b_structure[edge] = self.S.addObject('Edge', self.C.owner)
+                    self.b_structure[edge] = self.S.addObject('edge_structure', self.C.owner)
 
                     v1 = mu.Vector(edge[0])
                     v2 = mu.Vector(edge[1])
@@ -162,6 +179,10 @@ class BlenderDrawer():
 
                     self.b_structure[edge].applyRotation(quat.to_euler('XYZ'))
 
+                    # Set scale
+                    dist = (v2-v1).magnitude
+                    self.b_structure[edge].localScale = [dist, 1, 1]
+
         self.substep += 1
 
         if self.substep == self.substeps:
@@ -169,6 +190,47 @@ class BlenderDrawer():
             self.substep = 0
             self.frame += 1
 
+    def handle_camera(self):
+
+        # Get current window dimensions (pixel)
+        width = bge.render.getWindowWidth()
+        height = bge.render.getWindowHeight()
+
+        # Scale mouse position to [0, 1] in x and y
+        x = self.mouse.position[0] / width
+        y = 1 - self.mouse.position[1] / height
+
+        # Mouse button presses
+        left_pressed = self.mouse.getButtonStatus(bge.events.LEFTMOUSE) > 0
+        right_pressed = self.mouse.getButtonStatus(bge.events.RIGHTMOUSE) > 0
+
+        left_ctrl = self.keyboard.getKeyStatus(bge.events.LEFTCTRLKEY) > 0
+        left_shift = self.keyboard.getKeyStatus(bge.events.LEFTSHIFTKEY) > 0
+
+        # Get movement
+        dx = x - self.mouse_x
+        dy = y - self.mouse_y
+
+        zoom_scale = 20
+        pan_scale = 10
+        look_scale = 1
+
+        if left_ctrl and left_pressed:
+            m = mu.Vector((0, 0, -dy)) * zoom_scale
+            self.camera.applyMovement(m, True)
+
+        elif left_shift and left_pressed:
+            m = mu.Vector((-dx, -dy, 0)) * pan_scale
+            self.camera.applyMovement(m)
+
+        elif left_pressed:
+            m = mu.Vector((-dy, dx, 0)) * look_scale
+            self.camera.applyRotation(m, True)
+
+        self.mouse_x = x
+        self.mouse_y = y
+        self.mouse_left = left_pressed
+        self.mouse_right = right_pressed
 
 # --------------------------------------------------
 

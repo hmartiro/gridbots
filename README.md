@@ -113,3 +113,13 @@ currently planned:
 * The 3D renderer will produce a more compelling visual output of the system with meshes, textures, 
   and lighting using the Blender Game Engine This is most useful for producing 
   impressive and realistic looking videos.
+
+### TODO
+
+* Implement moving structure
+* Implement strict job ordering
+* Implement unidirectional graph
+* Sphinx documentation
+* Make a map to match their setup
+* Implement zones
+* Implement controller based on their logic

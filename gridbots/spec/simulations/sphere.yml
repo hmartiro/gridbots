@@ -9,7 +9,7 @@
 #
 # Expecting a YAML file (.yml) in gridbots/maps
 # ---------------------------------------------------------
-map: "dave_demo_map"
+map: "sphere"
 
 
 # Name of the file that defines the target truss structure
@@ -17,7 +17,7 @@ map: "dave_demo_map"
 #
 # Expecting a YAML file (.yml) in gridbots/structures
 # ---------------------------------------------------------
-structure: "stair"
+structure: "box_1_1_2"
 
 
 # Classification of bot types, by name
@@ -82,26 +82,26 @@ bots:
   z1:
     position: 6
     type: builder_z
-
-  x2:
-    position: 22
-    type: builder_x
-  y2:
-    position: 24
-    type: builder_y
-  z2:
-    position: 26
-    type: builder_z
-
-  x3:
-    position: 12
-    type: builder_x
-  y3:
-    position: 14
-    type: builder_y
-  z3:
-    position: 16
-    type: builder_z
+#
+#  x2:
+#    position: 22
+#    type: builder_x
+#  y2:
+#    position: 24
+#    type: builder_y
+#  z2:
+#    position: 26
+#    type: builder_z
+#
+#  x3:
+#    position: 12
+#    type: builder_x
+#  y3:
+#    position: 14
+#    type: builder_y
+#  z3:
+#    position: 16
+#    type: builder_z
 
 #  x4:
 #    position: 32
@@ -134,29 +134,29 @@ bots:
 
 stations:
   grab_rod_x:
-    - position: grab_rod_1
+    - position: 100
       time: 2.0
 
   grab_rod_y:
-    - position: grab_rod_3
+    - position: 588
       time: 2.0
 
   grab_rod_z:
-    - position: grab_rod_2
+    - position: 54
       time: 2.0
 
   grab_glue_x:
-    - position: 94
+    - position: 495
       time: 2.0
 
   grab_glue_y:
-    - position: 85
+    - position: 201
       time: 2.0
 
   grab_glue_z:
-    - position: 96
+    - position: 311
       time: 2.0
 
   attach_rod:
-    - position: attach_rod_1
+    - position: 210
       time: 2.0

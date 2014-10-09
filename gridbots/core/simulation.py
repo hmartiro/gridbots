@@ -252,7 +252,7 @@ class Simulation:
             output["bots"][bot.name]['move_history'].append(bot.move_history[-1])
 
         # Create the paths directory if needed
-        paths_dir = "spec/paths"
+        paths_dir = "paths"
         if not os.path.exists(paths_dir):
             os.makedirs(paths_dir)
 

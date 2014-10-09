@@ -17,7 +17,7 @@ def read_graph(filename):
 
     # Extract data from the map file
     vertices, edges = read_graph_data(filename)
-
+    
     # Create a Graph object
     graph = nx.Graph()
 
