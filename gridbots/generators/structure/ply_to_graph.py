@@ -30,16 +30,18 @@ def ply_to_graph(ply_file):
     vertices = []
     for i in range(start_inx, start_inx + num_vertex_normals):
         vertex = [float(p) for p in ply_data[i].split(' ')[:3]]
+        #d = [float(p) for p in ply_data[i].split(' ')[:3]]
+        #print(i)
         if vertex not in vertices:
             vertices.append(vertex)
 
     num_vertices = len(vertices)
-    #print('Number of unique vertices: {}'.format(num_vertices))
+    print('Number of unique vertices: {}'.format(num_vertices))
 
     # Create a dictionary of vertices by giving IDs
     vertex_dict = {i: v for i, v in enumerate(vertices)}
 
-    #print('Number of faces: {}'.format(num_faces))
+    print('Number of faces: {}'.format(num_faces))
 
     # Parse edges from faces
     edges = []
