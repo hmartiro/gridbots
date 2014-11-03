@@ -5,6 +5,7 @@
 import os
 import yaml
 import logging
+import networkx as nx
 
 import gridbots
 from gridbots import utils
@@ -49,8 +50,10 @@ class Simulation:
         self.map_name = self.sim_data["map"]
 
         # Parse the map file
-        map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(self.map_name))
-        self.map = utils.graph.read_graph(map_path)
+        #map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(self.map_name))
+        #self.map = utils.graph.read_graph(map_path)
+        map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(self.map_name))
+        self.map = nx.read_gpickle(map_path)
 
         # Parse the structure file
         structure_path = os.path.join(gridbots.path, 'spec', 'structures',
@@ -61,12 +64,12 @@ class Simulation:
         # Iterate through the waypoints and create Stations
         self.stations = utils.parse.parse_stations(self.sim_data['stations'])
 
-        self.job_queue = utils.planning.create_job_queue(
-            self.structure,
-            self.sim_data['job_types']
-        )
+        # self.job_queue = utils.planning.create_job_queue(
+        #     self.structure,
+        #     self.sim_data['job_types']
+        # )
 
-        self.job_queue = self.structure.jobs_todo
+        self.job_queue = []#self.structure.jobs_todo
 
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
@@ -87,7 +90,7 @@ class Simulation:
         logging.debug("----- MAP -----")
         logging.info('Map {} has {} nodes.'.format(
             self.map_name,
-            len(self.map.nodes())
+            self.map.number_of_nodes()
         ))
 
         logging.debug("----- BOTS -----")
@@ -149,7 +152,7 @@ class Simulation:
 
         logging.info('----- frame: {} time: {} -----'.format(self.frame, self.time))
 
-        self.plan_tasks()
+        #self.plan_tasks()
 
         # Run state machine for each bot
         for bot in self.bots:
@@ -184,7 +187,7 @@ class Simulation:
 
             self.update()
 
-            if all([j.finished for j in self.job_queue]):
+            if all([j.finished for j in self.job_queue]) and self.time > 5:
                 if all([b.at_home() for b in self.bots]):
                     logging.info('ALL JOBS COMPLETE!!')
                     self.status = self.STATUS["success"]

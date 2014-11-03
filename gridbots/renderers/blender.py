@@ -7,6 +7,7 @@ import sys
 import math
 import yaml
 import mathutils as mu
+import networkx as nx
 
 import gridbots
 from gridbots.utils.graph import read_graph_data
@@ -36,12 +37,20 @@ class BlenderDrawer():
             paths_data = yaml.load(pf.read())
 
         # Get map data
-        map_file = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(paths_data["map_name"]))
-        self.vertices, self.edges = read_graph_data(map_file)
+        #map_file = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(paths_data["map_name"]))
+        #self.vertices, self.edges = read_graph_data(map_file)
+        map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(paths_data["map_name"]))
+        self.map = nx.read_gpickle(map_path)
+
+        self.vertices = {}
+        for n, d in self.map.nodes_iter(data=True):
+            self.vertices[n] = mu.Vector((d['x'], d['y'], d['z']))
+
+        self.edges = self.map.edges()
 
         # Convert vertex data to 3D mathutils.Vectors
-        for v_name, v in self.vertices.items():
-            self.vertices[v_name] = mu.Vector(v).to_3d()
+        #for v_name, v in self.vertices.items():
+        #    self.vertices[v_name] = mu.Vector(v).to_3d()
 
         self.framerate = framerate
         self.substeps = int(float(BLENDER_FPS) / float(self.framerate))
@@ -99,31 +108,31 @@ class BlenderDrawer():
             #print(dir(self.bots[bot]))
 
         # Draw nodes
-        self.nodes = {}
-        for name, coords in self.vertices.items():
-            self.nodes[name] = self.S.addObject('Node', self.C.owner)
-            self.nodes[name].position = coords
-
-        self.b_edges = []
-        for e in self.edges:
-
-            b_edge = self.S.addObject('Edge', self.C.owner)
-            self.b_edges.append(b_edge)
-
-            v1 = self.vertices[e[0]]
-            v2 = self.vertices[e[1]]
-
-            midpoint = v1.lerp(v2, 0.5)
-            b_edge.position = midpoint
-
-            # Set rotation
-            unit = mu.Vector((1, 0, 0))
-            quat = unit.rotation_difference(v2-v1)
-            b_edge.applyRotation(quat.to_euler('XYZ'))
-
-            # Set scale
-            dist = (v2-v1).magnitude
-            b_edge.localScale = [dist, 1, 1]
+        # self.nodes = {}
+        # for name, coords in self.vertices.items():
+        #     self.nodes[name] = self.S.addObject('Node', self.C.owner)
+        #     self.nodes[name].position = coords
+        #
+        # self.b_edges = []
+        # for e in self.edges:
+        #
+        #     b_edge = self.S.addObject('Edge', self.C.owner)
+        #     self.b_edges.append(b_edge)
+        #
+        #     v1 = self.vertices[e[0]]
+        #     v2 = self.vertices[e[1]]
+        #
+        #     midpoint = v1.lerp(v2, 0.5)
+        #     b_edge.position = midpoint
+        #
+        #     # Set rotation
+        #     unit = mu.Vector((1, 0, 0))
+        #     quat = unit.rotation_difference(v2-v1)
+        #     b_edge.applyRotation(quat.to_euler('XYZ'))
+        #
+        #     # Set scale
+        #     dist = (v2-v1).magnitude
+        #     b_edge.localScale = [dist, 1, 1]
 
         self.b_stations = []
         for station_type in self.stations:
@@ -134,6 +143,7 @@ class BlenderDrawer():
                 self.b_stations.append(b_station)
 
                 b_station.position = self.vertices[station.pos]
+                b_station.position.z += 0.05
 
         self.b_structure = {}
 
