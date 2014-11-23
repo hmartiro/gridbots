@@ -64,12 +64,12 @@ class Simulation:
         # Iterate through the waypoints and create Stations
         self.stations = utils.parse.parse_stations(self.sim_data['stations'])
 
-        # self.job_queue = utils.planning.create_job_queue(
-        #     self.structure,
-        #     self.sim_data['job_types']
-        # )
+        self.job_queue = utils.planning.create_job_queue(
+            self.structure,
+            self.sim_data['job_types']
+        )
 
-        self.job_queue = []#self.structure.jobs_todo
+        self.job_queue = self.structure.jobs_todo
 
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
@@ -152,7 +152,7 @@ class Simulation:
 
         logging.info('----- frame: {} time: {} -----'.format(self.frame, self.time))
 
-        #self.plan_tasks()
+        self.plan_tasks()
 
         # Run state machine for each bot
         for bot in self.bots:
@@ -161,10 +161,11 @@ class Simulation:
         # Update structure location
         try:
             structure_station = self.stations['attach_rod'][0]
-            coords = self.map.node[structure_station.pos]['coords']
+            node_data = self.map.node[structure_station.pos]
+            coords = node_data['x'], node_data['y'], node_data['z']
         except KeyError:
-            coords = [0, 0]
-        self.structure.move_history.append([coords[0], coords[1], 0])
+            coords = [0, 0, 0]
+        self.structure.move_history.append(coords)
 
         # Print wait times for each station
         for station_type in self.stations:
@@ -187,7 +188,7 @@ class Simulation:
 
             self.update()
 
-            if all([j.finished for j in self.job_queue]) and self.time > 5:
+            if all([j.finished for j in self.job_queue]):# and self.time > 5:
                 if all([b.at_home() for b in self.bots]):
                     logging.info('ALL JOBS COMPLETE!!')
                     self.status = self.STATUS["success"]
@@ -203,10 +204,11 @@ class Simulation:
         # TODO this is a copy of update function
         try:
             structure_station = self.stations['attach_rod'][0]
-            coords = self.map.node[structure_station.pos]['coords']
+            node_data = self.map.node[structure_station.pos]
+            coords = node_data['x'], node_data['y'], node_data['z']
         except KeyError:
-            coords = [0, 0]
-        self.structure.move_history.append([coords[0], coords[1], 0])
+            coords = [0, 0, 0]
+        self.structure.move_history.append(coords)
 
         # Add the last frame to the move history
         for bot in self.bots:

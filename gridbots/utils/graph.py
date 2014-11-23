@@ -61,13 +61,16 @@ def find_shortest_path(graph, src, dest):
 
     # Get all the shortest paths
     try:
-        all_paths = list(nx.all_shortest_paths(graph, src, dest))
+        #all_paths = list(nx.all_shortest_paths(graph, src, dest))
+        path = nx.shortest_path(graph, src, dest)
+        print('src: {}, dest: {}, shortest path legnth: {}'.format(src, dest, len(path)))
+        return path
     except nx.NetworkXNoPath:
         return None
 
     # Choose one at random
-    random_index = random.randint(0, len(all_paths) - 1)
-    return all_paths[random_index]
+    #random_index = random.randint(0, len(all_paths) - 1)
+    #return all_paths[random_index]
 
 
 # def get_bounding_box(graph):

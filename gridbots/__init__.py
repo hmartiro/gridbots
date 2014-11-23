@@ -20,4 +20,4 @@ path = os.path.dirname(os.path.realpath(__file__))
 
 # Set up logging
 import logging
-logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(message)s', level=logging.INFO)

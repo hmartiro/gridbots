@@ -82,8 +82,7 @@ class Bot:
         # move or wait for the turn
         self.turn_over = False
 
-        # Graph which can have nodes removed for obstacle avoidance
-        self.graph = self.sim.map.copy()
+        self.graph = self.sim.map
 
         # Check to see if the graph has been modified, to reset it
         self.graph_modified = False
@@ -192,7 +191,7 @@ class Bot:
         self.logger.debug("State: calculating_path")
 
         # Reset the graph
-        self.graph = self.sim.map.copy()
+        #self.graph = self.sim.map.copy()
 
         # List of obstacles
         obstacles = []
@@ -204,7 +203,8 @@ class Bot:
         obstacles.extend(self.permanent_obstacles())
 
         # Remove the obstacles from the graph
-        self.remove_nodes(obstacles)
+        # TODO reincorporate obstacle avoidance
+        #self.remove_nodes(obstacles)
 
         # Go to the goal or towards home position if no goal
         dest_node = self.goal or self.home_pos
@@ -225,7 +225,7 @@ class Bot:
 
             # If we have moves
             if self.moves:
-                assert self.is_node_free(self.next_move())
+                #assert self.is_node_free(self.next_move())
                 return Bot.State.on_track
 
             # Otherwise, we should be at the goal
@@ -255,7 +255,8 @@ class Bot:
         self.logger.debug("State: on_track")
 
         # If the next node is free, go to it
-        if self.is_node_free(self.next_move()):
+        # TODO reincorporate obstacle avoidance
+        if self.is_node_free(self.next_move()) or True:
 
             self.move()
 
@@ -339,12 +340,12 @@ class Bot:
 
         # Log state information
         if self.has_goal():
-            self.logger.info('At {}, moving to goal ({}) with planned moves {}'.format(
-                self.pos, self.goal, self.moves))
+            self.logger.info('At {}, moving to goal ({}) in {} more moves'.format(
+                self.pos, self.goal, len(self.moves)))
         elif self.at_goal():
             self.logger.info('At goal ({})'.format(self.pos))
         elif not self.at_home():
-            self.logger.info('At {}, moving to home ({}) with planned moves {}'.format(
-                self.pos, self.home_pos, self.moves))
+            self.logger.info('At {}, moving to home ({}) in {} more moves'.format(
+                self.pos, self.home_pos, len(self.moves)))
         else:
             self.logger.info('At home ({})'.format(self.pos))

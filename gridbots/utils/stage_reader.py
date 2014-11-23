@@ -115,8 +115,8 @@ def parse_flex_pixel(g, zone, pixel):
 
         source_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[0])
         dest_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[1])
-        edges_to_add.append((source_id, dest_id, {'group': labels[0]}))
-        edges_to_add.append((dest_id, source_id, {'group': labels[1]}))
+        edges_to_add.append((source_id, dest_id, {zone.name: labels[0]}))
+        edges_to_add.append((dest_id, source_id, {zone.name: labels[1]}))
 
     g.add_edges_from(edges_to_add)
 
@@ -143,8 +143,8 @@ def parse_rotational_pixel(g, zone, pixel):
 
         source_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[0])
         dest_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[1])
-        edges_to_add.append((source_id, dest_id, {'group': labels[0]}))
-        edges_to_add.append((dest_id, source_id, {'group': labels[1]}))
+        edges_to_add.append((source_id, dest_id, {zone.name: labels[0]}))
+        edges_to_add.append((dest_id, source_id, {zone.name: labels[1]}))
 
     g.add_edges_from(edges_to_add)
 
@@ -169,8 +169,8 @@ def parse_regular_pixel(g, zone, pixel):
 
         source_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[0])
         dest_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[1])
-        edges_to_add.append((source_id, dest_id, {'group': labels[0]}))
-        edges_to_add.append((dest_id, source_id, {'group': labels[1]}))
+        edges_to_add.append((source_id, dest_id, {zone.name: labels[0]}))
+        edges_to_add.append((dest_id, source_id, {zone.name: labels[1]}))
 
     g.add_edges_from(edges_to_add)
 
@@ -224,8 +224,11 @@ def merge_vertices(g):
 
     print('Nodes and edges before merging edges: {}, {}'.format(g.number_of_nodes(), g.number_of_edges()))
 
+    # Map of nodes being replaced to their replacement
+    replacements = {}
+
     # Loop through looking for co-located vertices
-    dupes_to_remove = []
+    edges_to_add = []
     for i in range(len(v_list) - 1):
 
         if eq(v_list[i], v_list[i+1]):
@@ -233,17 +236,48 @@ def merge_vertices(g):
             n1 = v_list[i][0]
             n2 = v_list[i+1][0]
 
-            # Mark node for removal
-            dupes_to_remove.append(n2)
+            # Mark node for merge
+            replacements[n2] = n1
 
-            # Add edges of node 2 to node 1
-            for n in g[n2].keys():
-                g.add_edge(n1, n, g[n2][n])
+            for n2d, n, data in g.out_edges(n2, data=True):
+                assert(n2d == n2)
+                edges_to_add.append((n1, n, data))
 
-    print('Total duplicates: {}'.format(len(dupes_to_remove)))
-    print('Nodes and edges after merging edges: {}, {}'.format(g.number_of_nodes(), g.number_of_edges()))
-    g.remove_nodes_from(dupes_to_remove)
+            for n, n2d, data in g.in_edges(n2, data=True):
+                assert(n2d == n2)
+                edges_to_add.append((n, n1, data))
+
+    def bad_ref_count(edge_list):
+        bad_ref = 0
+        for n1, n2, data in edges_to_add:
+            if n1 in replacements:
+                bad_ref += 1
+            if n2 in replacements:
+                bad_ref += 1
+        return bad_ref
+
+    def replace(e):
+        n1 = replacements.get(e[0], e[0])
+        n2 = replacements.get(e[1], e[1])
+        data = e[2]
+        return n1, n2, data
+
+    while bad_ref_count(edges_to_add) > 0:
+        edges_to_add = list(map(replace, edges_to_add))
+
+    print('Total duplicates: {}'.format(len(replacements)))
+    print('Nodes and edges before: {}, {}'.format(g.number_of_nodes(), g.number_of_edges()))
+    g.remove_nodes_from(replacements.keys())
     print('Nodes and edges after removing dupes: {}, {}'.format(g.number_of_nodes(), g.number_of_edges()))
+
+    for e in edges_to_add:
+        if g.has_edge(e[0], e[1]):
+            old_data = g[e[0]][e[1]]
+            e[2].update(old_data)
+        g.add_edge(*e)
+
+    print('Nodes and edges after adding edges: {}, {}'.format(g.number_of_nodes(), g.number_of_edges()))
+    print('Total edges moved during merge: {}'.format(len(edges_to_add)))
 
 
 def parse_all():
@@ -274,7 +308,43 @@ if __name__ == '__main__':
 
         G = parse_all()
 
-        nx.write_gpickle(G, 'stage.gpickle')
+        name = sys.argv[4][:-6]
+
+        nx.write_gpickle(G, 'spec/maps/{}.gpickle'.format(name))
+
+        from mathutils import Vector
+
+        scn = bpy.context.scene
+
+        # Delete all other objects
+        for ob in scn.objects:
+            ob.select = True
+        bpy.ops.object.delete()
+
+        # Create mesh and object
+        me = bpy.data.meshes.new('{}_mesh'.format(name))
+        ob = bpy.data.objects.new(name, me)
+        ob.location = Vector((0, 0, 0))
+        ob.show_name = True
+
+        # Link object to scene and make active
+        scn.objects.link(ob)
+        scn.objects.active = ob
+        ob.select = True
+
+        # Generate mesh vertices and edges
+        G2 = nx.convert_node_labels_to_integers(G)
+        verts = [(v[1]['x'], v[1]['y'], v[1]['z']) for v in G2.nodes_iter(data=True)]
+        edges = G2.edges()
+        faces = []
+
+        # Fill in mesh data
+        me.from_pydata(verts, edges, faces)
+        me.update()
+
+        # Save the .blend file
+        bpy.ops.wm.save_as_mainfile(filepath='{}-generated.blend'.format(name))
+
     else:
 
         import networkx
