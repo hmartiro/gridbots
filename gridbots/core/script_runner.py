@@ -5,7 +5,7 @@
 import os
 import re
 import logging
-from pprint import pprint, pformat
+from pprint import pformat
 
 import gridbots
 
@@ -39,42 +39,18 @@ class TrajectoryBuilder():
 
     SCRIPT_DIR = os.path.join(gridbots.path, 'sri-scripts')
 
+    # Switch rate of the board
+    DEFAULT_RATE = 100.  # Hz
+
     def __init__(self, script_name):
 
-        commands = self.process_script(script_name)
-        logging.info('Commands:\n{}\n'.format(commands))
+        self.commands = self.process_script(script_name)
+        logging.info('Commands:\n{}\n'.format(self.commands))
 
-        zone_moves = self.generate_trajectory(commands)
-        logging.info('Zone moves:\n{}\n'.format(pformat(zone_moves)))
+        self.moves = self.generate_trajectory(self.commands)
+        #logging.info('Zone moves:\n{}\n'.format(pformat(self.moves)))
 
-    def generate_parallel_trajectory(self, commands):
-
-        trajectories = []
-        for command in commands:
-
-            if type(command) == list:
-                trajectories.append(self.generate_trajectory(command))
-
-            else:
-                name, args = command
-                if name == 'zmove':
-                    zone, x, y = args
-
-                    # TODO handle non-integer movements
-                    x = int(float(x))
-                    y = int(float(y))
-                    trajectories.append(self.zmove_to_trajectory(zone, x, y))
-
-        merged = []
-        for trajectory in trajectories:
-            for i in range(len(trajectory)):
-                try:
-                    merged[i].update(trajectory[i])
-                except IndexError:
-                    merged.append(trajectory[i])
-
-        logging.debug('output of generate_sim_trajectory: {}'.format(merged))
-        return merged
+        self.rate = self.DEFAULT_RATE
 
     def generate_trajectory(self, command):
 
@@ -89,15 +65,29 @@ class TrajectoryBuilder():
                 y = int(float(y))
                 return self.zmove_to_trajectory(zone, x, y)
 
+            elif command.name == 'rate':
+                rate, = command.args
+                return [{'rate': float(rate)}]
+
+            # TODO ask about what this does
+            elif command.name == 'zonewait':
+                zone, time = command.args
+                return [{'zonewait': [zone, time]}]
+
+            # TODO ask about what this does
+            elif command.name == 'wait':
+                time, = command.args
+                return [{'wait': time}]
+
             else:
-                logging.warning('Skipping command {}'.format(command))
-                return []
+                logging.warning('Unknown command {}'.format(command))
+                return [{command.name: command.args}]
 
         elif isinstance(command, SerialCommands):
 
             # Create a trajectory for each sub-command
             trajectories = [self.generate_trajectory(c) for c in command]
-            print(trajectories)
+
             # Concatenate all moves together in order
             serial_trajectory = [move for trajectory in trajectories for move in trajectory]
             return serial_trajectory
@@ -163,7 +153,7 @@ class TrajectoryBuilder():
             lines = self.read_script(script_name)
         except FileNotFoundError:
             logging.error('Script not found: {}'.format(script_name))
-            return [('SCRIPT NOT FOUND: {}'.format(script_name), [])]
+            return Command('SCRIPT NOT FOUND: {}'.format(script_name), [])
 
         commands = SerialCommands()
         for i, line in enumerate(lines):
@@ -187,6 +177,7 @@ class TrajectoryBuilder():
             return self.process_script(line)
 
         command, args = line.split('(')
+        command = command.strip()
         args = args[:-1].split(',')
         args = [a.strip() for a in args]
         return Command(command, args)
@@ -246,4 +237,6 @@ if __name__ == '__main__':
     else:
         top_level_script = sys.argv[1]
 
-    s = TrajectoryBuilder(top_level_script)
+    builder = TrajectoryBuilder(top_level_script)
+
+    print(yaml.dump(builder.moves))
