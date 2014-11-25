@@ -115,15 +115,18 @@ class TrajectoryBuilder():
     @staticmethod
     def zmove_to_trajectory(zone, x, y):
 
+        zone_name = 'Z{:02}'.format(int(zone))
+        #zone_name = int(zone)
+
         trajectory = []
 
         x_move = '+X' if x > 0 else '-X'
         for i in range(abs(x)):
-            trajectory.append({zone: x_move})
+            trajectory.append({zone_name: x_move})
 
         y_move = '+Y' if y > 0 else '-Y'
         for i in range(abs(y)):
-            trajectory.append({zone: y_move})
+            trajectory.append({zone_name: y_move})
 
         return trajectory
 

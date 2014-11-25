@@ -4,14 +4,23 @@
 
 import networkx as nx
 
+ERROR_TOLERANCE = 1e-6
+
 
 def get_node(x, y, z):
 
     nodes = []
     for n, d in G.nodes_iter(data=True):
-        if d['x'] == x and d['y'] == y and d['z'] == z:
+
+        if abs(d['x'] - x) + abs(d['y'] - y) + abs(d['z'] - z) < ERROR_TOLERANCE:
             nodes.append(n)
+
     return nodes
+
+
+def get_node_mm(x, y):
+
+    return get_node(x/24., y/24., 0)
 
 
 def shortest_path(p1, p2):
@@ -32,5 +41,10 @@ if __name__ == '__main__':
 
     code.interact(
         banner='The map is loaded into the variable G. Explore!',
-        local={'G': G, 'get_node': get_node, 'shortest_path': shortest_path}
+        local={
+            'G': G,
+            'get_node': get_node,
+            'get_node_mm': get_node_mm,
+            'shortest_path': shortest_path
+        }
     )

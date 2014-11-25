@@ -19,6 +19,8 @@ map: "stage"
 # ---------------------------------------------------------
 structure: "stair"
 
+routines:
+  - "units1_2_tree_int"
 
 # Classification of bot types, by name
 # ---------------------------------------------------------
@@ -30,15 +32,12 @@ structure: "stair"
 bot_types:
 
   builder_x:
-    speed: 1.0
     radius: 0.05
 
   builder_y:
-    speed: 1.0
     radius: 0.05
 
   builder_z:
-    speed: 1.0
     radius: 0.05
 
 
@@ -63,6 +62,33 @@ job_types:
     operations: [grab_rod_z, grab_glue_z, attach_rod]
     bot_type: builder_z
 
+# Aliases for nodes in this map
+# ---------------------------------------------------------
+
+node_aliases:
+
+  grab_rod_x: 'Z12.P.068.300'
+  grab_rod_y: 'Z12.P.069.300'
+  grab_rod_z: 'Z12.P.061.300'
+
+  grab_glue_x: 'Z06.P.063.300'
+  grab_glue_y: 'Z06.P.064.300'
+  grab_glue_z: 'Z06.P.065.300'
+
+  attach_rod: 'Z07.P.033.624'
+
+  bot_1_start: 'Z10.P.041.318' # (162,156)
+  bot_2_start: 'Z08.P.042.322' # (190, 156)
+  bot_3_start: 'Z08.P.039.302' # (218, 156)
+  bot_4_start: 'Z07.P.031.306' # (246, 108)
+  bot_5_start: 'Z09.P.029.302' # (218, 108)
+  bot_6_start: 'Z09.P.026.322' # (190, 108)
+  bot_7_start: 'Z04.P.017.318' # (162, 60)
+  bot_8_start: 'Z02.P.018.322' # (190, 60)
+  bot_9_start: 'Z02.P.015.302' # (218, 60)
+  bot_10_start: 'Z01.P.007.306' # (246, 12)
+  bot_11_start: 'Z03.P.005.302' # (218, 12)
+  bot_12_start: 'Z03.P.002.322' # (190, 12)
 
 # Definition of bots in this map, by name
 # ---------------------------------------------------------
@@ -73,55 +99,45 @@ job_types:
 
 bots:
 
-  x1:
-    position: 'Z11.P.053.24'
+  b1:
+    position: bot_1_start
     type: builder_x
-  y1:
-    position: 'Z11.P.052.24'
+  b2:
+    position: bot_2_start
     type: builder_y
-  z1:
-    position: 'Z11.P.051.24'
+  b3:
+    position: bot_3_start
     type: builder_z
-#
-#  x2:
-#    position: 22
-#    type: builder_x
-#  y2:
-#    position: 24
-#    type: builder_y
-#  z2:
-#    position: 26
-#    type: builder_z
-#
-#  x3:
-#    position: 12
-#    type: builder_x
-#  y3:
-#    position: 14
-#    type: builder_y
-#  z3:
-#    position: 16
-#    type: builder_z
 
-#  x4:
-#    position: 32
-#    type: builder_x
-#  y4:
-#    position: 34
-#    type: builder_y
-#  z4:
-#    position: 36
-#    type: builder_z
-#
-#  x5:
-#    position: 42
-#    type: builder_x
-#  y5:
-#    position: 44
-#    type: builder_y
-#  z5:
-#    position: 46
-#    type: builder_z
+  b4:
+    position: bot_4_start
+    type: builder_x
+  b5:
+    position: bot_5_start
+    type: builder_y
+  b6:
+    position: bot_6_start
+    type: builder_z
+
+  b7:
+    position: bot_7_start
+    type: builder_x
+  b8:
+    position: bot_8_start
+    type: builder_y
+  b9:
+    position: bot_9_start
+    type: builder_z
+
+  b10:
+    position: bot_10_start
+    type: builder_x
+  b11:
+    position: bot_11_start
+    type: builder_y
+  b12:
+    position: bot_12_start
+    type: builder_z
 
 
 # Definition of stations in this map, by type
@@ -134,29 +150,29 @@ bots:
 
 stations:
   grab_rod_x:
-    - position: 'Z12.P.068.300'
+    - position: grab_rod_x
       time: 2.0
 
   grab_rod_y:
-    - position: 'Z12.P.069.300'
+    - position: grab_rod_y
       time: 2.0
 
   grab_rod_z:
-    - position: 'Z12.P.061.300'
+    - position: grab_rod_z
       time: 2.0
 
   grab_glue_x:
-    - position: 'Z06.P.063.300'
+    - position: grab_glue_x
       time: 2.0
 
   grab_glue_y:
-    - position: 'Z06.P.064.300'
+    - position: grab_glue_y
       time: 2.0
 
   grab_glue_z:
-    - position: 'Z06.P.065.300'
+    - position: grab_glue_z
       time: 2.0
 
   attach_rod:
-    - position: 'Z07.P.033.624'
+    - position: attach_rod
       time: 2.0

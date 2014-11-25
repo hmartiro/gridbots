@@ -349,3 +349,25 @@ class Bot:
                 self.pos, self.home_pos, len(self.moves)))
         else:
             self.logger.info('At home ({})'.format(self.pos))
+
+        # Move based on routine
+        # TODO temporary
+        routine = self.sim.routines['units1_2_tree_int']
+        move_dict = routine[self.sim.frame]
+        print(move_dict)
+
+        out_edges = self.graph.out_edges(self.pos, data=True)
+        moves_to_make = []
+        for n1, n2, edge_data in out_edges:
+            for zone in edge_data.keys():
+                if zone in move_dict:
+                    if edge_data[zone] == move_dict[zone]:
+                        print('Bot {} can move from {} to {}'.format(self.name, n1, n2))
+                        moves_to_make.append(n2)
+
+        print('Possible moves: {}'.format(moves_to_make))
+        if len(moves_to_make) > 0:
+            self.pos = moves_to_make[0]
+
+        if len(moves_to_make) > 1:
+            raise Exception()

@@ -48,6 +48,7 @@ class Simulation:
         self.sim_name = sim_name
         self.structure_name = self.sim_data["structure"]
         self.map_name = self.sim_data["map"]
+        self.node_aliases = self.sim_data['node_aliases']
 
         # Parse the map file
         #map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(self.map_name))
@@ -62,14 +63,17 @@ class Simulation:
         self.structure = Structure(structure_graph)
 
         # Iterate through the waypoints and create Stations
-        self.stations = utils.parse.parse_stations(self.sim_data['stations'])
+        self.stations = utils.parse.parse_stations(self.sim_data['stations'], self.node_aliases)
 
-        self.job_queue = utils.planning.create_job_queue(
-            self.structure,
-            self.sim_data['job_types']
-        )
+        # Parse routines from script files
+        self.routines = utils.parse.parse_routines(self.sim_data['routines'])
 
-        self.job_queue = self.structure.jobs_todo
+        # self.job_queue = utils.planning.create_job_queue(
+        #     self.structure,
+        #     self.sim_data['job_types']
+        # )
+
+        self.job_queue = []  # self.structure.jobs_todo
 
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
@@ -147,12 +151,11 @@ class Simulation:
 
         """
 
-        self.frame += 1
         self.time += self.TIME_PER_FRAME
 
         logging.info('----- frame: {} time: {} -----'.format(self.frame, self.time))
 
-        self.plan_tasks()
+        # self.plan_tasks()
 
         # Run state machine for each bot
         for bot in self.bots:
@@ -175,6 +178,8 @@ class Simulation:
                     station.wait_time = 0.0
                 logging.debug('{}, wait time {}'.format(station, station.wait_time))
 
+        self.frame += 1
+
     def run(self):
 
         """
@@ -188,14 +193,14 @@ class Simulation:
 
             self.update()
 
-            if all([j.finished for j in self.job_queue]):# and self.time > 5:
-                if all([b.at_home() for b in self.bots]):
-                    logging.info('ALL JOBS COMPLETE!!')
-                    self.status = self.STATUS["success"]
-                    break
+            # if all([j.finished for j in self.job_queue]):# and self.time > 5:
+            #     if all([b.at_home() for b in self.bots]):
+            #         logging.info('ALL JOBS COMPLETE!!')
+            #         self.status = self.STATUS["success"]
+            #         break
 
-            #if self.frame == 1000:
-            #    break
+            if self.frame == 4000:
+                break
 
             if self.interactive:
                 input('Enter to continue: ')
