@@ -1,0 +1,82 @@
+#
+feed(h)
+
+<alignall
+
+rate(180)
+
+#(162,156) to (134,160) and (162, 60) to (134,64)
+simscript(unit2_bufftorotate_z10, unit1_bufftorotate_z4)
+
+#rotate 270 both robots
+simscript(unit1_rotate270_z4, unit1_rotate270_z5, unit2_rotate270_z10, unit2_rotate270_z11)
+#simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+#simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#unit1 will move to getwater position (110, 82)
+simscript(zmove(4, -24, 0), zmove(5, -24, 0))
+zmove(5, 0, 18)
+
+rate(120)
+#unit1 will drive to get water while
+#unit2 will move from z10 into z4
+simscript(units1&2_getwater_z5, units1&2_getwater_z6, units1&2_z10toz4_z10, units1&2_z10toz4_z4)
+
+#unit1 will move to h rod position (110, 136)
+simscript(zmove(5, 0, 72), zmove(11, 0, 72))
+
+#unit2 will move to getwater position
+simscript(zmove(4, -24, 0), zmove(5, -24, 0))
+zmove(5, 0, 18)
+
+rate(120)
+#unit2 will get water and end at 110,82
+#unit1 will get h rod and end at 40, 154
+simscript(units1&2_getwater_z5, units1&2_getwater_z6, units1&2_gethrod_z11, units1&2_gethrod_z12)
+
+feed(h)
+
+#register the rod
+zmove(11, 0, -31.5)
+wait(0.3)
+zmove(11, 0, 5.5)
+zmove(11, 0, -6)
+wait(0.3)
+zmove(11, 0, 32)
+zmove(11, 70, 0)
+
+rate(140)
+#move unit1 to z10 and end at rotation position 134, 60
+zmove(11, 0, 6)
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+
+#move unit1 to to unit1 rotation position (134, 64)
+#move unit2 to h rod position in z11 (110, 154)
+simscript(zmove(5, 0, 72), zmove(11, 0, 72), units1&2_z10toz4_z10, units1&2_z10toz4_z4) 
+
+#wait(1)
+
+rate(120)
+#unit2 will now get h rod and end at 40, 154
+simscript(units1&2_gethrod_z11, units1&2_gethrod_z12)
+#register the rod
+zmove(11, 0, -31.5)
+wait(0.3)
+zmove(11, 0, 5.5)
+zmove(11, 0, -6)
+wait(0.3)
+zmove(11, 0, 32)
+
+zmove(11, 70, 0)
+
+
+rate(140)
+#unit2 will now move to z10 and end at rotation position 134, 60
+zmove(11, 0, 6)
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+
+#rotate 90 both robots
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#move both robots to their buffer positions
+simscript (unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)

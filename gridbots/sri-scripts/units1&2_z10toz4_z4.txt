@@ -1,0 +1,5 @@
+#move from unit2 rotate position (134,160 to unit1 rotate position (134,64)
+
+zmove(4, 28, 0)
+zmove(4,0, -96)
+zmove(4, -28, 0)

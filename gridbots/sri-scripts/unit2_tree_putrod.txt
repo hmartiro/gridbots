@@ -1,0 +1,10 @@
+#Robot start: (246, 108)
+
+zmove(7, 0, 4)
+zmove(7, 32, 0)
+
+zonewait(7,.4)
+
+zmove(7, 4, 0)
+
+#Robot loc: (282, 112)

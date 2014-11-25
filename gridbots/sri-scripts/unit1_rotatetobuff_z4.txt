@@ -1,0 +1,6 @@
+#assume robot is at the rotate position (134, 64)
+#target position is buffer exit (162, 60)
+
+#go to rotate position
+zmove(4, 28, 0)
+zmove(4, 0, -4)
