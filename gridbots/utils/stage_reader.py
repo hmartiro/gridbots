@@ -18,6 +18,7 @@ def check_direction_xy(v1, v2):
     """
 
     v = (v2 - v1).normalized()
+    # print('v1: {}, v2: {}'.format(v1, v2))
 
     if abs(v.x) > error:
 
@@ -131,15 +132,19 @@ def parse_rotational_pixel(g, zone, pixel):
     edges_to_add = []
     for e in pixel.data.edges:
 
-        labels = check_direction_xy(
-            pixel.data.vertices[e.vertices[0]].co,
-            pixel.data.vertices[e.vertices[1]].co
-        )
+        v1 = pixel.data.vertices[e.vertices[0]].co
+        v2 = pixel.data.vertices[e.vertices[1]].co
 
+        labels = check_direction_xy(v1, v2)
+
+        # Skip side edges of rotational pixels
         if labels is not None:
             continue
 
-        labels = ('+X', '-X')
+        if v1.x - v1.y > v2.x - v2.y:
+            labels = ('-X', '+X')
+        else:
+            labels = ('+X', '-X')
 
         source_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[0])
         dest_id = '{}.{}.{}'.format(zone.name, pixel.name, e.vertices[1])
@@ -218,9 +223,15 @@ def merge_vertices(g):
 
     v_list.sort(key=itemgetter(1, 2, 3, 0))
 
-    # Define equality as all three coordinates being equal
+    # Define equality as all three coordinates being (almost) equal
+    MERGE_THRESHOLD = 1e-3
+
     def eq(u, v):
-        return (u[1] == v[1]) and (u[2] == v[2]) and (u[3] == v[3])
+        return (
+            abs(u[1] - v[1]) < MERGE_THRESHOLD and
+            abs(u[2] - v[2]) < MERGE_THRESHOLD and
+            abs(u[3] - v[3]) < MERGE_THRESHOLD
+        )
 
     print('Nodes and edges before merging edges: {}, {}'.format(g.number_of_nodes(), g.number_of_edges()))
 

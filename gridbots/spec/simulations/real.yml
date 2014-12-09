@@ -67,27 +67,27 @@ job_types:
 
 node_aliases:
 
-  grab_rod_x: 'Z12.P.068.300'
-  grab_rod_y: 'Z12.P.069.300'
-  grab_rod_z: 'Z12.P.061.300'
+  grab_rod_x: 'Z11.P.051.2076'
+  grab_rod_y: 'Z11.P.052.2076'
+  grab_rod_z: 'Z11.P.053.2076'
 
-  grab_glue_x: 'Z06.P.063.300'
-  grab_glue_y: 'Z06.P.064.300'
-  grab_glue_z: 'Z06.P.065.300'
+  grab_glue_x: 'Z06.P.063.2076'
+  grab_glue_y: 'Z06.P.064.2076'
+  grab_glue_z: 'Z06.P.065.2076'
 
-  attach_rod: 'Z07.P.033.624'
+  attach_rod: 'Z07.P.033.2100'
 
-  bot_1_start: 'Z10.P.041.318' # (162,156)
-  bot_2_start: 'Z08.P.042.322' # (190, 156)
-  bot_3_start: 'Z08.P.039.302' # (218, 156)
-  bot_4_start: 'Z07.P.031.306' # (246, 108)
-  bot_5_start: 'Z09.P.029.302' # (218, 108)
-  bot_6_start: 'Z09.P.026.322' # (190, 108)
-  bot_7_start: 'Z04.P.017.318' # (162, 60)
-  bot_8_start: 'Z02.P.018.322' # (190, 60)
-  bot_9_start: 'Z02.P.015.302' # (218, 60)
-  bot_10_start: 'Z01.P.007.306' # (246, 12)
-  bot_11_start: 'Z03.P.005.302' # (218, 12)
+  bot_1_start: 'Z10.P.041.2094' # (162,156)
+  bot_2_start: 'Z08.P.042.2098' # (190, 156)
+  bot_3_start: 'Z08.P.039.2078' # (218, 156)
+  bot_4_start: 'Z07.P.031.2082' # (246, 108)
+  bot_5_start: 'Z09.P.029.2078' # (218, 108)
+  bot_6_start: 'Z09.P.026.2098' # (190, 108)
+  bot_7_start: 'Z04.P.017.2094' # (162, 60)
+  bot_8_start: 'Z02.P.018.2098' # (190, 60)
+  bot_9_start: 'Z02.P.015.2078' # (218, 60)
+  bot_10_start: 'Z01.P.007.2082' # (246, 12)
+  bot_11_start: 'Z03.P.005.2078' # (218, 12)
   bot_12_start: 'Z03.P.002.322' # (190, 12)
 
 # Definition of bots in this map, by name
@@ -148,31 +148,32 @@ bots:
 #    - position: 1 # Location node
 #      time: 2.0 # How long a bot takes here
 
-stations:
-  grab_rod_x:
-    - position: grab_rod_x
-      time: 2.0
+stations: {}
 
-  grab_rod_y:
-    - position: grab_rod_y
-      time: 2.0
-
-  grab_rod_z:
-    - position: grab_rod_z
-      time: 2.0
-
-  grab_glue_x:
-    - position: grab_glue_x
-      time: 2.0
-
-  grab_glue_y:
-    - position: grab_glue_y
-      time: 2.0
-
-  grab_glue_z:
-    - position: grab_glue_z
-      time: 2.0
-
-  attach_rod:
-    - position: attach_rod
-      time: 2.0
+#  grab_rod_x:
+#    - position: grab_rod_x
+#      time: 2.0
+#
+#  grab_rod_y:
+#    - position: grab_rod_y
+#      time: 2.0
+#
+#  grab_rod_z:
+#    - position: grab_rod_z
+#      time: 2.0
+#
+#  grab_glue_x:
+#    - position: grab_glue_x
+#      time: 2.0
+#
+#  grab_glue_y:
+#    - position: grab_glue_y
+#      time: 2.0
+#
+#  grab_glue_z:
+#    - position: grab_glue_z
+#      time: 2.0
+#
+#  attach_rod:
+#    - position: attach_rod
+#      time: 2.0

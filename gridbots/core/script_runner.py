@@ -7,6 +7,8 @@ import re
 import logging
 from pprint import pformat
 
+logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+
 import gridbots
 
 
@@ -40,17 +42,17 @@ class TrajectoryBuilder():
     SCRIPT_DIR = os.path.join(gridbots.path, 'sri-scripts')
 
     # Switch rate of the board
-    DEFAULT_RATE = 100.  # Hz
+    DEFAULT_RATE = 120  # Hz
 
     def __init__(self, script_name):
+
+        self.rate = self.DEFAULT_RATE
 
         self.commands = self.process_script(script_name)
         logging.info('Commands:\n{}\n'.format(self.commands))
 
         self.moves = self.generate_trajectory(self.commands)
         #logging.info('Zone moves:\n{}\n'.format(pformat(self.moves)))
-
-        self.rate = self.DEFAULT_RATE
 
     def generate_trajectory(self, command):
 
@@ -60,24 +62,41 @@ class TrajectoryBuilder():
 
                 zone, x, y = command.args
 
-                # TODO handle non-integer movements
-                x = int(float(x))
-                y = int(float(y))
+                x = float(x)
+                y = float(y)
                 return self.zmove_to_trajectory(zone, x, y)
 
             elif command.name == 'rate':
                 rate, = command.args
-                return [{'rate': float(rate)}]
+                self.rate = float(rate)
+                return [{'rate': self.rate}]
 
             # TODO ask about what this does
             elif command.name == 'zonewait':
                 zone, time = command.args
-                return [{'zonewait': [zone, time]}]
+                time = float(time)
+                frames = int(time * self.rate)
+                return [{'zonewaiting_Z{}'.format(zone): time} for i in range(frames)]
 
             # TODO ask about what this does
             elif command.name == 'wait':
                 time, = command.args
-                return [{'wait': time}]
+                time = float(time)
+                frames = int(time * self.rate)
+                return [{'waiting': time} for i in range(frames)]
+
+            elif command.name == 'uv':
+                state, = command.args
+                state = int(state)
+                return [{'uv': state}]
+
+            elif command.name == 'feed':
+                feed_type, = command.args
+                return [{'feed': feed_type}]
+
+            elif command.name == 'stagerel':
+                x, y, z = [float(v) for v in command.args]
+                return [{'stagerel': [x, y, z]}]
 
             else:
                 logging.warning('Unknown command {}'.format(command))
@@ -112,8 +131,11 @@ class TrajectoryBuilder():
                 type(command), command
             ))
 
-    @staticmethod
-    def zmove_to_trajectory(zone, x, y):
+    def zmove_to_trajectory(self, zone, x, y):
+
+        # 0.5 mm converts to one edge
+        x = int(2 * x)
+        y = int(2 * y)
 
         zone_name = 'Z{:02}'.format(int(zone))
         #zone_name = int(zone)

@@ -18,7 +18,7 @@ import bge
 BLENDER_FPS = 40
 
 # Desired framerate of simulation (fps)
-FRAMERATE = 40
+FRAMERATE = 120
 
 
 class BlenderDrawer():
@@ -53,7 +53,7 @@ class BlenderDrawer():
         #    self.vertices[v_name] = mu.Vector(v).to_3d()
 
         self.framerate = framerate
-        self.substeps = int(float(BLENDER_FPS) / float(self.framerate))
+        self.superstep = int(float(self.framerate) / float(BLENDER_FPS))
 
         self.bot_data = paths_data["bots"]
 
@@ -97,9 +97,6 @@ class BlenderDrawer():
 
         # Which simulation frame are we on?
         self.frame = 0
-
-        # Which substep of the simulation frame?
-        self.substep = 0
 
         self.bots = {}
         for bot in self.bot_data.keys():
@@ -155,17 +152,9 @@ class BlenderDrawer():
             return
 
         for bot_name, bot in self.bots.items():
-            
-            node1 = self.bot_data[bot_name]['move_history'][self.frame]
-            node2 = self.bot_data[bot_name]['move_history'][self.frame+1]
 
-            c1 = self.vertices[node1]
-            c2 = self.vertices[node2]
-
-            fraction = self.substep / float(self.substeps)
-
-            pos = c1.lerp(c2, fraction)
-            bot.position = pos
+            node = self.bot_data[bot_name]['move_history'][self.frame]
+            bot.position = self.vertices[node]
 
         for frame, edge in self.structure:
 
@@ -193,12 +182,8 @@ class BlenderDrawer():
                     dist = (v2-v1).magnitude
                     self.b_structure[edge].localScale = [dist, 1, 1]
 
-        self.substep += 1
-
-        if self.substep == self.substeps:
-            print('------- frame {} -------'.format(self.frame))
-            self.substep = 0
-            self.frame += 1
+        print('------- frame {} -------'.format(self.frame))
+        self.frame += self.superstep
 
     def handle_camera(self):
 

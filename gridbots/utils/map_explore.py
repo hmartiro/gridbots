@@ -4,7 +4,7 @@
 
 import networkx as nx
 
-ERROR_TOLERANCE = 1e-6
+ERROR_TOLERANCE = 1e-4
 
 
 def get_node(x, y, z):

@@ -145,7 +145,7 @@ class Bot:
         """ Do nothing for this turn.
         """
         self.turn_over = True
-        self.logger.info('Waiting for this turn'.format(self.name))
+        self.logger.debug('Waiting for this turn'.format(self.name))
 
     def permanent_obstacles(self):
         """ Return a list of bots who are waiting at their home positions.
@@ -311,7 +311,7 @@ class Bot:
     def state_stuck(self):
 
         self.logger.debug("State: stuck")
-        print('neighbors: {}'.format(self.free_neighbors(self.pos)))
+        self.logger.debug('neighbors: {}'.format(self.free_neighbors(self.pos)))
         # If I have any moves, recalculate path
         # if self.free_neighbors(self.pos):
         #     return Bot.State.calculating_path
@@ -328,7 +328,7 @@ class Bot:
         """
 
         # Logging header
-        self.logger.info('################### Bot {}'.format(self.name, self.pos))
+        self.logger.debug('################### Bot {}'.format(self.name, self.pos))
 
         # Record my current position
         self.move_history.append(self.pos)
@@ -340,21 +340,20 @@ class Bot:
 
         # Log state information
         if self.has_goal():
-            self.logger.info('At {}, moving to goal ({}) in {} more moves'.format(
+            self.logger.debug('At {}, moving to goal ({}) in {} more moves'.format(
                 self.pos, self.goal, len(self.moves)))
         elif self.at_goal():
-            self.logger.info('At goal ({})'.format(self.pos))
+            self.logger.debug('At goal ({})'.format(self.pos))
         elif not self.at_home():
-            self.logger.info('At {}, moving to home ({}) in {} more moves'.format(
+            self.logger.debug('At {}, moving to home ({}) in {} more moves'.format(
                 self.pos, self.home_pos, len(self.moves)))
         else:
-            self.logger.info('At home ({})'.format(self.pos))
+            self.logger.debug('At home ({})'.format(self.pos))
 
         # Move based on routine
         # TODO temporary
         routine = self.sim.routines['units1_2_tree_int']
         move_dict = routine[self.sim.frame]
-        print(move_dict)
 
         out_edges = self.graph.out_edges(self.pos, data=True)
         moves_to_make = []
@@ -362,12 +361,17 @@ class Bot:
             for zone in edge_data.keys():
                 if zone in move_dict:
                     if edge_data[zone] == move_dict[zone]:
-                        print('Bot {} can move from {} to {}'.format(self.name, n1, n2))
+                        self.logger.debug('Bot {} can move from {} to {}'.format(self.name, n1, n2))
                         moves_to_make.append(n2)
 
-        print('Possible moves: {}'.format(moves_to_make))
+        # if len(moves_to_make) > 0:
+        #     self.logger.info('Possible moves: {}'.format(moves_to_make))
+        #     input('')
+
+        if len(moves_to_make) > 1:
+            self.logger.error('Multiple moves possible for bot {}: {}'.format(self.name, moves_to_make))
+            #raise Exception()
+
         if len(moves_to_make) > 0:
             self.pos = moves_to_make[0]
 
-        if len(moves_to_make) > 1:
-            raise Exception()

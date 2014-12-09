@@ -199,7 +199,7 @@ class Simulation:
             #         self.status = self.STATUS["success"]
             #         break
 
-            if self.frame == 4000:
+            if self.frame == len(self.routines['units1_2_tree_int']):
                 break
 
             if self.interactive:
