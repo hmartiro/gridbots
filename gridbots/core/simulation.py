@@ -260,6 +260,8 @@ class Simulation:
             output["bots"][bot.name]['type'] = bot.type
             output["bots"][bot.name]['move_history'] = bot.move_history
             output["bots"][bot.name]['move_history'].append(bot.move_history[-1])
+            output["bots"][bot.name]['rot_history'] = bot.rot_history
+            output["bots"][bot.name]['rot_history'].append(bot.rot_history[-1])
 
         # Create the paths directory if needed
         paths_dir = "paths"
@@ -268,8 +270,12 @@ class Simulation:
 
         # Create and write to the paths file
         paths_name = "paths_{}".format(self.sim_name)
-        paths_path = os.path.join(gridbots.path, 'spec', 'paths', '{}.yml'.format(paths_name))
-        with open(paths_path, 'w') as t_file:
-            t_file.write(yaml.dump(output))
+        paths_path = os.path.join(gridbots.path, 'spec', 'paths', '{}.pickle'.format(paths_name))
+
+        import pickle
+
+        with open(paths_path, 'wb') as t_file:
+            pickle.dump(output, t_file)
+            #t_file.write(yaml.dump(output))
 
         return paths_name

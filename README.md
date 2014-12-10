@@ -109,17 +109,74 @@ currently planned:
 * The 2D renderer outputs a real-time top-view visualization of the system in action. The 
   PyGameDrawer achieves this using the PyGame python library for both timing and drawing. This is 
   most useful for simulating and understanding the platform with a simple visualization.
-   
+
 * The 3D renderer will produce a more compelling visual output of the system with meshes, textures, 
   and lighting using the Blender Game Engine This is most useful for producing 
   impressive and realistic looking videos.
 
-### TODO
+### Progress
+* Bot rotation
+* Exact rotational pixels
 
-* Implement moving structure
-* Implement strict job ordering
-* Implement unidirectional graph
-* Sphinx documentation
-* Make a map to match their setup
-* Implement zones
-* Implement controller based on their logic
+### Items for next meeting
+* Exact rot/flex pixels
+* All scripts
+* Robot types, orientations
+* Updated pictures of setup, rod feed area
+* Location (mm) of indexer
+* close parenthesis in simscript files
+* video of this exact routine, times should compare
+
+### TODO
+* Drawing end effectors/rods
+* Updating rates in playback
+* UV light, stagerel
+* Provide location directory in mm, not nodes
+
+### Answers
+* Brushing glue robots brush glue across
+* Dab glue robots dab straight forward
+* Robots face build area by default
+* Flex pixels are laid out like the board
+  * Physically they have 3 traces currently
+  * flex pixels are 192mm long, 18 or 20mm wide
+
+* 120 Hz is the default clock rate, 0.5 mm steps
+* Move flex circuits to end of zones 6 and 11, get rid of PCD
+* Flex circuits 192 mm, overlap 2 mm
+* 2 steps per mm for now
+* Possibility of variable mesh - Zone 1, Zone 7, and flex pixels are the only 0.5 steps
+
+* wait pauses for the given time in seconds, and based on the clock
+  gives that many ticks of nothing - rate?
+* wait CANNOT be in a simscript, it will be ignored
+* zonewaits do NOT work inside (outside??) simscripts
+* zonewait, 50ms
+* If you do zmove 3, zonewait 3, zmove 3
+* Another script zmove 5, zonewait 5, zmove 5
+* Rate, only one rate, cannot be within a simscript
+* If you do uv(0), uv(1), it will be on for only one clock cycle
+* Put in wait command explicitly with uv
+* stagerel, can be fast or up to a couple seconds
+* stagerel is NON BLOCKING
+* feed is like uv, stagerel - it takes an argument for H or V feeder
+* feed only gives one orientation of rod right now (H). Get the plane orientation
+  pretty easily by rotating. Y is default, X after rotation. For Z orientation, it
+  drives down a twisted flex. Two types of rod robots.
+* Dab glue robot - pushes forward. Paint glue robot
+* This example is gluing rod onto substrate. Uses rod robots and dab robot. Dab robot
+  dabs surface, then rod robot puts in a robot.
+* Structure is called trees.
+* Paint robot is used to make lap joints in between rods.
+
+* High level, just run a bunch of routines
+* Stage starts at 0, 0
+
+### Milestone
+* Mid december - key demo
+  * Goal for SRI: Build skin
+  * Aspect of software
+    * Demonstrate CAD to build process design + simulation
+* Truss structure
+  * Carbon fiber rods, 0.5mm and 
+  * Skin = fiberglass platelets

@@ -6,6 +6,7 @@ import os
 import sys
 import math
 import yaml
+import pickle
 import mathutils as mu
 import networkx as nx
 
@@ -32,9 +33,9 @@ class BlenderDrawer():
     def __init__(self, paths_name, framerate=FRAMERATE):
 
         # Read the paths file
-        paths_file = os.path.join(gridbots.path, 'spec', 'paths', '{}.yml'.format(paths_name))
-        with open(paths_file) as pf:
-            paths_data = yaml.load(pf.read())
+        paths_file = os.path.join(gridbots.path, 'spec', 'paths', '{}.pickle'.format(paths_name))
+        with open(paths_file, 'rb') as pf:
+            paths_data = pickle.load(pf)
 
         # Get map data
         #map_file = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(paths_data["map_name"]))
@@ -155,6 +156,9 @@ class BlenderDrawer():
 
             node = self.bot_data[bot_name]['move_history'][self.frame]
             bot.position = self.vertices[node]
+
+            z_rot = self.bot_data[bot_name]['rot_history'][self.frame]
+            bot.orientation = (0, 0, z_rot)
 
         for frame, edge in self.structure:
 

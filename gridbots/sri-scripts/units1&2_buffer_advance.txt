@@ -4,7 +4,7 @@ rate(180)
 simscript(zmove(1, 0, 48), zmove(4, 0, -48), zmove(7, 0, 48), zmove(10, 0, -48))
 
 #enter buffers
-simscript (zmove(1, -14, 0), zmove(2, -14, 0), zmove(4, 14, 0), zmove(3, 14, 0),zmove(7, -14, 0), zmove(8, -14, 0), zmove(10, 14, 0), zmove(9, 14, 0))
+simscript(zmove(1, -14, 0), zmove(2, -14, 0), zmove(4, 14, 0), zmove(3, 14, 0),zmove(7, -14, 0), zmove(8, -14, 0), zmove(10, 14, 0), zmove(9, 14, 0))
 
 #exit buffers
 simscript(zmove(3, 14, 0), zmove(1, 14, 0), zmove(2, -14, 0), zmove(4, -14, 0), zmove(9, 14, 0), zmove(7, 14, 0), zmove(8, -14, 0), zmove(10, -14, 0))

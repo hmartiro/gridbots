@@ -31,15 +31,10 @@ routines:
 
 bot_types:
 
-  builder_x:
-    radius: 0.05
-
-  builder_y:
-    radius: 0.05
-
-  builder_z:
-    radius: 0.05
-
+  bot_rod_v: {}
+  bot_rod_h: {}
+  bot_glue_brush: {}
+  bot_glue_dab: {}
 
 # Classification of required job types, by name
 # ---------------------------------------------------------
@@ -48,19 +43,19 @@ bot_types:
 #    operations: [grab_glue, attach rod] # List of ops
 #    bot_type: builder_x # Required bot type
 
-job_types:
+job_types: {}
 
-  rod_x:
-    operations: [grab_rod_x, grab_glue_x, attach_rod]
-    bot_type: builder_x
-
-  rod_y:
-    operations: [grab_rod_y, grab_glue_y, attach_rod]
-    bot_type: builder_y
-
-  rod_z:
-    operations: [grab_rod_z, grab_glue_z, attach_rod]
-    bot_type: builder_z
+#  rod_x:
+#    operations: [grab_rod_x, grab_glue_x, attach_rod]
+#    bot_type: builder_x
+#
+#  rod_y:
+#    operations: [grab_rod_y, grab_glue_y, attach_rod]
+#    bot_type: builder_y
+#
+#  rod_z:
+#    operations: [grab_rod_z, grab_glue_z, attach_rod]
+#    bot_type: builder_z
 
 # Aliases for nodes in this map
 # ---------------------------------------------------------
@@ -101,43 +96,55 @@ bots:
 
   b1:
     position: bot_1_start
-    type: builder_x
+    rotation: 0
+    type: bot_glue_brush
   b2:
     position: bot_2_start
-    type: builder_y
+    rotation: 0
+    type: bot_glue_brush
   b3:
     position: bot_3_start
-    type: builder_z
+    rotation: 0
+    type: bot_rod_v
 
   b4:
     position: bot_4_start
-    type: builder_x
+    rotation: 0
+    type: bot_glue_dab
   b5:
     position: bot_5_start
-    type: builder_y
+    rotation: 0
+    type: bot_glue_dab
   b6:
     position: bot_6_start
-    type: builder_z
+    rotation: 0
+    type: bot_rod_h
 
   b7:
     position: bot_7_start
-    type: builder_x
+    rotation: 0
+    type: bot_glue_brush
   b8:
     position: bot_8_start
-    type: builder_y
+    rotation: 0
+    type: bot_glue_brush
   b9:
     position: bot_9_start
-    type: builder_z
+    rotation: 0
+    type: bot_rod_v
 
   b10:
     position: bot_10_start
-    type: builder_x
+    rotation: 0
+    type: bot_glue_dab
   b11:
     position: bot_11_start
-    type: builder_y
+    rotation: 0
+    type: bot_glue_dab
   b12:
     position: bot_12_start
-    type: builder_z
+    rotation: 0
+    type: bot_rod_h
 
 
 # Definition of stations in this map, by type

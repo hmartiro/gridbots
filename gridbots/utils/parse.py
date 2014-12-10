@@ -39,6 +39,7 @@ def parse_bots(bots_data, sim):
         bot = Bot(
             name=bot_name,
             position=bot_data['position'],
+            rotation=bot_data['rotation'],
             bot_type=bot_data['type'],
             sim=sim
         )

@@ -3,9 +3,52 @@
 """
 
 from gridbots import utils
+from operator import itemgetter
 
 import random
 import logging
+import math
+import numpy as np
+from numpy import linalg
+
+
+def angle_between(v1, v2):
+    """ Returns the angle in radians between vectors 'v1' and 'v2'
+    """
+    v1_u = v1 / np.linalg.norm(v1)
+    v2_u = v2 / np.linalg.norm(v2)
+    angle = np.arccos(np.dot(v1_u, v2_u))
+    if np.isnan(angle):
+        if (v1_u == v2_u).all():
+            return 0.0
+        else:
+            return np.pi
+    return angle
+
+
+def angle_from_x(v):
+    """ Returns the angle of v from the positive x-axis, 0 to 2 pi.
+    """
+    assert len(v) == 2
+    angle_from_y = -np.arctan2(v[0], v[1])
+    if angle_from_y < 0:
+        angle_from_y = np.pi + (np.pi + angle_from_y)
+
+    return (angle_from_y + np.pi/2) % (2 * np.pi)
+
+
+def rotation_between(v1, v2):
+    """ Returns the correctly signed rotation in z needed to go
+        from v1 to v2 in the XY plane.
+    """
+    theta = angle_between(v1, v2)
+    theta1_x = angle_from_x(v1)
+    theta2_x = angle_from_x(v2)
+    if theta2_x >= theta1_x:
+        sign = +1 if theta2_x - theta1_x < np.pi else -1
+    else:
+        sign = -1 if theta1_x - theta2_x < np.pi else +1
+    return sign * theta
 
 
 class Bot:
@@ -33,7 +76,7 @@ class Bot:
         calculating_path = 6
         checking_nodes = 7
 
-    def __init__(self, name, position, bot_type, sim):
+    def __init__(self, name, position, rotation, bot_type, sim):
 
         self.logger = logging.getLogger(__name__)
 
@@ -52,14 +95,23 @@ class Bot:
         # Home position
         self.home_pos = self.pos
 
+        # Current orientation
+        self.rot = rotation
+
+        # Last movement vector (for rotation calc)
+        self.last_move_vector = None
+
         # Current goal node
         self.goal = None
 
         # Planned path to the goal
         self.moves = []
 
-        # Full trajectory of motion
+        # Full trajectory of position
         self.move_history = []
+
+        # Full trajectory of orientation
+        self.rot_history = []
 
         # Save a reference to the simulation
         self.sim = sim
@@ -323,6 +375,50 @@ class Bot:
 
     # -----------------------------------------------------------
 
+    def rotate(self):
+        """ Change rotation as needed, based on the current position
+            and the move history.
+        """
+
+        if not self.move_history:
+            return
+
+        n0 = self.move_history[-1]
+        n1 = self.pos
+
+        c0 = np.array(itemgetter('x', 'y', 'z')(self.graph.node[n0]))
+        c1 = np.array(itemgetter('x', 'y', 'z')(self.graph.node[n1]))
+
+        v0 = self.last_move_vector
+        v1 = c1 - c0
+
+        # Can't make rotation decision if we have no data
+        if v0 is None:
+            self.last_move_vector = v1
+            return
+
+        # Create unit vectors
+        v0_u = v0[:2] / linalg.norm(v0[:2])
+        v1_u = v1[:2] / linalg.norm(v1[:2])
+        v0p_u = np.array([v0_u[1], -v0_u[0]])
+
+        d1 = np.dot(v0_u, v1_u)
+        d2 = np.dot(v0p_u, v1_u)
+
+        # Axis of rotation, whether along v0 or perpendicular to it
+        v_rot = v0_u if abs(d1) > abs(d2) else v0p_u
+
+        # Direction
+        v_rot = v_rot if d1 > 0 else -v_rot
+
+        theta = rotation_between(v_rot, v1_u)
+
+        self.rot += theta
+
+        #print('Bot {}: d1: {}, d2: {}, theta: {}'.format(self.name, d1, d2, theta))
+
+        self.last_move_vector = v1
+
     def update(self):
         """ Run the bot state machine until it makes a physical move.
         """
@@ -332,6 +428,7 @@ class Bot:
 
         # Record my current position
         self.move_history.append(self.pos)
+        self.rot_history.append(self.rot)
 
         # Run the state machine until the 'turn' is over
         self.turn_over = False
@@ -364,14 +461,16 @@ class Bot:
                         self.logger.debug('Bot {} can move from {} to {}'.format(self.name, n1, n2))
                         moves_to_make.append(n2)
 
-        # if len(moves_to_make) > 0:
-        #     self.logger.info('Possible moves: {}'.format(moves_to_make))
-        #     input('')
-
         if len(moves_to_make) > 1:
             self.logger.error('Multiple moves possible for bot {}: {}'.format(self.name, moves_to_make))
-            #raise Exception()
+            raise Exception()
 
         if len(moves_to_make) > 0:
-            self.pos = moves_to_make[0]
+
+            new_pos = moves_to_make[0]
+            if new_pos == self.pos:
+                raise Exception('Bot {} moving to same node {}!'.format(self.name, self.pos))
+            print('{}, {}, {}'.format(self.pos, new_pos, self.move_history[-5:]))
+            self.pos = new_pos
+            self.rotate()
 
