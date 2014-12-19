@@ -413,6 +413,14 @@ class Bot:
 
         theta = rotation_between(v_rot, v1_u)
 
+        if d1 == 0:
+            theta = 0
+
+        if theta > math.pi/2:
+            print('v0_u = {}, v1_u = {}'.format(v0_u, v1_u))
+            print('v_rot = {}, d1 = {}'.format(v_rot, d1))
+            raise Exception('Invalid rotation, theta = {}'.format(theta))
+
         self.rot += theta
 
         #print('Bot {}: d1: {}, d2: {}, theta: {}'.format(self.name, d1, d2, theta))

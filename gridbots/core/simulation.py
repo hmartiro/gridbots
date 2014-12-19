@@ -264,13 +264,13 @@ class Simulation:
             output["bots"][bot.name]['rot_history'].append(bot.rot_history[-1])
 
         # Create the paths directory if needed
-        paths_dir = "paths"
+        paths_dir = os.path.join(gridbots.path, 'spec', 'paths')
         if not os.path.exists(paths_dir):
             os.makedirs(paths_dir)
 
         # Create and write to the paths file
         paths_name = "paths_{}".format(self.sim_name)
-        paths_path = os.path.join(gridbots.path, 'spec', 'paths', '{}.pickle'.format(paths_name))
+        paths_path = os.path.join(paths_dir, '{}.pickle'.format(paths_name))
 
         import pickle
 
