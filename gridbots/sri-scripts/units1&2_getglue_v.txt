@@ -11,10 +11,10 @@ simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate
 #move to highway x-position (110, 160) from (134, 160)
 simscript(zmove(10, -24, 0), zmove(11, -24, 0))
 #move to glue position in zone 5 (110, 58)
-simscript(zmove(11, 0, -102), zmove(5, 0, -102)) # TODO fix this typo
+simscript(zmove(11, 0, -102), zmove(5, 0, -102))
 
 ###modified to go to slot 4 for glue
-simscript(zmove(11, 0, -48), zmove(5, 0, -48)) # TODO fix this typo
+simscript(zmove(11, 0, -48), zmove(5, 0, -48))
 ###modified to go to slot 4 for glue
 
 
@@ -72,4 +72,4 @@ simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate
 simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
 
 #move both robots to their buffer positions
-simscript(unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)
+simscript (unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)

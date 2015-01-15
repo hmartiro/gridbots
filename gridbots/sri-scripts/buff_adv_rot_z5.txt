@@ -1,0 +1,7 @@
+zmove(5, -28, 0)
+zmove(5, 0, 4)
+zmove(5, -40,0)
+zmove(5, 0, -24)
+zmove(5, 24, 0)
+zmove(5, 0, -4)
+zmove(5, 28, 0)

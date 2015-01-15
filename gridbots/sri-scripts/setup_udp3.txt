@@ -1,0 +1,11 @@
+#center of bruiser bot in cell 1
+insert (H, 162, 60)
+
+#center of bruiser bot in cell 2
+insert (H, 162, 156)
+
+#center of bruiser bot in cell 1
+insert (V, 246, 12)
+
+#center of bruiser bot in cell 2
+insert (V, 246, 108)

@@ -1,0 +1,51 @@
+#162,156 to 134, 160
+<unit2_bufftorotate_z10
+
+#rotate by 180. start and end at 134,64
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+#move to solvent position in zone 5 (110, 34)
+simscript(zmove(10, -24, 0), zmove(11, -24, 0))
+simscript(zmove(11, 0, -126), zmove(5, 0, -126)
+
+#transition to 6 and drive all the way down 6 to well
+simscript(zmove(5, -198, 0), zmove(6, -198, 0))
+
+wait(2)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(.2)
+
+#drive back up to 5
+simscript(zmove(6, 198, 0), zmove(5, 198, 0))
+
+#move back to rotate position (134,64)
+simscript(zmove(5, 0, 126), zmove(11, 0, 126))
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+
+#rotate by 180. start and end at 134,64
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+#return to buffer
+<unit2_rotatetobuff_z10

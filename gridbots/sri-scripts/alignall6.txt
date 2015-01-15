@@ -1,0 +1,18 @@
+
+simscript(unit1_errcorrec.txt.psf, unit2_errcorrec.txt.psf)
+<units1&2_buffer_advance
+
+simscript(unit1_errcorrec.txt.psf, unit2_errcorrec.txt.psf)
+<units1&2_buffer_advance
+
+simscript(unit1_errcorrec.txt.psf, unit2_errcorrec.txt.psf)
+<units1&2_buffer_advance
+
+simscript(unit1_errcorrec.txt.psf, unit2_errcorrec.txt.psf)
+<units1&2_buffer_advance
+
+simscript(unit1_errcorrec.txt.psf, unit2_errcorrec.txt.psf)
+<units1&2_buffer_advance
+
+simscript(unit1_errcorrec.txt.psf, unit2_errcorrec.txt.psf)
+<units1&2_buffer_advance

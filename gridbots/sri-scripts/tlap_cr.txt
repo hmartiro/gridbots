@@ -1,0 +1,3 @@
+stagerel(0,0,12)
+wait(2)
+stagerel(0,-24, 0)

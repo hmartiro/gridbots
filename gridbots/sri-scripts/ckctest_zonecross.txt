@@ -1,0 +1,13 @@
+# test bug exposed by unit1 and unit2 get water scripts
+# try to replicate problem with simple (and short) test
+
+simscript (zmove (1, 4, 0), zmove (2, 4, 0), zmove(10, 4, 0), zmove (11, 4, 0))
+
+# test indepentent zone moves that incorporate boundary crossing
+simscript (ckctest_zonecross_z1z2, ckctest_zonecross_z3z4)
+
+# make sure extra move starts after zone crossings
+simscript (zmove(10, 3, 0), zmove (11, 3, 0))
+
+printtimeline
+

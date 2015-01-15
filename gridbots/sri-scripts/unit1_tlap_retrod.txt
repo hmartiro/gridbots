@@ -1,0 +1,19 @@
+#Robot start: (283, 88)
+
+#pull diagonally away
+zmove(1, -0.5, 0.5)
+zonewait(1, 0.3)
+zmove(1, -0.5, 0.5)
+zonewait(1, 0.3)
+zmove(1, -1, 1)
+zmove(1, -1, 0)
+
+#Robot loc: (279, 93)
+
+#pull back in -x to clear rod and move to buff
+zmove(1, -10, 0)
+zmove(1, 0, -24)
+zmove(1, -24, 0)
+zmove(1, 0, -54)
+
+#Robot loc: (246, 12)

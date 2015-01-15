@@ -1,0 +1,70 @@
+#transition to 6 and drive all the way down 6 to the well
+zmove(6, -197, 0)
+
+zonewait(6, 1)
+
+##drive all the way back to 5
+#zmove(6, 1, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, 3, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, 3, 0)
+#zonewait(6, 0.5)
+
+zmove(6, 1, 0)
+zonewait(6, 0.5)
+
+zmove(6, 3, 0)
+zonewait(6, 0.5)
+
+zmove(6, 3, 0)
+zonewait(6, 0.5)
+
+#zmove(6, 2, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, -7, 0)
+
+##drive all the way back to 5
+#zmove(6, 1, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, 3, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, 3, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, -1, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, -3, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, -3, 0)
+#zonewait(6, 0.5)
+
+
+
+##drive all the way back to 5
+#zmove(6, 1, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, 3, 0)
+#zonewait(6, 0.5)
+
+#zmove(6, 3, 0)
+#zonewait(6, 0.5)
+
+
+##zmove(6, 2, 0)
+##zonewait(6, 0.2)
+
+zmove(6, 190, 0)
+
+##modified for mineral-oil steps - 09/30/2014
+#zmove(6, -180, 0)
+#zonewait(6, 0.2)
+#zmove(6, 180, 0)

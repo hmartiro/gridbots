@@ -1,0 +1,41 @@
+#robot start: 246, 12
+
+#z compensation of stage
+stagerel(0,0,-3)
+wait(1.5)
+stagerel(0,0,0.5)
+wait(1)
+
+zmove(1, 0, 11)
+zmove(1, 31.5, 0)
+#robot loc: 277.5, 23
+
+#glue location should be 280.5, 26
+zmove(1, 3, 3)
+wait(1)
+zmove (1, 0, -3)
+wait(1)
+zmove (1, -0.5, 0)
+zmove (1, 0, 3)
+zmove (1, 0, -3)
+wait(1)
+zmove (1, -0.5, 0)
+zmove (1, 0, 3)
+zmove (1, -0.5, 0)
+zmove (1, -0.5, 0)
+#robot loc: 278.5, 26
+
+#retract slowly
+zmove (1, 0, -1)
+zmove (1, -1, 0)
+zmove (1, 0, -2)
+wait(1)
+#robot loc: 277.5, 23
+
+#final move compensates for the previous x direction steps
+
+zmove(1, -31.5, 0)
+zmove(1, 0, -11)
+
+stagerel(0,0,2.5)
+wait(1)

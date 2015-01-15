@@ -1,0 +1,41 @@
+#(162,156) to (134,160)
+#param_dictionary = getrod_dict.txt
+
+
+<unit2_bufftorotate_z10
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+simscript(unit2_rotate90_z10, unit2_rotate90_z11)
+
+wait(0.1)
+
+#
+simscript(unit2_movewater_z10, unit2_movewater_z11, unit2_movewater_z5)
+simscript(units1&2_getwater_z5, units1&2_getwater_z6)
+
+#move to h rod position (110, 154)
+simscript(zmove(5, 0, 72), zmove(11, 0, 72))
+
+#move onto flex (2, 154) and get rod
+rate(120)
+simscript(units1&2_gethrod_z11, units1&2_gethrod_z12)
+
+#register the rod
+zmove(11, 0, -31.5)
+wait(0.3)
+zmove(11, 0, 5.5)
+zmove(11, 0, -6)
+wait(0.3)
+zmove(11, 0, 32)
+
+rate(140)
+
+zmove(11, 70, 0)
+
+#move to rotate position (134, 160)
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+zmove(10, 0, 6)
+
+simscript(unit2_rotate90_z10, unit2_rotate90_z11)
+
+<unit2_rotatetobuff_z10

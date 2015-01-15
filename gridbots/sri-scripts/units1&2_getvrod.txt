@@ -1,0 +1,84 @@
+feed(h)
+<alignall
+
+#(162,156) to (134,160) and (162, 60) to (134,64)
+simscript(unit2_bufftorotate_z10, unit1_bufftorotate_z4)
+
+#rotate 180 both robots
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#unit1 will move to getwater position (110, 82)
+simscript(zmove(4, -24, 0), zmove(5, -24, 0))
+zmove(5, 0, 18)
+
+rate(120)
+#unit1 will drive to get water while
+#unit2 will move from z10 into z4
+rate(120)
+simscript(units1&2_getwater_z5, units1&2_getwater_z6, units1&2_z10toz4_z10, units1&2_z10toz4_z4)
+rate(120)
+#unit1 will move to v rod position (110, 132)
+simscript(zmove(5, 0, 50), zmove(11, 0, 50))
+
+#unit2 will move to getwater position
+simscript(zmove(4, -24, 0), zmove(5, -24, 0))
+zmove(5, 0, 18)
+
+#unit2 will get water and end at 110,82
+#unit1 will get v rod and end at 34, 132
+rate(120)
+simscript(units1&2_getwater_z5, units1&2_getwater_z6, units1&2_getvrod_z11, units1&2_getvrod_z12)
+rate(120)
+
+#Comment to remove
+#Shake robot back and forth - added for mineral oil
+simscript(zmove(11, -15, 0),zmove(12, -15, 0))
+simscript(zmove(11,  15, 0),zmove(12,  15, 0))
+simscript(zmove(11, -15, 0),zmove(12, -15, 0))
+simscript(zmove(11,  15, 0),zmove(12,  15, 0))
+#Comment to remove
+
+
+
+feed(h)
+
+rate(180)
+#move unit1 to z10 and end at rotation position 134, 160
+simscript(zmove(11, 100, 0), zmove(10, 100, 0))
+zmove(10, 0, 28)
+
+#move unit1 to to unit1 rotation position (134, 64)
+#move unit2 to v rod position in z11 (110, 154)
+simscript(zmove(5, 0, 50), zmove(11, 0, 50), units1&2_z10toz4_z10, units1&2_z10toz4_z4) 
+
+#wait(1)
+
+#rate(120)
+rate(120)
+#unit2 will now get v rod and end at 34, 154
+simscript(units1&2_getvrod_z11, units1&2_getvrod_z12)
+rate(120)
+
+
+#Comment to remove
+#Shake robot back and forth - added for mineral oil
+simscript(zmove(11, -15, 0),zmove(12, -15, 0))
+simscript(zmove(11,  15, 0),zmove(12,  15, 0))
+simscript(zmove(11, -15, 0),zmove(12, -15, 0))
+simscript(zmove(11,  15, 0),zmove(12,  15, 0))
+#Comment to remove
+
+
+rate(180)
+#unit2 will now move to z10 and end at rotation position 134, 60
+simscript(zmove(11, 100, 0), zmove(10, 100, 0))
+zmove(10, 0, 28)
+
+rate(180)
+#rotate 180 both robots
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#move both robots to their buffer positions
+simscript (unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)

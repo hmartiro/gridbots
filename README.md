@@ -119,19 +119,16 @@ currently planned:
 * Exact rotational pixels
 
 ### Items for next meeting
-* Exact rot/flex pixels
-* All scripts
-* Robot types, orientations
-* Updated pictures of setup, rod feed area
-* Location (mm) of indexer
-* close parenthesis in simscript files
 * video of this exact routine, times should compare
+* Indexing procedure, move further than wall?
+* Exact dimensions of robots, for indexing
 
 ### TODO
 * Drawing end effectors/rods
 * Updating rates in playback
 * UV light, stagerel
 * Provide location directory in mm, not nodes
+* Be ok dealing with missing parentheses?
 
 ### Answers
 * Brushing glue robots brush glue across

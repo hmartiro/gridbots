@@ -1,0 +1,4 @@
+# parameter dictionary for error correction
+
+$err_ydist = 46
+$err_xdist = 32

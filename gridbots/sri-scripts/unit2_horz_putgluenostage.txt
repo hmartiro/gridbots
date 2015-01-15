@@ -1,0 +1,10 @@
+#Robot start: (246, 108)
+
+#glue put location should be 277.5, 104
+zmove(7, 0, -7)
+#zmove(7, 31.5, 0)
+zmove(7, 30.5, 0)
+#Robot loc: (277.5, 104)
+
+#Robot loc: (277.5, 104)
+#Stage loc: (0, 0, 0)

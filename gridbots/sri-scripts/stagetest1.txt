@@ -1,0 +1,10 @@
+# test sequence of support ops using stage
+wait (1)
+stagerel (20, 0, 0)
+
+#note: the stage moves at about 10mm per sec
+wait (3)
+
+stagerel (-10, 0, 0)
+wait (2)
+stagerel (-10, 0, 0)

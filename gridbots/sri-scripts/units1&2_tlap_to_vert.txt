@@ -1,0 +1,17 @@
+#
+
+stagerel(14,0,0)
+wait(3)
+stagerel(0,-24, -36)
+
+<alignall
+<units1&2_getsolv
+
+<units1&2_buffer_advance
+<units1&2_buffer_advance
+
+<units1&2_getwater_soak
+<alignall
+
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse

@@ -1,0 +1,1 @@
+simscript(zmove(1, 5, 0), zmove(2, 5, 0))

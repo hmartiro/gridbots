@@ -1,0 +1,10 @@
+#Robot start: (246, 12)
+
+#move rod into position
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 16)
+#zmove(1, 9, 0)
+zmove(1, 8.0, 0)
+
+#Robot loc: (280, 79)

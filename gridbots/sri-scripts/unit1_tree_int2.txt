@@ -1,0 +1,12 @@
+
+#cure
+
+#<unit1_getsolv
+
+<unit1_tree_retrod
+
+stagerel(0,0,1.8)
+wait(1)
+
+#advance stage
+stagerel(0,12,0)

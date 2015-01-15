@@ -71,14 +71,10 @@ def parse_stations(station_data, node_aliases):
     return stations
 
 
-def parse_routines(routine_data):
+def parse_routine(routine):
 
-    routines = {}
-    for routine_name in routine_data:
+    from gridbots.core.routine import TrajectoryBuilder
 
-        path = os.path.join(gridbots.path, 'spec', 'routines', '{}.yml'.format(routine_name))
-        with open(path) as f:
-            data = yaml.load(f.read())
-        routines[routine_name] = data
-
-    return routines
+    path = os.path.join(gridbots.path, 'sri-scripts', routine)
+    builder = TrajectoryBuilder(path)
+    return builder.moves

@@ -1,0 +1,15 @@
+# Script for demoing units_1&2_tree_int
+
+<units1&2_tlap_int
+
+# To get the right robots into position
+#<units1&2_buffer_advance
+#<units1&2_buffer_advance
+#<units1&2_buffer_advance
+#<units1&2_buffer_advance
+
+# To rotate
+#<units1&2_tlap_to_vert
+#<units1&2_vert_to_horz
+
+#<units1&2_tree_int

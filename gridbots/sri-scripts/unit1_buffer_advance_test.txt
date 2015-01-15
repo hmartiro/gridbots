@@ -1,0 +1,19 @@
+﻿#align
+#<z5_align
+#rate(100)
+#simscript(z1_align, buff_adv_rot_z4, buff_adv_rot_z5)
+#<z1_align
+
+rate(180)
+#buffer_position
+#simscript(z1_pos48y, z4_neg48y)
+simscript(zmove(1, 0, 48), zmove(4, 0, -48))
+
+#buffer_enter
+#simscript(z1_neg14, z2_neg14, z4_pos14, z3_pos14)
+simscript(zmove(1, -14, 0), zmove(2, -14, 0), zmove(4, 14, 0), zmove(3, 14, 0))
+
+
+#buffer_exit
+#simscript(z3_pos14, z1_pos14, z2_neg14, z4_neg14)
+simscript(zmove(3, 14, 0), zmove(1, 14, 0), zmove(2, -14, 0), zmove(4, -14, 0))

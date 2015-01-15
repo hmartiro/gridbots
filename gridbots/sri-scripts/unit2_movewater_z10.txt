@@ -1,0 +1,7 @@
+#assume robot is at the rotate position (134, 160) after having finished 180 rotation
+
+#go to zone 11 (vertical highway)
+zmove(10, -24, 0)
+
+#move to water position
+zmove(10, 0, -78)

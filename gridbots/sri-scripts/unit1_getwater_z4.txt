@@ -1,0 +1,16 @@
+#assume robot is at the rotate position (134, 64) after having finished 180 rotation
+#robot will stay in uni1 to get water from water station
+
+#go to zone 5 (vertical highway) (110, 64)
+zmove(4, -24, 0)
+
+#move to vertical center of uppermost unit1 pixel (110, 82)
+zmove(4, 0, 18)
+
+#transition to 6 and drive all the way down 6 to the well 
+zmove(4, -197, 0)
+
+zonewait(4, 1)
+
+#drive all the way back to 5
+zmove(4, 197, 0)

@@ -1,0 +1,6 @@
+#assume robot is at the rotation position (134, 160)
+
+#rotate by 90
+zmove(10, 0, 40)
+zmove(10, 0, -24)
+zmove(10, 24, 0)

@@ -1,0 +1,17 @@
+#Robot start: (110, 154)
+#from h rod position (110, 154)
+zmove(12, -108, 0)
+#zonewait(12, 0.2)
+
+#drive down flex to rod
+zmove(12, -163, 0)
+#zonewait(12, 0.4)
+
+zonewait(12, 0.4)
+
+zmove(12, 163, 0)
+
+#move back to zone 11 to 40, 154
+zmove(12, 38, 0)
+
+#Robot loc: (40, 154)

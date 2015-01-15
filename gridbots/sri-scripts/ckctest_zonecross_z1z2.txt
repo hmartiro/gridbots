@@ -1,0 +1,13 @@
+# test zone moves with embedded boundary crossing
+
+# move zone a little, then use zone wait (sync'd with other subscript)
+zmove (2, 4, 0)
+#zonewait (2, 0.1)
+zmove (2, 0, -2)
+
+
+# test zone crossing z2 to z1
+CrossOneBoundary (236, 60, 244, 60)
+
+zmove (1, 8, 0)
+zmove (1, 0, -4)

@@ -52,7 +52,7 @@ class TrajectoryBuilder():
         logging.info('Commands:\n{}\n'.format(self.commands))
 
         self.moves = self.generate_trajectory(self.commands)
-        #logging.info('Zone moves:\n{}\n'.format(pformat(self.moves)))
+        # logging.info('Zone moves:\n{}\n'.format(pformat(self.moves)))
 
     def generate_trajectory(self, command):
 
@@ -155,7 +155,7 @@ class TrajectoryBuilder():
     def read_script(self, script_name):
 
         # Get path to the script file
-        script_path = os.path.join(self.SCRIPT_DIR, '{}.txt'.format(script_name))
+        script_path = os.path.join(self.SCRIPT_DIR, script_name)
 
         # Read the script as a list of lines
         with open(script_path, 'r') as f:
@@ -178,7 +178,8 @@ class TrajectoryBuilder():
             lines = self.read_script(script_name)
         except FileNotFoundError:
             logging.error('Script not found: {}'.format(script_name))
-            return Command('SCRIPT NOT FOUND: {}'.format(script_name), [])
+            raise
+            # return Command('SCRIPT NOT FOUND: {}'.format(script_name), [])
 
         commands = SerialCommands()
         for i, line in enumerate(lines):
@@ -193,12 +194,18 @@ class TrajectoryBuilder():
     def process_script_line(self, line):
 
         if line.startswith('<'):
+            # Found another script
+            if '.txt' not in line:
+                line += '.txt'
             return self.process_script(line[1:])
 
         elif line.startswith('simscript'):
             return self.process_simscript_line(line)
 
         if '(' not in line:
+            # Found script that was incorrectly not prefixed w/ <
+            if '.txt' not in line:
+                line += '.txt'
             return self.process_script(line)
 
         command, args = line.split('(')
@@ -210,7 +217,9 @@ class TrajectoryBuilder():
     def process_simscript_line(self, line):
 
         try:
-            args = re.search('simscript\s*\((.*)\)', line).group(1)
+            # NOTE ingoring closing parentheses since a lot of the scripts
+            # incorrectly are missing them
+            args = re.search('simscript\s*\((.*)', line).group(1)
         except AttributeError:
             logging.error('Bad line: {}'.format(line))
             raise
@@ -220,10 +229,6 @@ class TrajectoryBuilder():
         start_inx = 0
         lines = []
         for i, c in enumerate(args):
-
-            # logging.debug('i: {}, c: {}, paren: {}, start_inx: {}, str: {}'.format(
-            #     i, c, paren_depth, start_inx, args[start_inx:i])
-            # )
 
             if c == '(':
                 paren_depth += 1
@@ -238,7 +243,13 @@ class TrajectoryBuilder():
                     start_inx = i+1
 
         if start_inx < len(args):
-            lines.append(args[start_inx:])
+
+            # NOTE removing trailing parenthesis to handle bad simcript invocation
+            last_line = args[start_inx:]
+            if last_line.count('(') - last_line.count(')') == -1:
+                last_line = last_line[:-1]
+
+            lines.append(last_line)
 
         # Strip whitespace
         lines = [c.strip() for c in lines]
@@ -258,7 +269,7 @@ if __name__ == '__main__':
     import yaml
 
     if len(sys.argv) < 2:
-        top_level_script = 'units1&2_tree_int'
+        top_level_script = 'units1&2_tree_int.txt'
     else:
         top_level_script = sys.argv[1]
 

@@ -1,0 +1,3 @@
+#zmove(4, 0, -4)
+simscript(pix42_ccw_zone4, pix42_ccw_zone5)
+#zmove(4, 0, 4)

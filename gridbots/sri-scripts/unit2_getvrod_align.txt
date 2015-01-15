@@ -1,0 +1,33 @@
+#(162,156) to (134,160)
+rate(180)
+<unit2_bufftorotate_z10
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+simscript(unit2_getwater_z10, unit2_getwater_z11, unit2_getwater_z5, unit2_getwater_z6)
+
+#move to v rod position (110, 132)
+simscript(zmove(5, 0, 50), zmove(11, 0, 50))
+
+#move onto flex (2, 154)
+simscript(zmove(11, -108, 0), zmove(12, -108, 0))
+wait(0.2)
+
+rate(120)
+
+zmove(12, -164, 0)
+wait(15)
+zmove(12, 164, 0)
+
+#move back to zone 11 (110,132)
+simscript(zmove(11, 108, 0), zmove(12, 108, 0))
+
+rate(180)
+
+#move to rotate position (134, 160)
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+zmove(10, 0, 28)
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+<unit2_rotatetobuff_z10

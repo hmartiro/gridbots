@@ -1,0 +1,18 @@
+# test bug exposed by unit1 and unit2 get water scripts
+
+# first unit1 invocation works OK
+# echo ************** first <unit1_getwater_test ************
+<unit1_getwater_test
+
+# first unit2 invocation works OK
+# echo ************** first <unit2_getwater_test************
+<unit2_getwater_test
+
+
+# second or third unit1 invocation causes trouble (unexplained movement in zone 4 and 5)
+# echo ************** second <unit1_getwater_test ************
+<unit1_getwater_test
+
+# echo ************** third <unit1_getwater_test ************
+#<unit1_getwater_test
+

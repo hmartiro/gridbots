@@ -1,0 +1,16 @@
+<unit1_bufftorotate_z4
+
+simscript(unit1_rotate180_z4, unit1_rotate180_z5)
+
+wait (.2)
+
+simscript(unit1_getwater_z4, unit1_getwater_z5, unit1_getwater_z6)
+
+simscript(unit1_returnwater_z4, unit1_returnwater_z5, unit1_returnwater_z6)
+wait (.2)
+
+echo unit1_returnwater_z4,z5,z6 end
+
+simscript(unit1_rotate180_z4, unit1_rotate180_z5)
+
+<unit1_rotatetobuff_z4

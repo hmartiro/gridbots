@@ -1,0 +1,20 @@
+#Robot start: (246, 12)
+
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 14)
+zmove(1, 10.5, 0)
+#Robot loc: (280.5, 78)
+
+#vertical rod place position is 280.5, 25
+zmove(1, 0, 1.5)
+wait(0.5)
+zmove(1, 0, 0.5)
+wait(0.5)
+zmove(1, 0, 0.5)
+#Added to apply more pressure
+wait(0.5)
+zmove(1, 0, 0.5)
+wait(0.5)
+#Robot loc: (280.5, 80.5)
+#Stage loc: (0, 0, 0)

@@ -1,0 +1,17 @@
+#Robot start: (281, 79)
+
+#pull robot back
+zmove(1, -0.5, 0)
+zonewait(1, 0.5)
+zmove(1, -0.5, 0)
+zonewait(1, 0.5)
+#Robot loc: (280, 79)
+
+#zmove(1, -9, 0)
+zmove(1, -8.0, 0)
+zmove(1, 0, -16)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+#Robot loc: (246, 12)
+#Stage loc: (0, 0, 0)

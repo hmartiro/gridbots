@@ -1,0 +1,13 @@
+#assume that we are queued for 2 glue and then rod...
+
+
+#need to move stage while moving the robots around
+stagerel(0,-24,0)
+<units1&2_getsolv
+<units1&2_buffer_advance
+<units1&2_getsolv
+<units1&2_buffer_advance
+
+<units1&2_tree_ready
+
+<units1&2_buffer_advance

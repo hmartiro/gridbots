@@ -1,0 +1,36 @@
+#Robot start: (246, 12)
+#glue robot should be 24-13 = 9 mm short of rod robot location
+
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 20)
+zmove(1, 11, 0)
+#Robot loc: (281, 80)
+zonewait(1, .4)
+
+#put glue slowly
+zmove(1, 2, 0)
+zonewait(1, .5)
+zmove(1, .5, 0)
+zonewait(1, .5)
+zmove(1, .5, 0)
+#Robot loc: (284, 80)
+
+zonewait(1,1)
+
+#retract slowly
+zmove (1, -0.5, 0)
+zonewait(1, 1)
+zmove (1, -0.5, 0)
+zonewait(1, .5)
+zmove (1, -0.5, 0)
+zonewait(1, .5)
+#Robot loc: (282.5, 80)
+
+#return to buff
+zmove(1, -12.5, 0)
+zmove(1, 0, -20)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+#Robot loc: (246, 12)

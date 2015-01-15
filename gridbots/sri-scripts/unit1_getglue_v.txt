@@ -1,0 +1,29 @@
+#162,60 to 134, 64
+<unit1_bufftorotate_z4
+
+#rotate by 180. start and end at 134,64
+simscript(unit1_rotate180_z4, unit1_rotate180_z5)
+
+#move to glue position in zone 5 (110, 58)
+simscript(zmove(4, -24, 0), zmove(5, -24, 0))
+zmove(5, 0, -6)
+
+#transition to 6 and drive all the way down 6 to well
+simscript(zmove(5, -198, 0), zmove(6, -198, 0))
+
+wait(1)
+rate(100)
+
+#drive back up to 5
+simscript(zmove(6, 198, 0), zmove(5, 198, 0))
+
+rate(180)
+#move back to rotate position (134,64)
+zmove(5, 0, 6)
+simscript(zmove(5, 24, 0), zmove(4, 24, 0))
+
+#rotate by 180. start and end at 134,64
+simscript(unit1_rotate180_z4, unit1_rotate180_z5)
+
+#return to buffer
+<unit1_rotatetobuff_z4

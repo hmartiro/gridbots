@@ -1,0 +1,12 @@
+#
+<units1&2_horz_int
+wait(2)
+stagerel(0,-12,12)
+
+<units1&2_horz_int
+wait(2)
+stagerel(0,-12,12)
+
+<units1&2_horz_int
+wait(2)
+stagerel(0,-12,12)

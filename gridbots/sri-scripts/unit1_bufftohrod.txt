@@ -1,0 +1,10 @@
+<unit1_bufftorotate_z4
+<unit1_rotate90
+<unit1_rotate90
+
+<unit1_rotatetobuff_z4
+
+simscript(zmove(4, -52, 0), zmove(5, -52, 0))
+simscript(zmove(5, 0, 94), zmove(11, 0, 94))
+simscript(zmove(11, -108, 0), zmove(12, -108, 0))
+

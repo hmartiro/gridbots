@@ -1,0 +1,7 @@
+zmove(4, -28, 0)
+zmove(4, 0, 4)
+zmove(4, 0,40)
+zmove(4, 0, -24)
+zmove(4, 24, 0)
+zmove(4, 0, -4)
+zmove(4, 28, 0)

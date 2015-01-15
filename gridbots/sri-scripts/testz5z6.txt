@@ -1,0 +1,6 @@
+simscript(z5_neg100, z6_neg100)
+simscript(z5_neg100, z6_neg100)
+wait(0.2)
+simscript(z5_pos100, z6_pos100)
+simscript(z5_pos100, z6_pos100)
+wait(0.2)

@@ -1,0 +1,55 @@
+#
+
+#(162,156) to (134,160)
+
+<unit2_bufftorotate_z10
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+#ALLEN ADDED
+rate(120)
+simscript(unit2_movewater_z10, unit2_movewater_z11, unit2_movewater_z5)
+simscript(units1&2_getwater_z5, units1&2_getwater_z6)
+#ALLEN ADDED
+
+#ORIGINAL
+#rate(120)
+#simscript(unit2_getwater_z10, unit2_getwater_z11, unit2_getwater_z5, unit2_getwater_z6)
+
+
+#move to h rod position (110, 154)
+simscript(zmove(5, 0, 72), zmove(11, 0, 72))
+
+#unit2 will get h rod
+simscript(units1&2_gethrod_z11, units1&2_gethrod_z12)
+
+
+##move onto flex (2, 154)
+#simscript(zmove(11, -108, 0), zmove(12, -108, 0))
+#wait(1)
+
+##param_dictionary = getrod_dict.txt
+
+#zmove(12, -161.5, 0)
+#wait(0.5)
+#zmove(12, 161.5, 0)
+
+#move back to zone 11 and register
+#simscript(zmove(11, 108, 0), zmove(12, 108, 0))
+#simscript(zmove(11, 38, 0), zmove(12, 38, 0))
+#zmove(11, 0, -31.5)
+#wait(0.3)
+#zmove(11, 0, 5.5)
+#zmove(11, 0, -6)
+#wait(0.3)
+#zmove(11, 0, 32)
+zmove(11, 70, 0)
+
+rate(180)
+#move to rotate position (134, 160)
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+zmove(10, 0, 6)
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+<unit2_rotatetobuff_z10

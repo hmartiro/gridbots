@@ -1,0 +1,12 @@
+#
+<alignall
+<units1&2_gettree
+
+#buffer reverse to get rod robot in workspace
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse
+
+#put rods
+rate(100)
+simscript(unit1_tlap_putrod, unit2_tlap_putrod)

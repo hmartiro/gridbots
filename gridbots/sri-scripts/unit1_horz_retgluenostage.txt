@@ -1,0 +1,11 @@
+#Robot start: (277.5, 77)
+
+#return to buffer at 246, 12
+#zmove(1, -5.5, 0)
+zmove(1, -4.5, 0)
+zmove(1, 0, -20.5)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+#Robot loc: (246, 12)
+#Stage loc: (0, 0, 0)

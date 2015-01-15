@@ -1,0 +1,24 @@
+# script file path = .\unit2_errcorrec.txt
+# parent script dictionary = 
+
+#align unit1 robot in passive error correction feature
+
+#param_dictionary = errordict.txt
+
+zmove(10, 0, -46)
+zmove(10, -32, 0)
+
+rate(80)
+zmove(10, -4, 0)
+wait(0.2)
+zmove(10, 2, 0)
+
+zmove(10, 0, -4)
+wait(0.2)
+zmove(10, 0, 8)
+wait(0.2)
+zmove(10, 0, -4)
+
+rate(140)
+zmove(10, 32, 0)
+zmove(10, 0, 46)

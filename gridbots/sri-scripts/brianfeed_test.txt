@@ -1,0 +1,4 @@
+# script for brian to test feed 
+zmove(12, -160.5, 0)
+wait(5)
+zmove(12, 160.5, 0)

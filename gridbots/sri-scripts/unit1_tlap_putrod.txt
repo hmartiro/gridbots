@@ -1,0 +1,16 @@
+#Robot start: (246, 12)
+
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 24)
+zmove(1, 13, 0)
+
+zonewait(1,.4)
+
+zmove(1, 0, 4)
+
+#plant rod position should be same as tree (282, 90)
+#but approach from y direction
+#8/26/14 updated to 282, 88
+
+#Robot loc: (282, 88)

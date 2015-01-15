@@ -1,0 +1,6 @@
+# for testing simscript movements
+
+
+zmove (12, -161.5, 0)
+zmove (12,  161.5, 0)
+

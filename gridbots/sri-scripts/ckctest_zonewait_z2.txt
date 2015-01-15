@@ -1,0 +1,8 @@
+# test bug exposed by unit1 and unit2 get water scripts
+# try to replicate problem with simple (and short) test
+
+# move zone a little, then use zone wait (sync'd with other subscript)
+zmove (2, 4, 0)
+zonewait (2, 0.1)
+zmove (2, -4, 0)
+

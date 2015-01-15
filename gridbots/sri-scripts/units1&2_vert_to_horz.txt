@@ -1,0 +1,15 @@
+#starting from vert int ready position
+
+stagerel(0,-24, -24)
+
+<units1&2_buffer_advance
+<units1&2_getsolv_long
+
+<units1&2_buffer_reverse
+<units1&2_getsolv_long
+
+<units1&2_buffer_reverse
+<units1&2_horz_ready
+
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse

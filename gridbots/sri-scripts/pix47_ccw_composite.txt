@@ -1,0 +1,5 @@
+#rotation location is (244, 60) in pix-35
+
+simscript(pix47_ccw_zone1, pix47_ccw_zone2)
+setroboty(1, 60)
+setrobotx(1, 244)

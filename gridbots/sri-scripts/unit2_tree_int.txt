@@ -1,0 +1,39 @@
+#First step is to get glue
+<alignall
+<units1&2_getglue_v
+<alignall
+
+#buffer advance and get rods
+<units1&2_buffer_advance
+<alignall
+<units1&2_gettree
+
+#buffer advance and put glue
+<units1&2_buffer_advance
+<units1&2_buffer_advance
+
+rate(80)
+<unit2_tree_putglue
+#simscript(unit1_tree_putglue, unit2_tree_putglue)
+
+#buffer advance and put rod
+<units1&2_buffer_advance
+rate(100)
+<unit2_tree_putrod
+#simscript(unit1_tree_putrod, unit2_tree_putrod)
+
+#cure
+wait(1)
+uv(1)
+wait(20)
+uv(0)
+<unit2_tree_retrod
+#simscript(unit1_tree_retrod, unit2_tree_retrod)
+
+rate(180)
+<units1&2_buffer_advance
+<units1&2_buffer_advance
+
+
+stagerel(0,12,0)
+wait(1)

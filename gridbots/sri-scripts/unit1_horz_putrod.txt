@@ -1,0 +1,36 @@
+#Robot start: (246, 12)
+
+#drive stage down
+stagerel(0,0,-3)
+wait(1)
+
+#move rod into position
+zmove(1, 0, 18)
+zmove(1, 34, 0)
+#Robot loc: (280, 30)
+
+#move the stage +z to lift the rod
+stagerel (0, 0, 3.1)
+wait(0.5)
+
+#push the rod a little bit more
+zmove (1, 0.5, 0)
+zmove (1, 0.5, 0)
+#robot loc: 281, 29
+
+#cure
+wait(10)
+
+#pull robot back
+zmove(1, -0.5, 0)
+zmove(1, -0.5, 0)
+
+zmove(1, -34, 0)
+zmove(1, 0, -18)
+
+#return stage to position
+stagerel(0, 0, -0.1)
+wait(1)
+
+#Robot loc: (246, 12)
+#Stage loc: (0, 0, -9.685755E-08)

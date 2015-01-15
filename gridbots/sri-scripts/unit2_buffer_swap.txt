@@ -1,0 +1,32 @@
+#align
+#rate(100)
+#simscript(z7_align, buff_adv_rot_z10, buff_adv_rot_z11)
+#<z7_align
+
+rate(180)
+#buffer_position
+simscript(zmove(7, 0, 48), zmove(10, 0, -48))
+
+#buffer_enter
+simscript(zmove(7, -14, 0), zmove(8, -14, 0), zmove(10, 14, 0), zmove(9, 14, 0))
+
+#buffer_exit
+simscript(zmove(9, 14, 0), zmove(7, 14, 0), zmove(8, -14, 0), zmove(10, -14, 0))
+
+#buffer_position
+simscript(zmove(7, 0, 48), zmove(10, 0, -48))
+
+#buffer_enter
+simscript(zmove(7, -14, 0), zmove(8, -14, 0), zmove(10, 14, 0), zmove(9, 14, 0))
+
+#buffer_exit
+simscript(zmove(9, 14, 0), zmove(7, 14, 0), zmove(8, -14, 0), zmove(10, -14, 0))
+#buffer_position
+simscript(zmove(7, 0, 48), zmove(10, 0, -48))
+
+#buffer_enter
+simscript(zmove(7, -14, 0), zmove(8, -14, 0), zmove(10, 14, 0), zmove(9, 14, 0))
+
+#buffer_exit
+simscript(zmove(9, 14, 0), zmove(7, 14, 0), zmove(8, -14, 0), zmove(10, -14, 0))
+

@@ -1,0 +1,20 @@
+# test new software that incorporates primitive commands and
+# support operations into simultaneous sequences
+
+# test if sequences of zmoves have necessary delay between moves
+# the idea is to try one of the alternatives and examing the generated timeline
+
+# try with just primitives
+#echo test primitive moves
+#simscript (zmove (1, 4, 0), zmove (2, 4, 0))
+#simscript (zmove (1, 0, 4), zmove (2, 0, 4))
+
+# try with only scripts
+echo test sub-ordinate scripts
+simscript (sim_z1, sim_z2)
+
+# try mixing scripts and primitives
+#echo test sub-ordinate scripts with primitive
+#simscript (sim_z1, sim_z2, zmove (3, 8, 0))
+
+printtimeline

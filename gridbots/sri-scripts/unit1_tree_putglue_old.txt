@@ -1,0 +1,27 @@
+#robot start: 246, 12
+
+zmove(1, 0, 13)
+zmove(1, 26, 0)
+#robot loc: 272, 26
+
+zonewait(1, .4)
+#put glue slowly
+zmove(1, 2.5, 0)
+zonewait(1, .5)
+zmove(1, .5, 0)
+zonewait(1, .5)
+zmove(1, .5, 0)
+#robot loc: 276, 26
+
+zonewait(1,1)
+
+#retract slowly
+#zmove (1, -0.5, 0)
+zmove (1, -0.5, 0)
+zmove (1, -0.5, 0)
+zmove (1, -0.5, 0)
+#robot loc: 274, 26
+
+#return to buff
+zmove(1, -28, 0)
+zmove(1, 0, -13)

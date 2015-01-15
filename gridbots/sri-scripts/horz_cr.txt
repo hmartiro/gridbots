@@ -1,0 +1,3 @@
+#move stage to left position
+
+stagerel(0, -24, 12)

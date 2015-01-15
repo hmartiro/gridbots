@@ -66,7 +66,7 @@ class Simulation:
         self.stations = utils.parse.parse_stations(self.sim_data['stations'], self.node_aliases)
 
         # Parse routines from script files
-        self.routines = utils.parse.parse_routines(self.sim_data['routines'])
+        self.routine = utils.parse.parse_routine(self.sim_data['routine'])
 
         # self.job_queue = utils.planning.create_job_queue(
         #     self.structure,
@@ -153,7 +153,7 @@ class Simulation:
 
         self.time += self.TIME_PER_FRAME
 
-        logging.info('----- frame: {} time: {} -----'.format(self.frame, self.time))
+        logging.debug('----- frame: {} time: {} -----'.format(self.frame, self.time))
 
         # self.plan_tasks()
 
@@ -199,7 +199,7 @@ class Simulation:
             #         self.status = self.STATUS["success"]
             #         break
 
-            if self.frame == len(self.routines['units1_2_tree_int']):
+            if self.frame == len(self.routine):
                 break
 
             if self.interactive:

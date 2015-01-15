@@ -1,0 +1,34 @@
+#align
+#<z5_align
+#rate(100)
+#simscript(z1_align, buff_adv_rot_z4, buff_adv_rot_z5)
+
+rate(180)
+#buffer_position
+simscript(z1_pos48y, z4_neg48y)
+
+#buffer_enter
+simscript(z1_neg14, z2_neg14, z4_pos14, z3_pos14)
+
+#buffer_exit
+simscript(z3_pos14, z1_pos14, z2_neg14, z4_neg14)
+
+rate(180)
+#buffer_position
+simscript(z1_pos48y, z4_neg48y)
+
+#buffer_enter
+simscript(z1_neg14, z2_neg14, z4_pos14, z3_pos14)
+
+#buffer_exit
+simscript(z3_pos14, z1_pos14, z2_neg14, z4_neg14)
+
+rate(180)
+#buffer_position
+simscript(z1_pos48y, z4_neg48y)
+
+#buffer_enter
+simscript(z1_neg14, z2_neg14, z4_pos14, z3_pos14)
+
+#buffer_exit
+simscript(z3_pos14, z1_pos14, z2_neg14, z4_neg14)

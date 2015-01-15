@@ -1,0 +1,48 @@
+#First step is to get glue
+<alignall
+<unit2_getglue
+
+#Advance and get glue on next set of robots
+<units1&2_buffer_advance
+<alignall
+<unit2_getglue
+
+#Get rods next
+<units1&2_buffer_advance
+feed(h)
+<alignall
+#9/26/2014 - I made a change to get this file to work Allen
+#9/30/2014 - rerouted the robot to go around the bump in the graphite
+<unit2_gethrod_AH
+
+#advance to get glue robots in work zone
+<units1&2_buffer_advance
+
+#put glue on left rods
+rate(80)
+<Unit2_horz_putglue
+
+#move stage, advance buffer and put glue on right rods
+stagerel(0,12,0)
+<units1&2_buffer_advance
+<Unit2_horz_putglue
+
+#move stage between two glue rods, advance buffer and put rod
+stagerel(0,-6, 0)
+<units1&2_buffer_advance
+<unit2_horz_putrod
+
+#cure the glue
+wait(0.3)
+uv(1)
+wait(10)
+uv(0)
+
+#return the robots to buffers
+<unit2_horz_retrod
+
+#advance to next get glue position
+<units1&2_buffer_advance
+
+#move stage to next horz place position
+stagerel(0, 6, 0)

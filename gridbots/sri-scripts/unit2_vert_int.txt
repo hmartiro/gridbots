@@ -1,0 +1,48 @@
+#First step is to get glue
+<alignall
+<unit2_getglue_v
+
+#Advance and get glue on next set of robots
+<units1&2_buffer_advance
+<alignall
+<unit2_getglue_v
+
+#Get rods next
+feed(h)
+<units1&2_buffer_advance
+<alignall
+<unit2_getvrod
+
+#advance to get glue robots in work zone
+<units1&2_buffer_advance
+
+#put glue on top rods
+rate(80)
+<unit2_vert_putglue
+
+#advance to next set of robots and put glue on bottom rods
+stagerel(0,0,12)
+<units1&2_buffer_advance
+rate(80)
+<unit2_vert_putglue
+
+#move stage to position for placing rods, advance the buffer, and place rods
+stagerel(0,0,-4.5)
+<units1&2_buffer_advance
+rate(120)
+<unit2_vert_putrod
+
+#cure the glue
+wait(2)
+uv(1)
+wait(10)
+uv(0)
+
+#retract the robots and return stage to top rod position
+<unit2_vert_retrod
+stagerel(0,12,-7.5)
+
+#advance to be ready for next get glue or get solv
+<units1&2_buffer_advance
+
+#Stage loc: (0, 0, 0)

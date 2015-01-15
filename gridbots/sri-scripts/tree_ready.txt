@@ -1,0 +1,12 @@
+#Rotate both robots by 270 deg counterclockwise
+
+<alignall
+
+simscript(unit2_bufftorotate_z10, unit1_bufftorotate_z4)
+
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#move both robots to their buffer positions
+simscript (unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)

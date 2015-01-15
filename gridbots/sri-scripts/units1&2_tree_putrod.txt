@@ -1,0 +1,14 @@
+#robot start: 246, 12
+
+#simscript(zmove(1, 0, 24), zmove(7, 0, 24))
+#simscript(zmove(1, 32, 0), zmove(7, 32, 0))
+
+#wait(.4)
+
+#simscript(zmove(1, 4, 0), zmove(7, 4, 0))
+
+#robot end: (282, 36)
+
+
+simscript(unit1_tree_putrod, unit2_tree_putrod)
+

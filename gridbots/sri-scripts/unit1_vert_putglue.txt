@@ -1,0 +1,46 @@
+﻿#Robot start: (246, 12)
+
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 14)
+#zmove(1, 7.5, 0)
+zmove(1, 7.0, 0)
+#Robot loc: (277.5, 77)
+
+#glue location should be 281, 80
+zmove(1, 3, 3)
+#Robot loc: (280.5, 80)
+wait(1)
+zonewait(1, 1)
+zmove (1, 0, -3)
+wait(1)
+zonewait(1, 1)
+zmove (1, -0.5, 0)
+zmove (1, 0, 3)
+zmove (1, 0, -3)
+wait(1)
+zonewait(1, 1)
+zmove (1, -0.5, 0)
+zmove (1, 0, 3)
+zmove (1, -0.5, 0)
+zmove (1, -0.5, 0)
+#Robot loc: (278.5, 80)
+
+#retract slowly
+zmove (1, 0, -1)
+zmove (1, -1, 0)
+zmove (1, 0, -2)
+wait(1)
+zonewait(1, 1)
+#Robot loc: (277.5, 77)
+
+#final move compensates for the previous x direction steps
+
+#zmove(1, -7.5, 0)
+zmove(1, -7.0, 0)
+
+zmove(1, 0, -14)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+#Robot loc: (246, 12)

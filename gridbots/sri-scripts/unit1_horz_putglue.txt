@@ -1,0 +1,57 @@
+#Robot start: (246, 12)
+
+#drive stage -z by 2mm
+stagerel(0, 0, -2)
+
+
+#glue put location should be 277.5, 80
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 17)
+zmove(1, 7.5, 0)
+#Robot loc: (277.5, 80)
+wait(.4)
+zonewait(1, .4)
+
+stagerel(0, 0, 1.4)
+zmove(1, 0.5, 0)
+zmove(1, 0.5, 0)
+wait(1)
+zonewait(1, 1)
+#Robot loc: (278.5, 80)
+
+#retract slowly
+zmove (1, -0.5, 0)
+stagerel(0,0,-0.6)
+zmove (1, -0.5, 0)
+wait(1)
+zonewait(1,1)
+zmove (1, -0.5, 0.5)
+wait(1)
+zonewait(1,1)
+zmove (1, -0.5, 0.5)
+wait(1)
+zonewait(1,1)
+zmove (1, -0.5, 0.5)
+wait(1)
+zonewait(1,1)
+zmove (1, -0.5, 0.5)
+wait (1)
+zonewait(1,1)
+zmove (1, 0, 1.5)
+wait(1)
+zonewait(1,1)
+#Robot loc: (275.5, 83.5)
+
+#return to buffer at 246, 12
+zmove(1, -5.5, 0)
+zmove(1, 0, -20.5)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+#return stage to proper position
+stagerel(0, 0, 1.2)
+wait(1)
+
+#Robot loc: (246, 12)
+#Stage loc: (0, 0, 0)

@@ -1,0 +1,4 @@
+# test sequence of support ops using UV light
+uv (1)
+wait (5)
+uv (0)

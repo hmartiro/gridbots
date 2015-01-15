@@ -1,0 +1,6 @@
+#assume robot is at the feed end of the buffer (162, 60)
+#robot will get water from water station in same unit1
+
+#go to rotate position
+zmove(4, -28, 0)
+zmove(4, 0, 4)

@@ -1,0 +1,97 @@
+#Move both robots to rotate position
+<alignall
+
+#(162,156) to (134,160) and (162, 60) to (134,64)
+simscript(unit2_bufftorotate_z10, unit1_bufftorotate_z4)
+
+#rotate 180 both robots
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#unit2 robot will get glue first since it has longer to travel
+#move to highway x-position (110, 160) from (134, 160)
+simscript(zmove(10, -24, 0), zmove(11, -24, 0))
+#move to glue position in zone 5 (110, 58)
+
+##Original command - If Glue is in slot 2 - step shoudl be -102
+#simscript(zmove(11, 0, -102), zmove(5, 0, -102)
+
+## If Glue is in slot 4 - step should be -74
+#simscript(zmove(11, 0, -102), zmove(5, 0, -74)
+
+#If Glue is slot 2
+simscript(zmove(11, 0, -102), zmove(5, 0, -102)
+
+###modified to go to slot 4 for glue
+simscript(zmove(11, 0, -48), zmove(5, 0, -48)
+###modified to go to slot 4 for glue
+
+
+#transition to 6 and drive all the way down 6 to well
+simscript(zmove(5, -198, 0), zmove(6, -198, 0))
+
+wait(1)
+
+#drive back up to 5
+rate(80)
+simscript(zmove(6, 4, 0), zmove(5, 4, 0))
+wait(0.3)
+simscript(zmove(6, 4, 0), zmove(5, 4, 0))
+wait(0.1)
+rate(120)
+simscript(zmove(6, 190, 0), zmove(5, 190, 0))
+
+rate(180)
+
+#move back to highway in zone 11
+##Original command - If Glue is in slot 2 - step shoudl be 102
+simscript(zmove(5, 0, 102), zmove(11, 0, 102))
+
+
+###modified to go to slot 4 for glue
+simscript(zmove(11, 0, 48), zmove(5, 0, 48)
+###modified to go to slot 4 for glue
+
+
+
+#robot2 will move to rotation position (134, 160)
+#robot1 will move to glue position in zone 5 (110, 58)
+simscript(zmove(11, 24, 0), zmove(10, 24, 0), zmove(4, -24, 0), zmove(5, -24, 0))
+zmove(5, 0, -6)
+
+###modified to go to slot 4 for glue
+zmove(5, 0, -48)
+###modified to go to slot 4 for glue
+
+
+#transition to 6 and drive all the way down 6 to well
+simscript(zmove(5, -198, 0), zmove(6, -198, 0))
+
+
+wait(1)
+#drive back up to 5
+rate(80)
+simscript(zmove(6, 4, 0), zmove(5, 4, 0))
+wait(0.3)
+simscript(zmove(6, 4, 0), zmove(5, 4, 0))
+wait(0.1)
+rate(120)
+simscript(zmove(6, 190, 0), zmove(5, 190, 0))
+
+rate(180)
+#move back to rotate position (134,64)
+zmove(5, 0, 6)
+
+###modified to go to slot 4 for glue
+zmove(5, 0, 48)
+###modified to go to slot 4 for glue
+
+simscript(zmove(5, 24, 0), zmove(4, 24, 0))
+
+#rotate both robots by 180
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#move both robots to their buffer positions
+simscript (unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)
+<alignall

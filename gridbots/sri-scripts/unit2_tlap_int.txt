@@ -1,0 +1,41 @@
+#
+<alignall
+
+#First step is to get glue
+<unit2_getglue_v
+
+#buffer reverse and then get rods
+<units1&2_buffer_reverse
+feed(h)
+<unit2_gettree
+
+#buffer reverse to get glue robot into workspace
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse
+
+#putglue
+rate(80)
+<unit2_tlap_putglue
+
+#buffer reverse to get rod robot in workspace
+<units1&2_buffer_reverse
+
+#put rods
+rate(100)
+<unit2_tlap_putrod
+
+#cure glue
+wait(1.5)
+uv(1)
+wait(15)
+uv(0)
+
+#return rod robots
+<unit2_tlap_retrod
+
+#buffer reverse to get glue robot to feed space
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse
+
+#move stage to next tlap position
+stagerel(0,12,0)

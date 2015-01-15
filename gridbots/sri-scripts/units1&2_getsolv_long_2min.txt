@@ -1,0 +1,84 @@
+#robot1 will get solvent on far right and robot2 will get solv next to it
+
+<alignall
+
+#Move both robots to rotate position
+
+#(162,156) to (134,160) and (162, 60) to (134,64)
+simscript(unit2_bufftorotate_z10, unit1_bufftorotate_z4)
+
+#rotate 180 both robots
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#both robots will need to move close to Z11/Z5 boundary to get spacing correct
+#robot1 will move to (110, 84)
+#robot2 will move to (110, 108)
+simscript(zmove(4, -24, 0), zmove(5, -24, 0), zmove(10, -24, 0), zmove(11, -24, 0))
+simscript(zmove(5, 0, 20), zmove(11, 0, -52))
+
+#now move both robots to solvent positions (110, 34) and (110, 10)
+simscript(zmove(5, 0, -74), zmove(11, 0, -74))
+
+
+##Move to slots 2 and 3
+#now move both robots to solvent positions (110, 34) and (110, 10)
+simscript(zmove(5, 0, +24), zmove(11, 0, 24))
+##Move to slots 2 and 3
+
+
+#transition to zone 6 and drive all the way down 6 to well
+simscript(zmove(5, -197.5, 0), zmove(6, -197.5, 0))
+
+#clean end effectors
+wait(120)
+
+
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(0.1)
+zmove(6, 4, 0)
+wait(0.1)
+zmove(6, -4, 0)
+wait(.2)
+
+#drive back up to 5
+simscript(zmove(6, 197.5, 0), zmove(5, 197.5, 0))
+
+#drive to Zone5/Zone11 boundary. robot2 should now be in z11
+simscript(zmove(5, 0, 74), zmove(11, 0, 74))
+
+
+##Move to slots 2 and 3
+#now move both robots to solvent positions (110, 34) and (110, 10)
+simscript(zmove(5, 0, -24), zmove(11, 0, -24))
+##Move to slots 2 and 3
+
+
+#now drive robots back to their proper rotation positions
+simscript(zmove(5, 0, -20), zmove(11, 0, 52))
+simscript(zmove(4, 24, 0), zmove(5, 24, 0), zmove(10, 24, 0), zmove(11, 24, 0))
+
+#rotate 180 both robots
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+simscript(unit1_rotate90_z4, unit1_rotate90_z5, unit2_rotate90_z10, unit2_rotate90_z11)
+
+#move both robots to their buffer positions
+simscript (unit1_rotatetobuff_z4, unit2_rotatetobuff_z10)

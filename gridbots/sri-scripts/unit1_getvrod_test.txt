@@ -1,0 +1,30 @@
+<unit1_bufftorotate_z4
+
+simscript(unit1_rotate180_z4, unit1_rotate180_z5)
+
+wait (0.1)
+
+simscript(unit1_getwater_z4, unit1_getwater_z5, unit1_getwater_z6)
+
+#move to v rod position
+simscript(zmove(5, 0, 50), zmove(11, 0, 50))
+
+#move onto flex
+simscript(zmove(11, -108, 0), zmove(12, -108, 0))
+wait(0.5)
+
+zmove(12, -162, 0)
+wait(1)
+zmove(12, 162, 0)
+
+#move back to zone 11
+simscript(zmove(11, 108, 0), zmove(12, 108, 0))
+
+#move to z5 highway position
+simscript(zmove(11, 0, -50), zmove(5, 0, -50))
+
+simscript(unit1_returnwater_z4, unit1_returnwater_z5, unit1_returnwater_z6)
+
+simscript(unit1_rotate180_z4, unit1_rotate180_z5)
+
+<unit1_rotatetobuff_z4

@@ -1,0 +1,4 @@
+#
+
+$hrod_getdistance = 162.5
+$vrod_getdistance = 163.5

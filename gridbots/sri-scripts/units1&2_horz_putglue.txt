@@ -1,0 +1,44 @@
+#Robot 1 start at (246, 12)
+#Robot 2 start at (246, 108)
+
+#drive stage -z by 2mm
+stagerel(0, 0, -2)
+
+#move robots to put positions
+simscript(unit1_horz_putgluenostage, unit2_horz_putgluenostage)
+wait(.4)
+
+#move stage up and push robots in
+stagerel(0, 0, 1.7)
+simscript(zmove(1, 0.5, 0), zmove(7, 0.5, 0))
+wait(0.2)
+simscript(zmove(1, 0.5, 0), zmove(7, 0.5, 0))
+wait(1)
+#Robot loc: (1, 0)
+
+#retract slowly
+simscript(zmove (1, -0.5, 0), zmove(7, -0.5, 0))
+stagerel(0,0,-0.6)
+simscript(zmove (1, -0.5, 0), zmove(7, -0.5, 0))
+wait(1)
+stagerel(0,0,-0.6)
+simscript(zmove (1, -0.5, 0.5), zmove(7, -0.5, 0.5))
+wait(0.5)
+simscript(zmove (1, -0.5, 0.5), zmove(7, -0.5, 0.5))
+wait(0.5)
+simscript(zmove (1, -0.5, 0.5), zmove(7, -0.5, 0.5))
+wait(0.5)
+simscript(zmove (1, -0.5, 0.5), zmove(7, -0.5, 0.5))
+wait (0.5)
+simscript(zmove (1, 0, 1.5), zmove(7, 0, 1.5))
+wait(1)
+
+
+#return to buffer
+simscript(unit1_horz_retgluenostage, unit2_horz_retgluenostage)
+
+#return stage to proper position
+stagerel(0, 0, 1.5)
+wait(1)
+
+#Stage loc: (0, 0, -1.192093E-07)

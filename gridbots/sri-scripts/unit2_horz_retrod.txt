@@ -1,0 +1,11 @@
+#Robot 2 starts at (281.5, 103)
+
+#pull robot back
+<unit2_horz_retrodnostage
+
+#return stage to position
+stagerel(0, 0, -0.5)
+wait(0.5)
+stagerel(0,0,0.4)
+
+#Stage loc

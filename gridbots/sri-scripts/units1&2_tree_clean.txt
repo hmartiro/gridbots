@@ -1,0 +1,9 @@
+#clean robots
+<unit1_getsolv
+<unit2_getsolv
+
+#<units1&2_buffer_advance
+#<unit1_getsolv
+#<unit2_getsolv
+
+#repeatscript(5, units1&2_buffer_advance)

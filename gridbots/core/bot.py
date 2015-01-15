@@ -419,7 +419,8 @@ class Bot:
         if theta > math.pi/2:
             print('v0_u = {}, v1_u = {}'.format(v0_u, v1_u))
             print('v_rot = {}, d1 = {}'.format(v_rot, d1))
-            raise Exception('Invalid rotation, theta = {}'.format(theta))
+            self.logger.warning('Rotation theta > pi/2! theta = {}'.format(theta))
+            # raise Exception('Invalid rotation, theta = {}'.format(theta))
 
         self.rot += theta
 
@@ -457,8 +458,7 @@ class Bot:
 
         # Move based on routine
         # TODO temporary
-        routine = self.sim.routines['units1_2_tree_int']
-        move_dict = routine[self.sim.frame]
+        move_dict = self.sim.routine[self.sim.frame]
 
         out_edges = self.graph.out_edges(self.pos, data=True)
         moves_to_make = []
@@ -470,15 +470,15 @@ class Bot:
                         moves_to_make.append(n2)
 
         if len(moves_to_make) > 1:
-            self.logger.error('Multiple moves possible for bot {}: {}'.format(self.name, moves_to_make))
-            raise Exception()
+            if len(set(moves_to_make)) != 1:
+                raise Exception('Multiple moves possible for bot {}: {}'.format(self.name, moves_to_make))
 
         if len(moves_to_make) > 0:
 
             new_pos = moves_to_make[0]
             if new_pos == self.pos:
                 raise Exception('Bot {} moving to same node {}!'.format(self.name, self.pos))
-            print('{}, {}, {}'.format(self.pos, new_pos, self.move_history[-5:]))
+            self.logger.debug('{}, {}, {}'.format(self.pos, new_pos, self.move_history[-5:]))
             self.pos = new_pos
             self.rotate()
 

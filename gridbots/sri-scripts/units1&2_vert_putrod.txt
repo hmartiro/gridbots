@@ -1,0 +1,17 @@
+#stage moves are taken out of the unit scrips and put here
+
+stagerel(0,0,8)
+
+simscript(unit1_vert_putrod, unit2_vert_putrod)
+
+uv(1)
+#simscript(zonewait(1, 10))
+wait(10)
+uv(0)
+
+simscript(unit1_vert_retrod, unit2_vert_retrod)
+
+stagerel(0,0,-8)
+wait(1)
+
+#Stage loc: (0, 0, 0)

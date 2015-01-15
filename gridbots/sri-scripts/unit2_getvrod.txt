@@ -1,0 +1,40 @@
+#
+#(162,156) to (134,160)
+rate(180)
+<unit2_bufftorotate_z10
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+rate(120)
+simscript(unit2_movewater_z10, unit2_movewater_z11, unit2_movewater_z5)
+simscript(units1&2_getwater_z5, units1&2_getwater_z6)
+
+#move to v rod position (110, 133)
+simscript(zmove(5, 0, 50), zmove(11, 0, 50))
+#Robot start: (110, 133)
+
+rate(120)
+#unit2 will now get v rod and end at 34, 154
+simscript(units1&2_getvrod_z11, units1&2_getvrod_z12)
+rate(120)
+
+rate(180)
+
+#unit2 will now move to z10 and end at rotation position 134, 60
+zmove(11, 10, 0)
+
+simscript(zmove(11, -30, 0), zmove(12, -30, 0))
+simscript(zmove(11, 30, 0), zmove(12, 30, 0))
+simscript(zmove(11, -30, 0), zmove(12, -30, 0))
+simscript(zmove(11, 30, 0), zmove(12, 30, 0))
+
+
+simscript(zmove(11, 90, 0), zmove(10, 90, 0))
+zmove(10, 0, 28)
+
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+<unit2_rotatetobuff_z10
+
+#Robot loc: (134, 160)

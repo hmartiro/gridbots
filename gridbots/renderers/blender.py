@@ -19,7 +19,7 @@ import bge
 BLENDER_FPS = 40
 
 # Desired framerate of simulation (fps)
-FRAMERATE = 120
+FRAMERATE = 240
 
 
 class BlenderDrawer():

@@ -1,0 +1,21 @@
+# test bug exposed by unit1 and unit2 get water scripts
+# try to replicate problem with simple (and short) test
+
+simscript (zmove (1, 4, 0), zmove (2, 4, 0), zmove(10, 4, 0), zmove (11, 4, 0))
+
+simscript (ckctest_zonewait_z1, ckctest_zonewait_z2)
+
+simscript (CrossOneBoundary (236, 60, 244, 60), CrossOneBoundary (172, 12, 164, 12), CrossOneBoundary(236, 156, 244, 156), CrossOneBoundary(172,108,164,108))
+#simscript (CrossOneBoundary (232, 60, 248, 60), CrossOneBoundary (172, 12, 164, 12), CrossOneBoundary(236, 156, 244, 156), CrossOneBoundary(172,108,164,108))
+
+# test zone crossing z2 to z1
+#CrossOneBoundary (236, 60, 244, 60)
+
+# test zone crossing z3 to z4
+#CrossOneBoundary (172, 12, 164, 12)
+
+# make sure extra move starts at tick 55
+simscript (zmove(10, 3, 0), zmove (11, 3, 0))
+
+printtimeline
+

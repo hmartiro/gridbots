@@ -19,8 +19,7 @@ map: "stage"
 # ---------------------------------------------------------
 structure: "stair"
 
-routines:
-  - "units1_2_tree_int"
+routine: "real_sim.txt"
 
 # Classification of bot types, by name
 # ---------------------------------------------------------

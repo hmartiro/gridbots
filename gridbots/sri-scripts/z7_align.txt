@@ -1,0 +1,10 @@
+# note that waits don't seem to work within simscript. alignment seems to work best at 100Hz
+zmove(7, 30, 0)
+zonewait(7, 0.2)
+zmove (7, 0, -4)
+zonewait(7, 0.2)
+zmove (7, 0, 8)
+zonewait(7, 0.2)
+zmove (7, 0, -4)
+zonewait(7, 0.2)
+zmove (7, -30, 0)

@@ -1,0 +1,19 @@
+#Robot starts at (246, 108)
+
+rate(80)
+
+#drive stage down
+stagerel(0,0,-3)
+
+<unit2_horz_putrodnostage
+
+#move the stage +z to lift the rod
+stagerel (0, 0, 3.1)
+wait(0.5)
+
+#push the rods a little bit
+zmove(7, 0.5, 0)
+wait(0.2)
+zmove(7, 0.5, 0)
+
+#Robot loc: (247, 108)

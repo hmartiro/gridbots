@@ -1,0 +1,5 @@
+
+#drive to correct rotation position (134, 64)
+zmove(4, 0, -18)
+zmove(4, 24, 0)
+#zonewait(4, 0.2)

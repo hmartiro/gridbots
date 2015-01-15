@@ -1,0 +1,13 @@
+<unit2_bufftorotate_z10
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+simscript(unit2_getwater_z10, unit2_getwater_z11, unit2_getwater_z5, unit2_getwater_z6)
+
+simscript(zmove(5, 0, 78), zmove(11, 0, 78))
+
+simscript(zmove(11, 24, 0), zmove(10, 24, 0))
+
+simscript(unit2_rotate180_z10, unit2_rotate180_z11)
+
+<unit2_rotatetobuff_z10

@@ -1,0 +1,41 @@
+#Robot start: (246, 12)
+
+stagerel(0,0,8)
+
+zmove(1, 0, 48)
+zmove(1, 24, 0)
+zmove(1, 0, 14)
+zmove(1, 10.5, 0)
+#Robot loc: (280.5, 77)
+
+#vertical rod place position is 280.5, 25
+zmove(1, 0, 1.5)
+wait(0.5)
+zmove(1, 0, 0.5)
+wait(0.5)
+zmove(1, 0, 0.5)
+#Robot loc: (280.5, 79.5)
+
+wait(10)
+
+#return rod robot
+#Robot loc: (280.5, 79.5)
+zmove(1, -0.5, -0.5)
+wait(0.5)
+zmove(1, -0.5, -0.5)
+wait(0.5)
+zmove(1, -1, 0)
+wait(0.5)
+
+
+#Robot loc: (278.5, 78.5)
+zmove(1, -8.5, 0)
+zmove(1, 0, -15.5)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+stagerel(0,0,-8)
+wait(1)
+
+#Robot loc: (246, 12)
+#Stage loc: (0, 0, 0)

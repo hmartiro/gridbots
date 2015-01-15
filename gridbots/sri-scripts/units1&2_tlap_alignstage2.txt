@@ -1,0 +1,7 @@
+#
+#return rod robots
+simscript(unit1_tlap_retrod, unit2_tlap_retrod)
+
+#buffer reverse to get glue robot to feed space
+<units1&2_buffer_reverse
+<units1&2_buffer_reverse

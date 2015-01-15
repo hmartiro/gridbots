@@ -1,0 +1,24 @@
+#return rod robot
+#Robot start: (280.5, 80.5)
+
+#Added to apply more pressure
+zonewait(1,0.5)
+zmove(1, 0, -0.5)
+
+zonewait(1,0.5)
+zmove(1, -0.5, -0.5)
+zonewait(1,0.5)
+zmove(1, -0.5, -0.5)
+zonewait(1,0.5)
+zmove(1, -1, 0)
+zonewait(1,0.5)
+
+
+#Robot loc: (278.5, 79.5)
+zmove(1, -8.5, 0)
+zmove(1, 0, -15.5)
+zmove(1, -24, 0)
+zmove(1, 0, -48)
+
+#Robot loc: (246, 12)
+#Stage loc: (0, 0, 0)
