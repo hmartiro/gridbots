@@ -115,20 +115,31 @@ currently planned:
   impressive and realistic looking videos.
 
 ### Progress
-* Bot rotation
-* Exact rotational pixels
+* Bot rotation, visualization from darpa milestone
+* Indexing behavior
+* Missing parenthesis handling
+* Optimizations!
+  * Required now, because map is huge and steps are small
+  * Example, 14577 steps per tlap (simulation frames)
+    * 12 bots per frame, 4 edges per bot to check, 2 things to record
+    * + rotation calculations, linear algebra
+    * 12 bots, 174924 bot updates
+    * almost always 4 edges, so 690173 dictionary (hash) lookups
+    * record position/rotation, 387183 list appends (use sparse/use numpy array?)
+    * 1.9s per tlap, 7672 steps/s, 130 us/step
+    * 3x3 cube has 144 edges, so in the realm of 2-4 minutes to calculate (1 tlap per 1-2 edges?)
+    * Also consider one tlap (at 200Hz rate) is 73s, so 3x3 cube is 1.5-3 hours
 
 ### Items for next meeting
 * video of this exact routine, times should compare
-* Indexing procedure, move further than wall?
 * Exact dimensions of robots, for indexing
+* Roles of scripts, time to map structure to scripts
 
 ### TODO
 * Drawing end effectors/rods
 * Updating rates in playback
 * UV light, stagerel
 * Provide location directory in mm, not nodes
-* Be ok dealing with missing parentheses?
 
 ### Answers
 * Brushing glue robots brush glue across

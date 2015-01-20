@@ -49,10 +49,10 @@ class TrajectoryBuilder():
         self.rate = self.DEFAULT_RATE
 
         self.commands = self.process_script(script_name)
-        logging.info('Commands:\n{}\n'.format(self.commands))
+        logging.debug('Commands:\n%s\n', self.commands)
 
         self.moves = self.generate_trajectory(self.commands)
-        # logging.info('Zone moves:\n{}\n'.format(pformat(self.moves)))
+        # logging.debug('Zone moves:\n%s\n', pformat(self.moves))
 
     def generate_trajectory(self, command):
 
@@ -99,7 +99,7 @@ class TrajectoryBuilder():
                 return [{'stagerel': [x, y, z]}]
 
             else:
-                logging.warning('Unknown command {}'.format(command))
+                logging.warning('Unknown command %s', command)
                 return [{command.name: command.args}]
 
         elif isinstance(command, SerialCommands):
@@ -131,7 +131,8 @@ class TrajectoryBuilder():
                 type(command), command
             ))
 
-    def zmove_to_trajectory(self, zone, x, y):
+    @staticmethod
+    def zmove_to_trajectory(zone, x, y):
 
         # 0.5 mm converts to one edge
         x = int(2 * x)
@@ -177,13 +178,12 @@ class TrajectoryBuilder():
         try:
             lines = self.read_script(script_name)
         except FileNotFoundError:
-            logging.error('Script not found: {}'.format(script_name))
+            logging.error('Script not found: %s', script_name)
             raise
-            # return Command('SCRIPT NOT FOUND: {}'.format(script_name), [])
 
         commands = SerialCommands()
         for i, line in enumerate(lines):
-            logging.debug('Script {}, Line {}: {}'.format(script_name, i+1, line))
+            logging.debug('Script %s, Line %s: %s', script_name, i+1, line)
             command = self.process_script_line(line)
             if isinstance(command, Command):
                 commands.append(command)
@@ -221,7 +221,7 @@ class TrajectoryBuilder():
             # incorrectly are missing them
             args = re.search('simscript\s*\((.*)', line).group(1)
         except AttributeError:
-            logging.error('Bad line: {}'.format(line))
+            logging.error('Bad line: %s', line)
             raise
 
         # Extract arguments
@@ -254,13 +254,13 @@ class TrajectoryBuilder():
         # Strip whitespace
         lines = [c.strip() for c in lines]
 
-        logging.debug('Simscript contains: {}'.format(lines))
+        logging.debug('Simscript contains: %s', lines)
 
         commands = ParallelCommands()
         for line in lines:
             commands.append(self.process_script_line(line))
 
-        logging.debug('Simscript commands: {}'.format(commands))
+        logging.debug('Simscript commands: %s', commands)
         return [commands]
 
 if __name__ == '__main__':

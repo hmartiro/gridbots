@@ -2,27 +2,21 @@
 
 """
 
-from gridbots import utils
 from operator import itemgetter
 
-import random
 import logging
 import math
 import numpy as np
 from numpy import linalg
 
 
-def angle_between(v1, v2):
-    """ Returns the angle in radians between vectors 'v1' and 'v2'
+def angle_between(u1, u2):
+    """ Returns the angle in radians between vectors 'u1' and 'u2'.
+        Assumes the vectors are normalized already.
     """
-    v1_u = v1 / np.linalg.norm(v1)
-    v2_u = v2 / np.linalg.norm(v2)
-    angle = np.arccos(np.dot(v1_u, v2_u))
+    angle = np.arccos(np.dot(u1, u2))
     if np.isnan(angle):
-        if (v1_u == v2_u).all():
-            return 0.0
-        else:
-            return np.pi
+        return 0.0 if (u1 == u2).all() else np.pi
     return angle
 
 
@@ -116,16 +110,16 @@ class Bot:
         # Save a reference to the simulation
         self.sim = sim
 
-        # State machine dictionary
-        self.state_machine = {
-            Bot.State.at_home: self.state_at_home,
-            Bot.State.calculating_path: self.state_calculating_path,
-            Bot.State.checking_nodes: self.state_checking_nodes,
-            Bot.State.on_track: self.state_on_track,
-            Bot.State.finished: self.state_finished,
-            Bot.State.traffic_jam: self.state_traffic_jam,
-            Bot.State.stuck: self.state_stuck,
-        }
+        # # State machine dictionary
+        # self.state_machine = {
+        #     Bot.State.at_home: self.state_at_home,
+        #     Bot.State.calculating_path: self.state_calculating_path,
+        #     Bot.State.checking_nodes: self.state_checking_nodes,
+        #     Bot.State.on_track: self.state_on_track,
+        #     Bot.State.finished: self.state_finished,
+        #     Bot.State.traffic_jam: self.state_traffic_jam,
+        #     Bot.State.stuck: self.state_stuck,
+        # }
 
         # State variable
         self.state = Bot.State.at_home
@@ -191,13 +185,13 @@ class Bot:
 
         self.last_pos = self.pos
         self.pos = self.moves.pop(0)
-        self.logger.debug('Moving from {} to {}'.format(self.last_pos, self.pos))
+        # self.logger.debug('Moving from {} to {}'.format(self.last_pos, self.pos))
 
     def wait(self):
         """ Do nothing for this turn.
         """
         self.turn_over = True
-        self.logger.debug('Waiting for this turn'.format(self.name))
+        # self.logger.debug('Waiting for this turn'.format(self.name))
 
     def permanent_obstacles(self):
         """ Return a list of bots who are waiting at their home positions.
@@ -227,151 +221,151 @@ class Bot:
         self.graph.remove_nodes_from(nodes)
 
     # -----------------------------------------------------------
-
-    def state_at_home(self):
-
-        self.logger.debug("State: at_home")
-
-        if self.has_goal():
-            return Bot.State.calculating_path
-        else:
-            self.wait()
-            return Bot.State.at_home
-
-    def state_calculating_path(self):
-
-        self.logger.debug("State: calculating_path")
-
-        # Reset the graph
-        #self.graph = self.sim.map.copy()
-
-        # List of obstacles
-        obstacles = []
-
-        # Neighboring nodes currently occupied
-        obstacles.extend(self.occupied_neighbors(self.pos))
-
-        # Bots at their home positions
-        obstacles.extend(self.permanent_obstacles())
-
-        # Remove the obstacles from the graph
-        # TODO reincorporate obstacle avoidance
-        #self.remove_nodes(obstacles)
-
-        # Go to the goal or towards home position if no goal
-        dest_node = self.goal or self.home_pos
-
-        # Get the optimal path to the destination
-        if dest_node not in obstacles:
-            path = utils.graph.find_shortest_path(self.graph, self.pos, dest_node)
-
-        # If the destination is an obstacle, no path found
-        else:
-            self.logger.debug('Destination node is currently an obstacle!')
-            path = None
-
-        # If there is a path, we're good to go
-        if path:
-
-            self.moves = path[1:]
-
-            # If we have moves
-            if self.moves:
-                #assert self.is_node_free(self.next_move())
-                return Bot.State.on_track
-
-            # Otherwise, we should be at the goal
-            else:
-                assert self.pos == (self.goal or self.home_pos)
-                self.goal = None
-                return Bot.State.finished
-
-        # Otherwise, check options
-        else:
-            return Bot.State.checking_nodes
-
-    def state_checking_nodes(self):
-
-        self.logger.debug("State: checking_nodes")
-
-        # If I am able to move in some direction
-        if self.free_neighbors(self.pos):
-            return Bot.State.traffic_jam
-
-        # If I am completely stuck
-        else:
-            return Bot.State.stuck
-
-    def state_on_track(self):
-
-        self.logger.debug("State: on_track")
-
-        # If the next node is free, go to it
-        # TODO reincorporate obstacle avoidance
-        if self.is_node_free(self.next_move()) or True:
-
-            self.move()
-
-            # Check if I have reached the goal
-            if self.has_goal() and self.at_goal():
-                return Bot.State.finished
-
-            # Otherwise if no goal, check if I've reached home
-            elif not self.has_goal() and self.at_home():
-                return Bot.State.finished
-
-            # Otherwise, keep moving
-            else:
-                return Bot.State.on_track
-
-        # I've hit an obstacle, recalculate path
-        else:
-            return Bot.State.calculating_path
-
-    def state_finished(self):
-
-        self.logger.debug("State: finished")
-
-        # If I made it home
-        if self.at_home():
-            return Bot.State.at_home
-
-        # Otherwise, see if i'm doing an operation
-        else:
-            return Bot.State.calculating_path
-
-    def state_traffic_jam(self):
-
-        self.logger.debug("State: traffic_jam")
-
-        # Get a list of the free neighboring nodes
-        free_neighbors = self.free_neighbors(self.pos)
-
-        # Choose one at random
-        random_neighbor = free_neighbors[random.randint(0, len(free_neighbors)-1)]
-
-        # Add it as the path
-        self.moves = [random_neighbor]
-        #self.moves = [free_neighbors[-1]]
-
-        # Move to it
-        self.move()
-
-        # Recalculate situation
-        return Bot.State.calculating_path
-
-    def state_stuck(self):
-
-        self.logger.debug("State: stuck")
-        self.logger.debug('neighbors: {}'.format(self.free_neighbors(self.pos)))
-        # If I have any moves, recalculate path
-        # if self.free_neighbors(self.pos):
-        #     return Bot.State.calculating_path
-        #
-        # # Otherwise, just wait
-        # else:
-        self.wait()
-        return Bot.State.calculating_path
+    #
+    # def state_at_home(self):
+    #
+    #     self.logger.debug("State: at_home")
+    #
+    #     if self.has_goal():
+    #         return Bot.State.calculating_path
+    #     else:
+    #         self.wait()
+    #         return Bot.State.at_home
+    #
+    # def state_calculating_path(self):
+    #
+    #     self.logger.debug("State: calculating_path")
+    #
+    #     # Reset the graph
+    #     #self.graph = self.sim.map.copy()
+    #
+    #     # List of obstacles
+    #     obstacles = []
+    #
+    #     # Neighboring nodes currently occupied
+    #     obstacles.extend(self.occupied_neighbors(self.pos))
+    #
+    #     # Bots at their home positions
+    #     obstacles.extend(self.permanent_obstacles())
+    #
+    #     # Remove the obstacles from the graph
+    #     # TODO reincorporate obstacle avoidance
+    #     #self.remove_nodes(obstacles)
+    #
+    #     # Go to the goal or towards home position if no goal
+    #     dest_node = self.goal or self.home_pos
+    #
+    #     # Get the optimal path to the destination
+    #     if dest_node not in obstacles:
+    #         path = utils.graph.find_shortest_path(self.graph, self.pos, dest_node)
+    #
+    #     # If the destination is an obstacle, no path found
+    #     else:
+    #         self.logger.debug('Destination node is currently an obstacle!')
+    #         path = None
+    #
+    #     # If there is a path, we're good to go
+    #     if path:
+    #
+    #         self.moves = path[1:]
+    #
+    #         # If we have moves
+    #         if self.moves:
+    #             #assert self.is_node_free(self.next_move())
+    #             return Bot.State.on_track
+    #
+    #         # Otherwise, we should be at the goal
+    #         else:
+    #             assert self.pos == (self.goal or self.home_pos)
+    #             self.goal = None
+    #             return Bot.State.finished
+    #
+    #     # Otherwise, check options
+    #     else:
+    #         return Bot.State.checking_nodes
+    #
+    # def state_checking_nodes(self):
+    #
+    #     self.logger.debug("State: checking_nodes")
+    #
+    #     # If I am able to move in some direction
+    #     if self.free_neighbors(self.pos):
+    #         return Bot.State.traffic_jam
+    #
+    #     # If I am completely stuck
+    #     else:
+    #         return Bot.State.stuck
+    #
+    # def state_on_track(self):
+    #
+    #     self.logger.debug("State: on_track")
+    #
+    #     # If the next node is free, go to it
+    #     # TODO reincorporate obstacle avoidance
+    #     if self.is_node_free(self.next_move()) or True:
+    #
+    #         self.move()
+    #
+    #         # Check if I have reached the goal
+    #         if self.has_goal() and self.at_goal():
+    #             return Bot.State.finished
+    #
+    #         # Otherwise if no goal, check if I've reached home
+    #         elif not self.has_goal() and self.at_home():
+    #             return Bot.State.finished
+    #
+    #         # Otherwise, keep moving
+    #         else:
+    #             return Bot.State.on_track
+    #
+    #     # I've hit an obstacle, recalculate path
+    #     else:
+    #         return Bot.State.calculating_path
+    #
+    # def state_finished(self):
+    #
+    #     self.logger.debug("State: finished")
+    #
+    #     # If I made it home
+    #     if self.at_home():
+    #         return Bot.State.at_home
+    #
+    #     # Otherwise, see if i'm doing an operation
+    #     else:
+    #         return Bot.State.calculating_path
+    #
+    # def state_traffic_jam(self):
+    #
+    #     self.logger.debug("State: traffic_jam")
+    #
+    #     # Get a list of the free neighboring nodes
+    #     free_neighbors = self.free_neighbors(self.pos)
+    #
+    #     # Choose one at random
+    #     random_neighbor = free_neighbors[random.randint(0, len(free_neighbors)-1)]
+    #
+    #     # Add it as the path
+    #     self.moves = [random_neighbor]
+    #     #self.moves = [free_neighbors[-1]]
+    #
+    #     # Move to it
+    #     self.move()
+    #
+    #     # Recalculate situation
+    #     return Bot.State.calculating_path
+    #
+    # def state_stuck(self):
+    #
+    #     self.logger.debug("State: stuck")
+    #     self.logger.debug('neighbors: %s'.format(self.free_neighbors(self.pos)))
+    #     # If I have any moves, recalculate path
+    #     # if self.free_neighbors(self.pos):
+    #     #     return Bot.State.calculating_path
+    #     #
+    #     # # Otherwise, just wait
+    #     # else:
+    #     self.wait()
+    #     return Bot.State.calculating_path
 
     # -----------------------------------------------------------
 
@@ -391,40 +385,40 @@ class Bot:
 
         v0 = self.last_move_vector
         v1 = c1 - c0
+        v1 = v1[:2] / linalg.norm(v1[:2])
 
         # Can't make rotation decision if we have no data
         if v0 is None:
             self.last_move_vector = v1
             return
 
-        # Create unit vectors
-        v0_u = v0[:2] / linalg.norm(v0[:2])
-        v1_u = v1[:2] / linalg.norm(v1[:2])
-        v0p_u = np.array([v0_u[1], -v0_u[0]])
+        # No need to do calculations if movement in same direction
+        if (v0 == v1).all():
+            return
 
-        d1 = np.dot(v0_u, v1_u)
-        d2 = np.dot(v0p_u, v1_u)
+        v0p = np.array([v0[1], -v0[0]])
+
+        d1 = np.dot(v0, v1)
+        d2 = np.dot(v0p, v1)
 
         # Axis of rotation, whether along v0 or perpendicular to it
-        v_rot = v0_u if abs(d1) > abs(d2) else v0p_u
+        v_rot = v0 if abs(d1) > abs(d2) else v0p
 
         # Direction
         v_rot = v_rot if d1 > 0 else -v_rot
 
-        theta = rotation_between(v_rot, v1_u)
+        theta = rotation_between(v_rot, v1)
 
         if d1 == 0:
             theta = 0
 
         if theta > math.pi/2:
-            print('v0_u = {}, v1_u = {}'.format(v0_u, v1_u))
-            print('v_rot = {}, d1 = {}'.format(v_rot, d1))
-            self.logger.warning('Rotation theta > pi/2! theta = {}'.format(theta))
+            self.logger.warning('v0_u = %s, v1_u = %s', v0, v1)
+            self.logger.warning('v_rot = %s, d1 = %s', v_rot, d1)
+            self.logger.warning('Rotation theta > pi/2! theta = %s', theta)
             # raise Exception('Invalid rotation, theta = {}'.format(theta))
 
         self.rot += theta
-
-        #print('Bot {}: d1: {}, d2: {}, theta: {}'.format(self.name, d1, d2, theta))
 
         self.last_move_vector = v1
 
@@ -433,40 +427,20 @@ class Bot:
         """
 
         # Logging header
-        self.logger.debug('################### Bot {}'.format(self.name, self.pos))
+        # self.logger.debug('################### Bot %s'.format(self.name, self.pos))
 
         # Record my current position
         self.move_history.append(self.pos)
         self.rot_history.append(self.rot)
 
-        # Run the state machine until the 'turn' is over
-        self.turn_over = False
-        while not self.turn_over:
-            self.state = self.state_machine[self.state]()
-
-        # Log state information
-        if self.has_goal():
-            self.logger.debug('At {}, moving to goal ({}) in {} more moves'.format(
-                self.pos, self.goal, len(self.moves)))
-        elif self.at_goal():
-            self.logger.debug('At goal ({})'.format(self.pos))
-        elif not self.at_home():
-            self.logger.debug('At {}, moving to home ({}) in {} more moves'.format(
-                self.pos, self.home_pos, len(self.moves)))
-        else:
-            self.logger.debug('At home ({})'.format(self.pos))
-
-        # Move based on routine
-        # TODO temporary
-        move_dict = self.sim.routine[self.sim.frame]
-
-        out_edges = self.graph.out_edges(self.pos, data=True)
         moves_to_make = []
-        for n1, n2, edge_data in out_edges:
+
+        # Line below is optimized w/ low-level nx access since this is a critical region
+        for n2, edge_data in self.graph.adj[self.pos].items():
             for zone in edge_data.keys():
-                if zone in move_dict:
-                    if edge_data[zone] == move_dict[zone]:
-                        self.logger.debug('Bot {} can move from {} to {}'.format(self.name, n1, n2))
+                if zone in self.sim.control_inputs:
+                    if edge_data[zone] == self.sim.control_inputs[zone]:
+                        # self.logger.debug('Bot %s can move from %s to %s'.format(self.name, n1, n2))
                         moves_to_make.append(n2)
 
         if len(moves_to_make) > 1:
@@ -478,7 +452,6 @@ class Bot:
             new_pos = moves_to_make[0]
             if new_pos == self.pos:
                 raise Exception('Bot {} moving to same node {}!'.format(self.name, self.pos))
-            self.logger.debug('{}, {}, {}'.format(self.pos, new_pos, self.move_history[-5:]))
+            # self.logger.debug('%s, %s, %s'.format(self.pos, new_pos, self.move_history[-5:]))
             self.pos = new_pos
             self.rotate()
-

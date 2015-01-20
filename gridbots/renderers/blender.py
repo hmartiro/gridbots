@@ -5,13 +5,11 @@
 import os
 import sys
 import math
-import yaml
 import pickle
 import mathutils as mu
 import networkx as nx
 
 import gridbots
-from gridbots.utils.graph import read_graph_data
 
 import bge
 
@@ -19,7 +17,7 @@ import bge
 BLENDER_FPS = 40
 
 # Desired framerate of simulation (fps)
-FRAMERATE = 240
+FRAMERATE = 480
 
 
 class BlenderDrawer():

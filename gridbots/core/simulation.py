@@ -10,6 +10,7 @@ import networkx as nx
 import gridbots
 from gridbots import utils
 from gridbots.core.job import Structure
+from gridbots.controllers.single_routine import SingleRoutineConroller
 
 
 class Simulation:
@@ -81,6 +82,9 @@ class Simulation:
             self
         )
 
+        self.controller = SingleRoutineConroller(self.bots, self.map, self.routine)
+        self.control_inputs = {}
+
         logging.debug('Simulating {}'.format(
             self.sim_name
         ))
@@ -133,19 +137,18 @@ class Simulation:
 
         return '[Simulation] Bots: {}'.format(len(self.bots))
 
-    def plan_tasks(self):
-
-        # Task planning for jobs
-        utils.planning.plan_paths(
-            frame=self.frame,
-            graph=self.map,
-            bots=self.bots,
-            stations=self.stations,
-            structure=self.structure
-        )
+    # def plan_tasks(self):
+    #
+    #     # Task planning for jobs
+    #     utils.planning.plan_paths(
+    #         frame=self.frame,
+    #         graph=self.map,
+    #         bots=self.bots,
+    #         stations=self.stations,
+    #         structure=self.structure
+    #     )
 
     def update(self):
-
         """
         Process one frame for all bots, including path planning and motion.
 
@@ -153,30 +156,28 @@ class Simulation:
 
         self.time += self.TIME_PER_FRAME
 
-        logging.debug('----- frame: {} time: {} -----'.format(self.frame, self.time))
-
-        # self.plan_tasks()
+        # logging.debug('----- frame: %s time: %s -----', self.frame, self.time)
 
         # Run state machine for each bot
         for bot in self.bots:
             bot.update()
 
-        # Update structure location
-        try:
-            structure_station = self.stations['attach_rod'][0]
-            node_data = self.map.node[structure_station.pos]
-            coords = node_data['x'], node_data['y'], node_data['z']
-        except KeyError:
-            coords = [0, 0, 0]
-        self.structure.move_history.append(coords)
-
-        # Print wait times for each station
-        for station_type in self.stations:
-            for station in self.stations[station_type]:
-                station.wait_time -= self.TIME_PER_FRAME
-                if station.wait_time < 0:
-                    station.wait_time = 0.0
-                logging.debug('{}, wait time {}'.format(station, station.wait_time))
+        # # Update structure location
+        # try:
+        #     structure_station = self.stations['attach_rod'][0]
+        #     node_data = self.map.node[structure_station.pos]
+        #     coords = node_data['x'], node_data['y'], node_data['z']
+        # except KeyError:
+        #     coords = [0, 0, 0]
+        # self.structure.move_history.append(coords)
+        #
+        # # Print wait times for each station
+        # for station_type in self.stations:
+        #     for station in self.stations[station_type]:
+        #         station.wait_time -= self.TIME_PER_FRAME
+        #         if station.wait_time < 0:
+        #             station.wait_time = 0.0
+        #         # logging.debug('%s, wait time %s'.format(station, station.wait_time))
 
         self.frame += 1
 
@@ -193,13 +194,9 @@ class Simulation:
 
             self.update()
 
-            # if all([j.finished for j in self.job_queue]):# and self.time > 5:
-            #     if all([b.at_home() for b in self.bots]):
-            #         logging.info('ALL JOBS COMPLETE!!')
-            #         self.status = self.STATUS["success"]
-            #         break
+            self.control_inputs = self.controller.step(self.frame)
 
-            if self.frame == len(self.routine):
+            if self.controller.finished:
                 break
 
             if self.interactive:
