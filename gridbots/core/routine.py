@@ -156,7 +156,7 @@ class TrajectoryBuilder():
     def read_script(self, script_name):
 
         # Get path to the script file
-        script_path = os.path.join(self.SCRIPT_DIR, script_name)
+        script_path = os.path.join(self.SCRIPT_DIR, script_name.lower())
 
         # Read the script as a list of lines
         with open(script_path, 'r') as f:

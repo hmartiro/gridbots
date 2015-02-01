@@ -126,20 +126,86 @@ currently planned:
     * 12 bots, 174924 bot updates
     * almost always 4 edges, so 690173 dictionary (hash) lookups
     * record position/rotation, 387183 list appends (use sparse/use numpy array?)
-    * 1.9s per tlap, 7672 steps/s, 130 us/step
+    * 1.9s per tlap, 7672 steps/s, 130 us/step. This is down from minutes per tlap.
+      * Reaching bare minimum if calculating every frame
     * 3x3 cube has 144 edges, so in the realm of 2-4 minutes to calculate (1 tlap per 1-2 edges?)
     * Also consider one tlap (at 200Hz rate) is 73s, so 3x3 cube is 1.5-3 hours
+* default is 120 hz
+
+### Scripts w/ naming convention
+* Anything w/o unit1, unit2, or units1&2 are experimental or not high-level scripts
+* Highest level scripts are units1&2 _ something
+* int means integrated - pick glue, pick rod, glue down
+* tree_int was the original
+  * tree script glues trees to a flat substrate
+* after trees, we go vertical (z) units1&2_vert_int
+* then, we go horizontal (y) units1&2_horz_int
+* tlap is the newer (tree direction and lap joint)
+  * comes back to the same positions, does another x joint (lap joint)
+* three rod dimensions - 
+* distance between trees is 12 mm
+  * when we glue verticals and horizontals, then drive the stage back 12 mm
+  * lap joints, then verticals, then horizontals
+* if an odd number, then just use the single unit script
+* length of the rods are 14 mm
+* after we plant rods, they stick out of the substrate 14 mm
+* we glue our verticals and horizontals 6 mm from the substrate
+* 2 mm overlap on the lap joints
+* in practice we have 6mm on the bottom and top remaining
+
+* starting configuration to scripts?
+* difference between tlap_int and tree_int
+* macros are high level
+* will have to build custom scripts
+
+* initial setup is by hand and so on
+  * probably run tree_ready?
+* build starts with tree_int, 4x4 rod array
+* then, tlap_to_vert - starting config of lap joints/trees to starting config of verticals
+  * align_all - index. getsolv - clean
+  * getwater_soak (now not often run) - puts rod robot in water, soaks end effector
+  * align all again
+  * buffer reverse x2 (bring glue robots to starting position)
+* run tlap_int
+* run tlap_to_vert
+* run vert_int
+* run vert_to_horz
+* run horz_int
+* run horz_to_tlap
+  * tree_ready (rotates rod robots by 270 CCW)
+
+Annjoe office number: 650 859 3538
 
 ### Items for next meeting
 * video of this exact routine, times should compare
 * Exact dimensions of robots, for indexing
 * Roles of scripts, time to map structure to scripts
 
+### Demo on Feb 10, Tuesday 1pm
+* January 30 or Feb. 2nd, dry run through at SRI
+* Hardware goals
+  * Run tree_int script
+  * In simulation / hardware
+  * Stretch goal - drive hardware w/ simulation output
+  * Build a skin
+  * Goal - hands on experience w/ software and hardware
+    * Get feedback for the rest of the program
+  * Prepare to have people use it who don't know what to do
+    * Prepare something for user to do
+  * Cheat sheet / operation sheet is helpful to have
+
+naming convention to use - need to talk about this
+what are the trees?
+big limitation - since teardown, no full truss building capability
+for the scripts, talk with annjoe
+
 ### TODO
-* Drawing end effectors/rods
+* Drawing rods on robots
+* Drawing structure
 * Updating rates in playback
 * UV light, stagerel
 * Provide location directory in mm, not nodes
+* Add texture to pixels
 
 ### Answers
 * Brushing glue robots brush glue across

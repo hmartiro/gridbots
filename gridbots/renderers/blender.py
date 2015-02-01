@@ -8,6 +8,7 @@ import math
 import pickle
 import mathutils as mu
 import networkx as nx
+import logging
 
 import gridbots
 
@@ -16,8 +17,11 @@ import bge
 # Must match that of the BGE!! (fps)
 BLENDER_FPS = 40
 
-# Desired framerate of simulation (fps)
-FRAMERATE = 480
+# Default 2x real time
+DEFAULT_SPEED = 2.0
+
+# TODO make this come from data
+DEFAULT_RATE = 120
 
 
 class BlenderDrawer():
@@ -28,7 +32,9 @@ class BlenderDrawer():
 
     """
 
-    def __init__(self, paths_name, framerate=FRAMERATE):
+    def __init__(self, paths_name, speed=DEFAULT_SPEED):
+
+        self.logger = logging.getLogger(__name__)
 
         # Read the paths file
         paths_file = os.path.join(gridbots.path, 'spec', 'paths', '{}.pickle'.format(paths_name))
@@ -36,8 +42,6 @@ class BlenderDrawer():
             paths_data = pickle.load(pf)
 
         # Get map data
-        #map_file = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(paths_data["map_name"]))
-        #self.vertices, self.edges = read_graph_data(map_file)
         map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(paths_data["map_name"]))
         self.map = nx.read_gpickle(map_path)
 
@@ -47,31 +51,18 @@ class BlenderDrawer():
 
         self.edges = self.map.edges()
 
-        # Convert vertex data to 3D mathutils.Vectors
-        #for v_name, v in self.vertices.items():
-        #    self.vertices[v_name] = mu.Vector(v).to_3d()
+        # TODO read from data
+        self.rate = DEFAULT_RATE
 
-        self.framerate = framerate
-        self.superstep = int(float(self.framerate) / float(BLENDER_FPS))
+        self.speed = speed
+        self.framerate = self.rate * self.speed
+        self.superstep = self.framerate / BLENDER_FPS
 
         self.bot_data = paths_data["bots"]
-
         self.frames = paths_data["frames"]
-
         self.stations = paths_data["stations"]
-
         self.structure = paths_data["structure"]
-
         self.structure_pos = paths_data['structure_move_history']
-
-        # Get map dimensions
-        #self.bounding_box = get_bounding_box(self.graph)
-        #self.minX = self.bounding_box[0]
-        #self.maxX = self.bounding_box[1]
-        #self.minY = self.bounding_box[2] 
-        #self.maxY = self.bounding_box[3]
-
-        #self.scaling = math.sqrt((self.maxY - self.minY) * (self.maxX - self.minX))
         
         # Top-level BGE objects
         self.C = bge.logic.getCurrentController()
@@ -88,6 +79,14 @@ class BlenderDrawer():
         self.mouse_left = False
         self.mouse_right = False
 
+        self.text = {
+            'title': self.S.objects['text_title'],
+            'status': self.S.objects['text_status'],
+            'frame': self.S.objects['text_frame'],
+            'time': self.S.objects['text_time'],
+            'speed': self.S.objects['text_speed']
+        }
+
         # Set framerate settings
         bge.logic.setMaxPhysicsFrame(1)
         bge.logic.setMaxLogicFrame(1)
@@ -95,40 +94,14 @@ class BlenderDrawer():
         bge.logic.setPhysicsTicRate(BLENDER_FPS)
 
         # Which simulation frame are we on?
-        self.frame = 0
+        self.frame = 0.0
+        self.time = 0.0
+        self.frame_int = int(self.frame)
 
         self.bots = {}
         for bot in self.bot_data.keys():
             self.bots[bot] = self.S.addObject(self.bot_data[bot]['type'], self.C.owner)
             self.bots[bot].orientation = (0, 0, math.pi/2)
-            #print(dir(self.bots[bot]))
-
-        # Draw nodes
-        # self.nodes = {}
-        # for name, coords in self.vertices.items():
-        #     self.nodes[name] = self.S.addObject('Node', self.C.owner)
-        #     self.nodes[name].position = coords
-        #
-        # self.b_edges = []
-        # for e in self.edges:
-        #
-        #     b_edge = self.S.addObject('Edge', self.C.owner)
-        #     self.b_edges.append(b_edge)
-        #
-        #     v1 = self.vertices[e[0]]
-        #     v2 = self.vertices[e[1]]
-        #
-        #     midpoint = v1.lerp(v2, 0.5)
-        #     b_edge.position = midpoint
-        #
-        #     # Set rotation
-        #     unit = mu.Vector((1, 0, 0))
-        #     quat = unit.rotation_difference(v2-v1)
-        #     b_edge.applyRotation(quat.to_euler('XYZ'))
-        #
-        #     # Set scale
-        #     dist = (v2-v1).magnitude
-        #     b_edge.localScale = [dist, 1, 1]
 
         self.b_stations = []
         for station_type in self.stations:
@@ -143,24 +116,58 @@ class BlenderDrawer():
 
         self.b_structure = {}
 
+        # Start in paused state to allow for loading the graphics
+        self.paused = True
+        self.logger.info('Hit [p] to start playback.')
+
+        # Draw the scene
+        self.render()
+
     def update(self):
 
+        self.handle_keys()
         self.handle_camera()
+        self.handle_text()
+
+        self.framerate = self.rate * self.speed
+        self.superstep = self.framerate / BLENDER_FPS
+
+        if self.paused:
+            return
+
+        self.render()
+
+        self.logger.debug('------- frame {} -------'.format(self.frame_int))
+
+        self.frame += self.superstep
+        self.time += self.superstep / self.rate
+
+        if self.frame < 0:
+            self.frame = 0
+            self.time = 0
+
+        elif self.frame > self.frames - 1:
+            self.frame = self.frames - 1
+            self.time -= self.superstep / self.rate
+
+        self.frame_int = int(self.frame)
+
+    def render(self):
 
         if self.frame > self.frames - 1:
             return
 
         for bot_name, bot in self.bots.items():
 
-            node = self.bot_data[bot_name]['move_history'][self.frame]
+            node = self.bot_data[bot_name]['move_history'][self.frame_int]
             bot.position = self.vertices[node]
 
-            z_rot = self.bot_data[bot_name]['rot_history'][self.frame]
+            z_rot = self.bot_data[bot_name]['rot_history'][self.frame_int]
             bot.orientation = (0, 0, z_rot)
 
         for frame, edge in self.structure:
 
-            if frame <= self.frame:
+            if frame <= self.frame_int:
 
                 if edge not in self.b_structure.keys():
 
@@ -184,8 +191,55 @@ class BlenderDrawer():
                     dist = (v2-v1).magnitude
                     self.b_structure[edge].localScale = [dist, 1, 1]
 
-        print('------- frame {} -------'.format(self.frame))
-        self.frame += self.superstep
+    def handle_text(self):
+
+        self.text['speed'].text = 'Speed: {:.2f}x'.format(self.speed)
+        self.text['frame'].text = 'Frame: {}'.format(self.frame_int)
+        self.text['time'].text = 'Time: {:.2f}s'.format(self.time)
+
+        if self.paused:
+            state_text = 'Paused '
+        else:
+            state_text = 'Playing'
+        self.text['status'].text = 'Status: {}'.format(state_text)
+
+    def handle_keys(self):
+
+        for key, status in self.keyboard.events:
+
+            if key == bge.events.XKEY:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    self.logger.info('X pressed, exiting.')
+                    sys.exit(0)
+
+            if key == bge.events.PKEY:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    if self.paused:
+                        self.logger.info('Playing simulation.')
+                        self.paused = False
+                    else:
+                        self.logger.info('Pausing simulation.')
+                        self.paused = True
+
+            if key == bge.events.IKEY:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    for bot in self.bots:
+                        self.logger.info('Bot %s: Pos: %s, Rot: %s', bot,
+                                         self.bot_data[bot]['move_history'][self.frame_int],
+                                         self.bot_data[bot]['rot_history'][self.frame_int])
+
+            if key == bge.events.RKEY:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    self.logger.info('Reversing speed.')
+                    self.speed *= -1
+
+            if key == bge.events.EQUALKEY:
+                self.logger.info('Speeding up.')
+                self.speed = self.speed * 1.01 + 0.01
+
+            if key == bge.events.MINUSKEY:
+                self.logger.info('Slowing down.')
+                self.speed = self.speed * 0.99 - 0.01
 
     def handle_camera(self):
 

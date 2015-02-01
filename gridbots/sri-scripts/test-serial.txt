@@ -1,1 +1,0 @@
-simscript(zmove(3, 1, 0), serial)

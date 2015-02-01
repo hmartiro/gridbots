@@ -9,7 +9,7 @@ import networkx as nx
 
 import gridbots
 from gridbots import utils
-from gridbots.core.job import Structure
+from gridbots.core.structure import Structure
 from gridbots.controllers.single_routine import SingleRoutineConroller
 
 
@@ -28,16 +28,17 @@ class Simulation:
         'traffic_jam': 2
     }
 
-    # Physical time passed per frame (seconds)
-    TIME_PER_FRAME = 0.1
+    # Default framerate of the system
+    DEFAULT_RATE = 120
 
-    def __init__(self, sim_name, interactive=False):
-
+    def __init__(self, sim_name):
         """
         Read in all simulation data from the given file and linked files. This includes
         the map graph, the target structure graph, bots, stations, and job types.
 
         """
+
+        self.logger = logging.getLogger(__name__)
 
         sim_path = os.path.join(gridbots.path, 'spec', 'simulations', '{}.yml'.format(sim_name))
 
@@ -52,8 +53,6 @@ class Simulation:
         self.node_aliases = self.sim_data['node_aliases']
 
         # Parse the map file
-        #map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.yml'.format(self.map_name))
-        #self.map = utils.graph.read_graph(map_path)
         map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(self.map_name))
         self.map = nx.read_gpickle(map_path)
 
@@ -69,51 +68,14 @@ class Simulation:
         # Parse routines from script files
         self.routine = utils.parse.parse_routine(self.sim_data['routine'])
 
-        # self.job_queue = utils.planning.create_job_queue(
-        #     self.structure,
-        #     self.sim_data['job_types']
-        # )
-
-        self.job_queue = []  # self.structure.jobs_todo
-
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
             self.sim_data['bots'],
             self
         )
 
+        # Controller that provides control inputs for each time step
         self.controller = SingleRoutineConroller(self.bots, self.map, self.routine)
-        self.control_inputs = {}
-
-        logging.debug('Simulating {}'.format(
-            self.sim_name
-        ))
-
-        logging.debug("----- STRUCTURE -----")
-        logging.info('Build a truss with {} rods and {} nodes.'.format(
-            len(self.structure.g.edges()),
-            len(self.structure.g.nodes()),
-            ))
-
-        logging.debug("----- MAP -----")
-        logging.info('Map {} has {} nodes.'.format(
-            self.map_name,
-            self.map.number_of_nodes()
-        ))
-
-        logging.debug("----- BOTS -----")
-        for bot in self.bots:
-            logging.debug(bot)
-
-        logging.debug("----- STATIONS -----")
-        for station_type in self.stations.keys():
-            logging.debug('* {}'.format(station_type))
-            for station in self.stations[station_type]:
-                logging.debug('  {}'.format(station))
-
-        logging.debug("------ JOBS -----")
-        for job in self.job_queue:
-            logging.debug(job)
 
         # Count frames
         self.frame = 0
@@ -124,9 +86,40 @@ class Simulation:
         # Simulation status
         self.status = self.STATUS["in_progress"]
 
-        self.running = False
+        self.to_exit = False
 
-        self.interactive = interactive
+        # Current system rate
+        self.rate = self.DEFAULT_RATE
+
+        # ---------------------
+        # Debug info
+        # ---------------------
+
+        self.logger.debug('Simulating {}'.format(
+            self.sim_name
+        ))
+
+        self.logger.debug("----- STRUCTURE -----")
+        self.logger.info('Build a truss with {} rods and {} nodes.'.format(
+            len(self.structure.g.edges()),
+            len(self.structure.g.nodes()),
+            ))
+
+        self.logger.debug("----- MAP -----")
+        self.logger.info('Map {} has {} nodes.'.format(
+            self.map_name,
+            self.map.number_of_nodes()
+        ))
+
+        self.logger.debug("----- BOTS -----")
+        for bot in self.bots:
+            self.logger.debug(bot)
+
+        self.logger.debug("----- STATIONS -----")
+        for station_type in self.stations.keys():
+            self.logger.debug('* {}'.format(station_type))
+            for station in self.stations[station_type]:
+                self.logger.debug('  {}'.format(station))
 
     def __str__(self):
 
@@ -137,80 +130,40 @@ class Simulation:
 
         return '[Simulation] Bots: {}'.format(len(self.bots))
 
-    # def plan_tasks(self):
-    #
-    #     # Task planning for jobs
-    #     utils.planning.plan_paths(
-    #         frame=self.frame,
-    #         graph=self.map,
-    #         bots=self.bots,
-    #         stations=self.stations,
-    #         structure=self.structure
-    #     )
-
     def update(self):
         """
         Process one frame for all bots, including path planning and motion.
 
         """
 
-        self.time += self.TIME_PER_FRAME
+        if self.frame % 1000 == 0:
+            self.logger.info('----- frame: {} time: {:.2f} -----'.format(self.frame, self.time))
 
-        # logging.debug('----- frame: %s time: %s -----', self.frame, self.time)
+        # If complete, exit
+        if self.controller.finished:
+            self.status = self.STATUS['success']
+            self.to_exit = True
+            return
 
-        # Run state machine for each bot
+        # Run the controller to get inputs for this time step
+        control_inputs = self.controller.step(self.frame)
+
+        # Update each bot based on the inputs
         for bot in self.bots:
-            bot.update()
+            bot.update(control_inputs)
 
-        # # Update structure location
-        # try:
-        #     structure_station = self.stations['attach_rod'][0]
-        #     node_data = self.map.node[structure_station.pos]
-        #     coords = node_data['x'], node_data['y'], node_data['z']
-        # except KeyError:
-        #     coords = [0, 0, 0]
-        # self.structure.move_history.append(coords)
-        #
-        # # Print wait times for each station
-        # for station_type in self.stations:
-        #     for station in self.stations[station_type]:
-        #         station.wait_time -= self.TIME_PER_FRAME
-        #         if station.wait_time < 0:
-        #             station.wait_time = 0.0
-        #         # logging.debug('%s, wait time %s'.format(station, station.wait_time))
-
+        # Update the simulation metadata
+        self.time += 1 / self.rate
         self.frame += 1
 
     def run(self):
-
         """
         Main loop, update until all jobs are complete.
 
         """
 
-        self.running = True
-
-        while self.running:
-
+        while not self.to_exit:
             self.update()
-
-            self.control_inputs = self.controller.step(self.frame)
-
-            if self.controller.finished:
-                break
-
-            if self.interactive:
-                input('Enter to continue: ')
-
-        # Update structure location
-        # TODO this is a copy of update function
-        try:
-            structure_station = self.stations['attach_rod'][0]
-            node_data = self.map.node[structure_station.pos]
-            coords = node_data['x'], node_data['y'], node_data['z']
-        except KeyError:
-            coords = [0, 0, 0]
-        self.structure.move_history.append(coords)
 
         # Add the last frame to the move history
         for bot in self.bots:
@@ -219,25 +172,32 @@ class Simulation:
         paths_name = self.output()
         return paths_name
 
-    def output(self):
+    def print_status(self):
 
+        self.logger.info(self)
+        self.logger.info('Frame: %s, Time: %s', self.frame, self.time)
+
+        for bot in self.bots:
+            self.logger.info(bot)
+
+    def output(self):
         """
         Write the results of the simulation, along with the trajectories of all
         bots and resources, to a paths file.
 
         """
 
-        logging.info('')
-        logging.info('===============================')
+        self.logger.info('')
+        self.logger.info('===============================')
 
         output = {}
 
         if self.status == self.STATUS["success"]:
-            logging.info('Simulation finished successfully!')
+            self.logger.info('Simulation finished successfully!')
         elif self.status == self.STATUS["traffic_jam"]:
-            logging.error('Simulation stuck in a traffic jam!')
+            self.logger.error('Simulation stuck in a traffic jam!')
         elif self.status == self.STATUS["in_progress"]:
-            logging.error('Output called but simulation still in progress!')
+            self.logger.error('Output called but simulation still in progress!')
 
         output["status"] = [s for s, val in self.STATUS.items() if val == self.status][0]
 
@@ -247,8 +207,8 @@ class Simulation:
         output["frames"] = len(self.bots[0].move_history)
 
         output["stations"] = self.stations
-        output["structure"] = self.structure.completion_times
 
+        output["structure"] = self.structure.completion_times
         output['structure_move_history'] = self.structure.move_history
 
         output["bots"] = {}
@@ -273,6 +233,5 @@ class Simulation:
 
         with open(paths_path, 'wb') as t_file:
             pickle.dump(output, t_file)
-            #t_file.write(yaml.dump(output))
 
         return paths_name

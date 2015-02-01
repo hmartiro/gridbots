@@ -7,21 +7,23 @@
 # as a graph of nodes bots can occupy and edges they
 # can travel along
 #
-# Expecting a YAML file (.yml) in gridbots/maps
+# Expecting a file name from gridbots/maps
 # ---------------------------------------------------------
 map: "stage"
-
 
 # Name of the file that defines the target truss structure
 # as a graph of edges (rods) and nodes (glue points)
 #
-# Expecting a YAML file (.yml) in gridbots/structures
+# Expecting a file name from gridbots/structures
 # ---------------------------------------------------------
 structure: "stair"
 
+# Temporary: Manually specified routine
+# for SingleRoutineController
+# ---------------------------------------------------------
 routine: "real_sim.txt"
 
-# Classification of bot types, by name
+# Classification of bot types and their properties
 # ---------------------------------------------------------
 #bot_types:
 #  builder_x: # Name of bot type
@@ -36,6 +38,7 @@ bot_types:
   bot_glue_dab: {}
 
 # Classification of required job types, by name
+# Currently not used.
 # ---------------------------------------------------------
 #job_types:
 #  rod_x: # Name of job type
@@ -61,7 +64,14 @@ job_types: {}
 
 node_aliases:
 
-  grab_rod_x: 'Z11.P.051.2076'
+  rod_feed_tree: 'Z11.PF.000.5191'
+
+  dropoff_tree_1: 'Z07.P.030.2221'
+  dropoff_tree_2: 'Z01.P.023.2220'
+
+  well_1: 'Z06.PF.001.4252'
+  well_4: 'Z06.PF.004.4256'
+
   grab_rod_y: 'Z11.P.052.2076'
   grab_rod_z: 'Z11.P.053.2076'
 
@@ -88,8 +98,9 @@ node_aliases:
 # ---------------------------------------------------------
 #bots:
 #  steve: # Bot name
-#    position: 2 # Position node
-#    type: builder_x # Bot type
+#    position: Z01.P.015.124 # Position node
+#    rotation: 0 # Z-rotation angle
+#    type: bot_rod_v # Bot type
 
 bots:
 
@@ -144,7 +155,6 @@ bots:
     position: bot_12_start
     rotation: 0
     type: bot_rod_h
-
 
 # Definition of stations in this map, by type
 # ---------------------------------------------------------

@@ -13,8 +13,8 @@ class SingleRoutineConroller():
 
     def step(self, frame):
 
-        if frame >= len(self.routine) * 1:
+        if frame >= len(self.routine):
             self.finished = True
-            return
+            return {}
 
-        return self.routine[frame % len(self.routine)]
+        return self.routine[frame]
