@@ -8,7 +8,7 @@ from operator import itemgetter
 ERROR_TOLERANCE = 1e-4
 
 
-def _get_node(x, y, z):
+def _get_node(G, x, y, z):
 
     nodes = []
     for n, d in G.nodes_iter(data=True):
@@ -19,13 +19,13 @@ def _get_node(x, y, z):
     return nodes
 
 
-def node_from_pos(x, y, z=0):
+def node_from_pos(G, x, y, z=0):
     """
     Given an XYZposition in mm, returns the name of the corresponding node at
     this point. If there are no nodes, returns None. If there are multiple,
     throws an exception.
     """
-    nodes = _get_node(x/24., y/24., z)
+    nodes = _get_node(G, x/24., y/24., z)
 
     if len(nodes) == 1:
         return nodes[0]
@@ -35,11 +35,11 @@ def node_from_pos(x, y, z=0):
         raise Exception('Multiple nodes at ({}, {}): {}'.format(x, y, nodes))
 
 
-def pos_from_node(node):
+def pos_from_node(G, node):
     """
-    Given a node ID, return the node's x and y position in millimeters.
+    Given a node ID, return the node's coordinates in millimeters.
     """
-    return G.node[node]['x']*24, G.node[node]['y']*24
+    return G.node[node]['x']*24, G.node[node]['y']*24, G.node[node]['z']*24
 
 
 def shortest_path(p1, p2):

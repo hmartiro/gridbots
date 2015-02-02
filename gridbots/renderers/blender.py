@@ -59,11 +59,15 @@ class BlenderDrawer():
         self.superstep = self.framerate / BLENDER_FPS
 
         self.bot_data = paths_data["bots"]
+        self.structure_data = paths_data["structure"]
+
         self.frames = paths_data["frames"]
         self.stations = paths_data["stations"]
-        self.structure = paths_data["structure"]
-        self.structure_pos = paths_data['structure_move_history']
-        
+
+        self.script_history = paths_data['script_history']
+
+        self.rod_history = paths_data['rod_history']
+
         # Top-level BGE objects
         self.C = bge.logic.getCurrentController()
         self.S = bge.logic.getCurrentScene()
@@ -84,7 +88,8 @@ class BlenderDrawer():
             'status': self.S.objects['text_status'],
             'frame': self.S.objects['text_frame'],
             'time': self.S.objects['text_time'],
-            'speed': self.S.objects['text_speed']
+            'speed': self.S.objects['text_speed'],
+            'scripts': self.S.objects['text_scripts']
         }
 
         # Set framerate settings
@@ -103,18 +108,40 @@ class BlenderDrawer():
             self.bots[bot] = self.S.addObject(self.bot_data[bot]['type'], self.C.owner)
             self.bots[bot].orientation = (0, 0, math.pi/2)
 
-        self.b_stations = []
-        for station_type in self.stations:
+        self.rods = {}
+        self.rod_type_to_model_map = {
+            'h': 'rod_y',
+            'v': 'rod_z'  # TODO this is awkward
+        }
+        self.bot_to_rod_pos_offset = {
+            'bot_rod_h': mu.Vector([.47136, 0, .17335]),
+            'bot_rod_v': mu.Vector([.47136, 0, .20895]),
+        }
 
-            for station in self.stations[station_type]:
+        for rod, rod_data in self.rod_history[-1].items():
+            rod_type = self.rod_type_to_model_map[rod_data['type']]
+            self.rods[rod] = self.S.addObject(rod_type, self.C.owner)
+            self.rods[rod].position = mu.Vector([0, 0, 0])
+            self.logger.info('Drew rod {}'.format(rod))
 
-                b_station = self.S.addObject(station_type, self.C.owner)
-                self.b_stations.append(b_station)
+        for rod_frame in self.rod_history[:100]:
+            print(rod_frame)
 
-                b_station.position = self.vertices[station.pos]
-                b_station.position.z += 0.05
+        # self.b_stations = []
+        # for station_type in self.stations:
+        #
+        #     for station in self.stations[station_type]:
+        #
+        #         b_station = self.S.addObject(station_type, self.C.owner)
+        #         self.b_stations.append(b_station)
+        #
+        #         b_station.position = self.vertices[station.pos]
+        #         b_station.position.z += 0.05
 
-        self.b_structure = {}
+        self.stage = self.S.objects['stage']
+        self.stage_base_pos = mu.Vector(self.stage.position)
+
+        self.structure = {}
 
         # Start in paused state to allow for loading the graphics
         self.paused = True
@@ -165,31 +192,57 @@ class BlenderDrawer():
             z_rot = self.bot_data[bot_name]['rot_history'][self.frame_int]
             bot.orientation = (0, 0, z_rot)
 
-        for frame, edge in self.structure:
+        # Move the stage
+        stage_pos = self.structure_data['move_history'][self.frame_int]
+        stage_pos = mu.Vector([v/24.0 for v in stage_pos])
+        self.stage.position = self.stage_base_pos + stage_pos
 
-            if frame <= self.frame_int:
+        for rod_id, rod_data in self.rod_history[self.frame_int].items():
 
-                if edge not in self.b_structure.keys():
+            rod = self.rods[rod_id]
+            bot = rod_data['bot']
 
-                    self.b_structure[edge] = self.S.addObject('edge_structure', self.C.owner)
+            # Rod is on a bot currently, draw it relative to bot's loc
+            if bot:
 
-                    v1 = mu.Vector(edge[0])
-                    v2 = mu.Vector(edge[1])
-                    midpoint = v1.lerp(v2, 0.5)
-                    self.b_structure[edge].position = midpoint
+                bot_pos = self.vertices[self.bot_data[bot]['move_history'][self.frame_int]]
+                bot_to_rod = self.bot_to_rod_pos_offset[self.bot_data[bot]['type']]
+                bot_to_rod_rotated = self.bots[bot].orientation * bot_to_rod
 
-                    # TODO interpolate frames like for bots
-                    base_pos = mu.Vector(self.structure_pos[self.frame])
-                    self.b_structure[edge].position = self.b_structure[edge].position + base_pos
+                rod.position = bot_pos
+                rod.position += bot_to_rod_rotated
+                rod.orientation = (0, 0, self.bot_data[bot]['rot_history'][self.frame_int])
 
-                    unit = mu.Vector((1, 0, 0))
-                    quat = unit.rotation_difference(v2-v1)
+            # Rod is on its own, just draw
+            else:
+                rod.position = rod_data['pos']
+                rod.orientation = (0, 0, 0)
 
-                    self.b_structure[edge].applyRotation(quat.to_euler('XYZ'))
-
-                    # Set scale
-                    dist = (v2-v1).magnitude
-                    self.b_structure[edge].localScale = [dist, 1, 1]
+        # for frame, edge in self.structure_data:
+        #
+        #     if frame <= self.frame_int:
+        #
+        #         if edge not in self.b_structure.keys():
+        #
+        #             self.b_structure[edge] = self.S.addObject('edge_structure', self.C.owner)
+        #
+        #             v1 = mu.Vector(edge[0])
+        #             v2 = mu.Vector(edge[1])
+        #             midpoint = v1.lerp(v2, 0.5)
+        #             self.b_structure[edge].position = midpoint
+        #
+        #             # TODO interpolate frames like for bots
+        #             base_pos = mu.Vector(self.structure_pos[self.frame])
+        #             self.b_structure[edge].position = self.b_structure[edge].position + base_pos
+        #
+        #             unit = mu.Vector((1, 0, 0))
+        #             quat = unit.rotation_difference(v2-v1)
+        #
+        #             self.b_structure[edge].applyRotation(quat.to_euler('XYZ'))
+        #
+        #             # Set scale
+        #             dist = (v2-v1).magnitude
+        #             self.b_structure[edge].localScale = [dist, 1, 1]
 
     def handle_text(self):
 
@@ -202,6 +255,12 @@ class BlenderDrawer():
         else:
             state_text = 'Playing'
         self.text['status'].text = 'Status: {}'.format(state_text)
+
+        self.text['scripts'].text = ''
+        for script in self.script_history[self.frame_int]:
+            if script == 'simscript' or not script:
+                continue
+            self.text['scripts'].text += '\n' + str(script)
 
     def handle_keys(self):
 

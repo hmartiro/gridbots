@@ -3,15 +3,18 @@
 """
 
 import os
+import sys
 import yaml
+from pprint import pprint, pformat
 import logging
 import networkx as nx
 
 import gridbots
 from gridbots import utils
+from gridbots.core.bot import Bot
 from gridbots.core.structure import Structure
 from gridbots.controllers.single_routine import SingleRoutineConroller
-
+from gridbots.utils.maputils import pos_from_node
 
 class Simulation:
 
@@ -56,23 +59,24 @@ class Simulation:
         map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(self.map_name))
         self.map = nx.read_gpickle(map_path)
 
-        # Parse the structure file
-        structure_path = os.path.join(gridbots.path, 'spec', 'structures',
-                                      '{}.yml'.format(self.structure_name))
-        structure_graph = utils.graph.read_graph(structure_path)
-        self.structure = Structure(structure_graph)
-
         # Iterate through the waypoints and create Stations
         self.stations = utils.parse.parse_stations(self.sim_data['stations'], self.node_aliases)
 
         # Parse routines from script files
         self.routine = utils.parse.parse_routine(self.sim_data['routine'])
-
+        #pprint(self.routine)
+        #sys.exit(1)
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
             self.sim_data['bots'],
             self
         )
+
+        # Parse the structure file
+        structure_path = os.path.join(gridbots.path, 'spec', 'structures',
+                                      '{}.yml'.format(self.structure_name))
+        structure_graph = utils.graph.read_graph(structure_path)
+        self.structure = Structure(self, structure_graph)
 
         # Controller that provides control inputs for each time step
         self.controller = SingleRoutineConroller(self.bots, self.map, self.routine)
@@ -90,6 +94,9 @@ class Simulation:
 
         # Current system rate
         self.rate = self.DEFAULT_RATE
+
+        # History of scripts being run
+        self.script_history = [[]]
 
         # ---------------------
         # Debug info
@@ -148,9 +155,16 @@ class Simulation:
         # Run the controller to get inputs for this time step
         control_inputs = self.controller.step(self.frame)
 
+        if not control_inputs:
+            return
+
         # Update each bot based on the inputs
         for bot in self.bots:
             bot.update(control_inputs)
+
+        self.structure.update(control_inputs)
+
+        self.script_history.append(control_inputs['script'])
 
         # Update the simulation metadata
         self.time += 1 / self.rate
@@ -165,12 +179,7 @@ class Simulation:
         while not self.to_exit:
             self.update()
 
-        # Add the last frame to the move history
-        for bot in self.bots:
-            bot.move_history.append(bot.pos)
-
-        paths_name = self.output()
-        return paths_name
+        return self.output()
 
     def print_status(self):
 
@@ -208,17 +217,19 @@ class Simulation:
 
         output["stations"] = self.stations
 
-        output["structure"] = self.structure.completion_times
-        output['structure_move_history'] = self.structure.move_history
-
         output["bots"] = {}
         for bot in self.bots:
             output["bots"][bot.name] = {}
             output["bots"][bot.name]['type'] = bot.type
             output["bots"][bot.name]['move_history'] = bot.move_history
-            output["bots"][bot.name]['move_history'].append(bot.move_history[-1])
             output["bots"][bot.name]['rot_history'] = bot.rot_history
-            output["bots"][bot.name]['rot_history'].append(bot.rot_history[-1])
+
+        output["structure"] = {}
+        output['structure']['move_history'] = self.structure.move_history
+
+        output['script_history'] = self.script_history
+
+        output['rod_history'] = self.structure.rod_history
 
         # Create the paths directory if needed
         paths_dir = os.path.join(gridbots.path, 'spec', 'paths')

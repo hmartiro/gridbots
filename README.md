@@ -115,9 +115,6 @@ currently planned:
   impressive and realistic looking videos.
 
 ### Progress
-* Bot rotation, visualization from darpa milestone
-* Indexing behavior
-* Missing parenthesis handling
 * Optimizations!
   * Required now, because map is huge and steps are small
   * Example, 14577 steps per tlap (simulation frames)

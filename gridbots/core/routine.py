@@ -27,14 +27,22 @@ class Command():
 
 class ParallelCommands(list):
 
+    def __init__(self, scripts, *args, **kwargs):
+        self.scripts = scripts
+        super(ParallelCommands, self).__init__(*args, **kwargs)
+
     def __repr__(self):
-        return 'P' + list.__repr__(self)
+        return '\nP' + list.__repr__(self)
 
 
 class SerialCommands(list):
 
+    def __init__(self, script, *args, **kwargs):
+        self.script = script
+        super(SerialCommands, self).__init__(*args, **kwargs)
+
     def __repr__(self):
-        return 'S' + list.__repr__(self)
+        return '\nS({})'.format(self.script) + list.__repr__(self)
 
 
 class TrajectoryBuilder():
@@ -44,9 +52,11 @@ class TrajectoryBuilder():
     # Switch rate of the board
     DEFAULT_RATE = 120  # Hz
 
-    def __init__(self, script_name):
+    def __init__(self, path, script_name):
 
         self.rate = self.DEFAULT_RATE
+
+        self.script = []
 
         self.commands = self.process_script(script_name)
         logging.debug('Commands:\n%s\n', self.commands)
@@ -59,62 +69,66 @@ class TrajectoryBuilder():
         if isinstance(command, Command):
 
             if command.name == 'zmove':
-
                 zone, x, y = command.args
-
-                x = float(x)
-                y = float(y)
-                return self.zmove_to_trajectory(zone, x, y)
+                return self.zmove_to_trajectory(zone, float(x), float(y))
 
             elif command.name == 'rate':
                 rate, = command.args
                 self.rate = float(rate)
-                return [{'rate': self.rate}]
+                return [{'rate': self.rate, 'script': list(self.script)}]
 
-            # TODO ask about what this does
             elif command.name == 'zonewait':
                 zone, time = command.args
                 time = float(time)
                 frames = int(time * self.rate)
-                return [{'zonewaiting_Z{}'.format(zone): time} for i in range(frames)]
+                return [{
+                    'zonewaiting_Z{}'.format(zone): time,
+                    'script': list(self.script)
+                } for i in range(frames)]
 
-            # TODO ask about what this does
             elif command.name == 'wait':
                 time, = command.args
                 time = float(time)
                 frames = int(time * self.rate)
-                return [{'waiting': time} for i in range(frames)]
+                return [{'waiting': time, 'script': list(self.script)} for i in range(frames)]
 
             elif command.name == 'uv':
                 state, = command.args
                 state = int(state)
-                return [{'uv': state}]
+                return [{'uv': state, 'script': list(self.script)}]
 
             elif command.name == 'feed':
                 feed_type, = command.args
-                return [{'feed': feed_type}]
+                return [{'feed': feed_type, 'script': list(self.script)}]
 
             elif command.name == 'stagerel':
                 x, y, z = [float(v) for v in command.args]
-                return [{'stagerel': [x, y, z]}]
+                return [{'stagerel': [x, y, z], 'script': list(self.script)}]
 
             else:
                 logging.warning('Unknown command %s', command)
-                return [{command.name: command.args}]
+                return [{command.name: command.args, 'script': list(self.script)}]
 
         elif isinstance(command, SerialCommands):
 
             # Create a trajectory for each sub-command
+            self.script.append(command.script)
             trajectories = [self.generate_trajectory(c) for c in command]
 
+            self.script.pop()
+
             # Concatenate all moves together in order
+            #serial_trajectory = [move for trajectory in trajectories for move in trajectory]
             serial_trajectory = [move for trajectory in trajectories for move in trajectory]
+
             return serial_trajectory
 
         elif isinstance(command, ParallelCommands):
 
             # Create a trajectory for each sub-command
+            self.script.append(command.scripts)
             trajectories = [self.generate_trajectory(c) for c in command]
+            self.script.pop()
 
             # Merge moves from each sub-command together
             parallel_trajectory = []
@@ -124,6 +138,7 @@ class TrajectoryBuilder():
                         parallel_trajectory[i].update(trajectory[i])
                     except IndexError:
                         parallel_trajectory.append(trajectory[i])
+
             return parallel_trajectory
 
         else:
@@ -131,25 +146,23 @@ class TrajectoryBuilder():
                 type(command), command
             ))
 
-    @staticmethod
-    def zmove_to_trajectory(zone, x, y):
+    def zmove_to_trajectory(self, zone, x, y):
 
         # 0.5 mm converts to one edge
         x = int(2 * x)
         y = int(2 * y)
 
         zone_name = 'Z{:02}'.format(int(zone))
-        #zone_name = int(zone)
 
         trajectory = []
 
         x_move = '+X' if x > 0 else '-X'
         for i in range(abs(x)):
-            trajectory.append({zone_name: x_move})
+            trajectory.append({zone_name: x_move, 'script': list(self.script)})
 
         y_move = '+Y' if y > 0 else '-Y'
         for i in range(abs(y)):
-            trajectory.append({zone_name: y_move})
+            trajectory.append({zone_name: y_move, 'script': list(self.script)})
 
         return trajectory
 
@@ -181,14 +194,11 @@ class TrajectoryBuilder():
             logging.error('Script not found: %s', script_name)
             raise
 
-        commands = SerialCommands()
+        commands = SerialCommands(script=script_name)
         for i, line in enumerate(lines):
             logging.debug('Script %s, Line %s: %s', script_name, i+1, line)
             command = self.process_script_line(line)
-            if isinstance(command, Command):
-                commands.append(command)
-            else:
-                commands.extend(command)
+            commands.append(command)
         return commands
 
     def process_script_line(self, line):
@@ -197,6 +207,7 @@ class TrajectoryBuilder():
             # Found another script
             if '.txt' not in line:
                 line += '.txt'
+
             return self.process_script(line[1:])
 
         elif line.startswith('simscript'):
@@ -256,12 +267,24 @@ class TrajectoryBuilder():
 
         logging.debug('Simscript contains: %s', lines)
 
-        commands = ParallelCommands()
+        parallel = ParallelCommands(scripts=[])
         for line in lines:
-            commands.append(self.process_script_line(line))
+            command = self.process_script_line(line)
+            parallel.append(command)
+            if isinstance(command, SerialCommands):
+                parallel.scripts.append(command.script)
+                command.script = ''
+            #     parallel.extend(command)
+            # elif isinstance(command, Command):
+            #     parallel.append(command)
+            # else:
+            #     raise Exception('Unexpected command: {}'.format(command))
 
-        logging.debug('Simscript commands: %s', commands)
-        return [commands]
+        logging.debug('Simscript commands: %s', parallel)
+
+        s = SerialCommands(script='simscript')
+        s.append(parallel)
+        return s
 
 if __name__ == '__main__':
 

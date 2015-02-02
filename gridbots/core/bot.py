@@ -10,18 +10,18 @@ import numpy as np
 from numpy import linalg
 
 from gridbots.utils.geometry import rotation_between
+from gridbots.utils.maputils import pos_from_node
 
 
 class Bot:
-
     """
     Micro robot that has a position in the map and an orientation.
 
     """
 
-    def __init__(self, name, position, rotation, bot_type, sim):
+    logger = logging.getLogger(__name__)
 
-        self.logger = logging.getLogger(__name__)
+    def __init__(self, name, position, rotation, bot_type, sim):
 
         # Bot name
         self.name = str(name)
@@ -148,3 +148,15 @@ class Bot:
         # Record my current position
         self.move_history.append(self.pos)
         self.rot_history.append(self.rot)
+
+    def distance_to_node(self, node):
+
+        node_pos = np.array(pos_from_node(self.graph, node))
+        return self.distance_to(node_pos)
+
+    def distance_to(self, pos):
+
+        feed_pos = np.array(pos)
+        bot_pos = np.array(pos_from_node(self.graph, self.pos))
+        dist = linalg.norm(feed_pos - bot_pos)
+        return dist

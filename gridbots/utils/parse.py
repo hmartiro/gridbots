@@ -75,6 +75,6 @@ def parse_routine(routine):
 
     from gridbots.core.routine import TrajectoryBuilder
 
-    path = os.path.join(gridbots.path, 'sri-scripts', routine)
-    builder = TrajectoryBuilder(path)
+    path = os.path.join(gridbots.path, 'sri-scripts')
+    builder = TrajectoryBuilder(path, routine)
     return builder.moves
