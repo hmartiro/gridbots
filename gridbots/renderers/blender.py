@@ -121,31 +121,16 @@ class BlenderDrawer():
         for rod, rod_data in self.rod_history[-1].items():
             rod_type = self.rod_type_to_model_map[rod_data['type']]
             self.rods[rod] = self.S.addObject(rod_type, self.C.owner)
-            self.rods[rod].position = mu.Vector([0, 0, 0])
-            self.logger.info('Drew rod {}'.format(rod))
-
-        for rod_frame in self.rod_history[:100]:
-            print(rod_frame)
-
-        # self.b_stations = []
-        # for station_type in self.stations:
-        #
-        #     for station in self.stations[station_type]:
-        #
-        #         b_station = self.S.addObject(station_type, self.C.owner)
-        #         self.b_stations.append(b_station)
-        #
-        #         b_station.position = self.vertices[station.pos]
-        #         b_station.position.z += 0.05
+            self.rods[rod].position = mu.Vector([0, 0, 100])
+        print(self.rod_history[-1])
 
         self.stage = self.S.objects['stage']
-        self.stage_base_pos = mu.Vector(self.stage.position)
 
         self.structure = {}
 
         # Start in paused state to allow for loading the graphics
         self.paused = True
-        self.logger.info('Hit [p] to start playback.')
+        self.logger.info('Hit space to start playback.')
 
         # Draw the scene
         self.render()
@@ -158,6 +143,7 @@ class BlenderDrawer():
 
         self.framerate = self.rate * self.speed
         self.superstep = self.framerate / BLENDER_FPS
+        self.frame_int = int(self.frame)
 
         if self.paused:
             return
@@ -177,8 +163,6 @@ class BlenderDrawer():
             self.frame = self.frames - 1
             self.time -= self.superstep / self.rate
 
-        self.frame_int = int(self.frame)
-
     def render(self):
 
         if self.frame > self.frames - 1:
@@ -195,7 +179,7 @@ class BlenderDrawer():
         # Move the stage
         stage_pos = self.structure_data['move_history'][self.frame_int]
         stage_pos = mu.Vector([v/24.0 for v in stage_pos])
-        self.stage.position = self.stage_base_pos + stage_pos
+        self.stage.position = stage_pos
 
         for rod_id, rod_data in self.rod_history[self.frame_int].items():
 
@@ -211,38 +195,21 @@ class BlenderDrawer():
 
                 rod.position = bot_pos
                 rod.position += bot_to_rod_rotated
-                rod.orientation = (0, 0, self.bot_data[bot]['rot_history'][self.frame_int])
+
+                if self.bot_data[bot]['type'] == 'bot_rod_h':
+                    rod.orientation = (0, 0, self.bot_data[bot]['rot_history'][self.frame_int])
+                elif self.bot_data[bot]['type'] == 'bot_rod_v':
+                    rod.orientation = (math.radians(90), 0, self.bot_data[bot]['rot_history'][self.frame_int])
+                else:
+                    raise Exception('Unexpected bot type: {}'.format(self.bot_data[bot]['type']))
 
             # Rod is on its own, just draw
             else:
-                rod.position = rod_data['pos']
-                rod.orientation = (0, 0, 0)
+                rod.position = mu.Vector([v/24 for v in rod_data['pos']])
+                rod.orientation = mu.Vector(rod_data['rot'])
 
-        # for frame, edge in self.structure_data:
-        #
-        #     if frame <= self.frame_int:
-        #
-        #         if edge not in self.b_structure.keys():
-        #
-        #             self.b_structure[edge] = self.S.addObject('edge_structure', self.C.owner)
-        #
-        #             v1 = mu.Vector(edge[0])
-        #             v2 = mu.Vector(edge[1])
-        #             midpoint = v1.lerp(v2, 0.5)
-        #             self.b_structure[edge].position = midpoint
-        #
-        #             # TODO interpolate frames like for bots
-        #             base_pos = mu.Vector(self.structure_pos[self.frame])
-        #             self.b_structure[edge].position = self.b_structure[edge].position + base_pos
-        #
-        #             unit = mu.Vector((1, 0, 0))
-        #             quat = unit.rotation_difference(v2-v1)
-        #
-        #             self.b_structure[edge].applyRotation(quat.to_euler('XYZ'))
-        #
-        #             # Set scale
-        #             dist = (v2-v1).magnitude
-        #             self.b_structure[edge].localScale = [dist, 1, 1]
+                if rod_data['done']:
+                    rod.position += mu.Vector(self.stage.position)
 
     def handle_text(self):
 
@@ -271,7 +238,7 @@ class BlenderDrawer():
                     self.logger.info('X pressed, exiting.')
                     sys.exit(0)
 
-            if key == bge.events.PKEY:
+            if key == bge.events.SPACEKEY:
                 if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
                     if self.paused:
                         self.logger.info('Playing simulation.')
@@ -299,6 +266,16 @@ class BlenderDrawer():
             if key == bge.events.MINUSKEY:
                 self.logger.info('Slowing down.')
                 self.speed = self.speed * 0.99 - 0.01
+
+            if key == bge.events.RIGHTBRACKETKEY:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    self.logger.info('Doubling speed.')
+                    self.speed *= 2.0
+
+            if key == bge.events.LEFTBRACKETKEY:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    self.logger.info('Halving speed.')
+                    self.speed *= 0.5
 
     def handle_camera(self):
 

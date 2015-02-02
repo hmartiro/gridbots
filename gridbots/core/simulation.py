@@ -64,13 +64,13 @@ class Simulation:
 
         # Parse routines from script files
         self.routine = utils.parse.parse_routine(self.sim_data['routine'])
-        #pprint(self.routine)
-        #sys.exit(1)
+
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
             self.sim_data['bots'],
             self
         )
+        self.bot_dict = {b.name: b for b in self.bots}
 
         # Parse the structure file
         structure_path = os.path.join(gridbots.path, 'spec', 'structures',

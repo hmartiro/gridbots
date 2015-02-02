@@ -1,0 +1,8 @@
+#move stage out
+stagerel(14,0,0)
+
+<units1&2_buffer_advance
+
+#stagerel(0, -24, -36)
+
+<units1&2_buffer_advance

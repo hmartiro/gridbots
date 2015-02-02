@@ -4,10 +4,28 @@
 <units1&2_tree_ready
 <units1&2_buffer_reverse
 
-<units1&2_tree_int
+stagerel(0, 0, -24)
+wait(1)
+<_tree_int
+
+stagerel(0, 0, 12)
+wait(1)
+<_tree_int
+
+stagerel(0, 0, 12)
+wait(1)
+<_tree_int
+
+<_tree_to_vert.txt
+stagerel(0, 0, 0)
+wait(1)
+
+<_vert_int
+
+#<units1&2_tree_int
 
 #<units1&2_tree_to_vert
-##<units1&2_tlap_to_vert
+#<units1&2_tlap_to_vert
 #<units1&2_vert_int
 
 #<units1&2_vert_to_horz

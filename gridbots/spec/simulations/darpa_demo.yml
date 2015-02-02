@@ -11,6 +11,8 @@
 # ---------------------------------------------------------
 map: "stage"
 
+stage_pos: [294, 96, 12]
+
 # Name of the file that defines the target truss structure
 # as a graph of edges (rods) and nodes (glue points)
 #

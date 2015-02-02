@@ -115,7 +115,12 @@ currently planned:
   impressive and realistic looking videos.
 
 ### Progress
-* Optimizations!
+* GUI
+* Keyboard commands
+* Stateless playback
+* Rod rendering
+
+* Optimization work!
   * Required now, because map is huge and steps are small
   * Example, 14577 steps per tlap (simulation frames)
     * 12 bots per frame, 4 edges per bot to check, 2 things to record
@@ -127,7 +132,37 @@ currently planned:
       * Reaching bare minimum if calculating every frame
     * 3x3 cube has 144 edges, so in the realm of 2-4 minutes to calculate (1 tlap per 1-2 edges?)
     * Also consider one tlap (at 200Hz rate) is 73s, so 3x3 cube is 1.5-3 hours
-* default is 120 hz
+
+* Future concept improvements
+  * Priority based control
+  * Discrete control heuristic?
+  * Parallelized queues
+
+### Demo on Feb 10, Tuesday 1pm
+* January 30 or Feb. 2nd, dry run through at SRI
+* Hardware goals
+  * Run tree_int script
+  * In simulation / hardware
+  * Stretch goal - drive hardware w/ simulation output
+  * Build a skin
+  * Goal - hands on experience w/ software and hardware
+    * Get feedback for the rest of the program
+  * Prepare to have people use it who don't know what to do
+    * Prepare something for user to do
+  * Cheat sheet / operation sheet is helpful to have
+
+big limitation - since teardown, no full truss building capability
+for the scripts, talk with annjoe
+
+### TODO
+* Drawing rods on robots
+* Drawing structure
+* Updating rates in playback
+* UV light, stagerel
+* Provide location directory in mm, not nodes
+* Add texture to pixels
+* Consoldiate math into either all numpy or mathutils
+  * Probably mathutils if it can handle everything
 
 ### Scripts w/ naming convention
 * Anything w/o unit1, unit2, or units1&2 are experimental or not high-level scripts
@@ -174,35 +209,8 @@ currently planned:
 Annjoe office number: 650 859 3538
 
 ### Items for next meeting
-* video of this exact routine, times should compare
-* Exact dimensions of robots, for indexing
-* Roles of scripts, time to map structure to scripts
-
-### Demo on Feb 10, Tuesday 1pm
-* January 30 or Feb. 2nd, dry run through at SRI
-* Hardware goals
-  * Run tree_int script
-  * In simulation / hardware
-  * Stretch goal - drive hardware w/ simulation output
-  * Build a skin
-  * Goal - hands on experience w/ software and hardware
-    * Get feedback for the rest of the program
-  * Prepare to have people use it who don't know what to do
-    * Prepare something for user to do
-  * Cheat sheet / operation sheet is helpful to have
-
-naming convention to use - need to talk about this
-what are the trees?
-big limitation - since teardown, no full truss building capability
-for the scripts, talk with annjoe
-
-### TODO
-* Drawing rods on robots
-* Drawing structure
-* Updating rates in playback
-* UV light, stagerel
-* Provide location directory in mm, not nodes
-* Add texture to pixels
+* Physical contact influencing robot position
+* Strategy for building
 
 ### Answers
 * Brushing glue robots brush glue across
