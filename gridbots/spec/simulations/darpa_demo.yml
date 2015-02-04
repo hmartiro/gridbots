@@ -23,7 +23,7 @@ structure: "stair"
 # Temporary: Manually specified routine
 # for SingleRoutineController
 # ---------------------------------------------------------
-routine: "real_sim.txt"
+routine: "2x2x5tower.txt"
 
 # Classification of bot types and their properties
 # ---------------------------------------------------------

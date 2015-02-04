@@ -118,6 +118,7 @@ currently planned:
 * Compressed state representation
 * Constant memory usage through rollover file pickling
 * Save only every 6 frames, so at 2x we get 40 hz smooth playback
+
 * 2x2x2 success
   * 63 rods
   * 734k steps to build
@@ -126,6 +127,15 @@ currently planned:
   * 310M of data when saving state every 6 frames
     * 1.86G when saving every frame - need to reduce this more
   * <2s to start playback, smooth playback
+
+* 2x2x5 build
+  * 147 rods
+  * 1713k steps to build
+  * 14281s to build (~4h)
+  * 175s to compute
+  * 1.4G of data for every 6th frame
+    * 8.4G of data for every frame
+  * no delay on playback, constant time
 
 * GUI
 * Keyboard commands

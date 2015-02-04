@@ -171,11 +171,9 @@ class BlenderDrawer():
 
         if self.frame < 0:
             self.frame = 0
-            self.paused = True
 
         elif self.frame > self.num_frames - 1:
             self.frame = self.num_frames - 1
-            self.paused = True
 
         self.frame_int = int(self.frame)
         self.state = self.get_state(self.frame_int)
