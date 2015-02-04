@@ -18,3 +18,7 @@ wait(0.5)
 
 #Robot loc: (280.5, 104.5)
 #Stage loc: (0, 0, 0)
+
+
+# Added by hayk because unit 2 verts were offset from unit 1
+zmove(7, -1, 0)

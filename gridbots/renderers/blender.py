@@ -13,6 +13,7 @@ import logging
 import gridbots
 from gridbots.utils.simstate import SimulationState
 from gridbots.core.simulation import STATES_PER_FILE
+from gridbots.core.simulation import FRAMES_PER_STATE
 
 import bge
 
@@ -34,25 +35,7 @@ class BlenderDrawer():
 
     """
 
-    def get_state(self, frame):
-
-        if frame not in self.states:
-
-            base_frame = frame - frame % STATES_PER_FILE
-            paths_file = os.path.join(
-                gridbots.path, 'spec', 'paths', self.sim_name,
-                '{}.pickle'.format(base_frame)
-            )
-
-            if not os.path.isfile(paths_file):
-                return None
-
-            with open(paths_file, 'rb') as f:
-                self.states = pickle.load(f)
-
-        return SimulationState.deserialize(self.states[frame])
-
-    def __init__(self, sim_name, speed=DEFAULT_SPEED):
+    def __init__(self, sim_name, start_frame=0, speed=DEFAULT_SPEED):
 
         self.logger = logging.getLogger(__name__)
 
@@ -107,8 +90,7 @@ class BlenderDrawer():
         bge.logic.setPhysicsTicRate(BLENDER_FPS)
 
         # Which simulation frame are we on?
-        self.frame = 0.0
-        self.time = 0.0
+        self.frame = start_frame
         self.frame_int = int(self.frame)
 
         self.bot_objs = {}
@@ -150,6 +132,25 @@ class BlenderDrawer():
         # Start in paused state to allow for loading the graphics
         self.paused = True
 
+    def get_state(self, exact_frame):
+
+        frame = exact_frame - exact_frame % FRAMES_PER_STATE
+        if frame not in self.states:
+
+            base_frame = frame - frame % (STATES_PER_FILE * FRAMES_PER_STATE)
+            paths_file = os.path.join(
+                gridbots.path, 'spec', 'paths', self.sim_name,
+                '{}.pickle'.format(base_frame)
+            )
+
+            if not os.path.isfile(paths_file):
+                return None
+
+            with open(paths_file, 'rb') as f:
+                self.states = pickle.load(f)
+
+        return SimulationState.deserialize(self.states[frame])
+
     def update(self):
 
         self.handle_keys(self.state)
@@ -167,16 +168,13 @@ class BlenderDrawer():
         self.logger.debug('------- frame {} -------'.format(self.frame_int))
 
         self.frame += self.superstep
-        self.time += self.superstep / self.rate
 
         if self.frame < 0:
             self.frame = 0
-            self.time = 0
             self.paused = True
 
         elif self.frame > self.num_frames - 1:
             self.frame = self.num_frames - 1
-            self.time = self.end_time
             self.paused = True
 
         self.frame_int = int(self.frame)
@@ -196,8 +194,14 @@ class BlenderDrawer():
         stage_pos = mu.Vector(state.structure)
         self.stage_obj.position = stage_pos
 
-        for rod_id, rod_data in state.rods.items():
-            rod_type, rod_bot, rod_pos, rod_rot, rot_done = rod_data
+        for rod_id, rod_obj in self.rod_objs.items():
+
+            if rod_id not in state.rods:
+                rod_obj.position = (0, 0, 100)
+                continue
+
+            rod_data = state.rods[rod_id]
+            rod_bot, rod_pos, rod_rot, rot_done = rod_data
             rod_obj = self.rod_objs[rod_id]
 
             # Rod is on a bot currently, draw it relative to bot's loc
@@ -219,8 +223,6 @@ class BlenderDrawer():
                 else:
                     raise Exception('Unexpected bot type: {}'.format(bot_type))
 
-                print('position of rod {}: {}'.format(rod_id, rod_obj.position))
-
             # Rod is on its own, just draw
             else:
                 rod_obj.position = mu.Vector(rod_pos)
@@ -228,13 +230,11 @@ class BlenderDrawer():
                 if rot_done:
                     rod_obj.position += mu.Vector(self.stage_obj.position)
 
-                print('position of rod {}: {}'.format(rod_id, rod_obj.position))
-
     def handle_text(self, state):
 
         self.text['speed'].text = 'Speed: {:.2f}x'.format(self.speed)
         self.text['frame'].text = 'Frame: {}'.format(self.frame_int)
-        self.text['time'].text = 'Time: {:.2f}s'.format(self.time)
+        self.text['time'].text = 'Time: {:.2f}s'.format(state.time)
 
         if self.paused:
             state_text = 'Paused '

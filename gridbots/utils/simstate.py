@@ -14,24 +14,23 @@ class SimulationState():
         self.rods = {}
         self.structure = None
         self.scripts = []
+        self.time = None
 
     def set_bots(self, bots):
-        for bot in bots:
-            self.bots[bot.name] = (tuple(bot.pos/24), bot.rot)
+        self.bots = {b.name: (tuple(b.pos/24), b.rot) for b_name, b in bots.items()}
 
     def set_structure(self, structure):
         self.structure = tuple(structure.pos/24)
-        for rod_id, rod in structure.rods.items():
-            self.rods[rod_id] = (
-                rod['type'],
-                rod['bot'],
-                tuple(rod['pos']/24) if rod['pos'] is not None else None,
-                rod['rot'],
-                rod['done']
-            )
+        self.rods = {rod_id: (
+            rod['bot'],
+            tuple(rod['pos']/24) if rod['pos'] is not None else None,
+            rod['rot'],
+            rod['done']
+        ) for rod_id, rod in structure.rods.items()}
 
-    def set_scripts(self, scripts):
+    def set_scripts(self, scripts, time):
         self.scripts = scripts
+        self.time = time
 
     def serialize(self):
         return pickle.dumps((
@@ -39,7 +38,8 @@ class SimulationState():
             self.bots,
             self.rods,
             self.structure,
-            self.scripts
+            self.scripts,
+            self.time
         ))
 
     @classmethod
@@ -50,4 +50,5 @@ class SimulationState():
         s.rods = data[2]
         s.structure = data[3]
         s.scripts = data[4]
+        s.time = data[5]
         return s

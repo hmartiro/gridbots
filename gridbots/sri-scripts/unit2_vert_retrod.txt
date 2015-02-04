@@ -21,3 +21,7 @@ zmove(7, 0, 8.5)
 
 #Robot loc: (246, 108)
 #Stage loc: (0, 0, 0)
+
+
+# Added by hayk because unit 2 verts were offset from unit 1
+zmove(7, 1, 0)

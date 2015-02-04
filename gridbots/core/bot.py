@@ -148,7 +148,3 @@ class Bot:
             self.last_pos = self.pos
             self.pos = self.node_to_pos(self.node)
             self.rotate()
-
-        # Record my current position
-        #self.move_history.append(self.node)
-        #self.rot_history.append(self.rot)

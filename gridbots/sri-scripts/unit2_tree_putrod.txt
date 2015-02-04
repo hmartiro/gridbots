@@ -3,8 +3,14 @@
 zmove(7, 0, 4)
 zmove(7, 32, 0)
 
+
 zonewait(7,.4)
 
 zmove(7, 4, 0)
 
+
 #Robot loc: (282, 112)
+
+
+# Added by hayk because unit 2 verts were offset from unit 1
+zmove(7, -1, 0)

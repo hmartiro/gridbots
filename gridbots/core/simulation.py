@@ -19,6 +19,7 @@ from gridbots.controllers.single_routine import SingleRoutineConroller
 from gridbots.utils.simstate import SimulationState
 
 STATES_PER_FILE = 10000
+FRAMES_PER_STATE = 6
 
 
 class Simulation:
@@ -194,15 +195,17 @@ class Simulation:
 
     def record_state(self, control_inputs):
 
-        s = SimulationState(self.frame)
+        if self.frame % FRAMES_PER_STATE == 0:
 
-        s.set_bots(self.bots)
-        s.set_structure(self.structure)
+            s = SimulationState(self.frame)
 
-        if 'script' in control_inputs:
-            s.set_scripts(control_inputs['script'])
+            s.set_bots(self.bot_dict)
+            s.set_structure(self.structure)
 
-        self.states[self.frame] = s.serialize()
+            if 'script' in control_inputs:
+                s.set_scripts(control_inputs['script'], self.time)
+
+            self.states[self.frame] = s.serialize()
 
         if len(self.states) >= STATES_PER_FILE:
             self.dump_data()
@@ -238,7 +241,7 @@ class Simulation:
         with open(paths_file, 'wb') as f:
             pickle.dump(self.states, f)
 
-        self.new_file_frame = self.frame + 1
+        self.new_file_frame = self.frame + FRAMES_PER_STATE
         self.states = {}
 
     def dump_meta(self):

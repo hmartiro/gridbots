@@ -15,3 +15,7 @@ zmove(7, -34, 0)
 zmove(7, 0, -6)
 
 #Robot loc: (246, 108)
+
+
+# Added by hayk because unit 2 verts were offset from unit 1
+zmove(7, 1, 0)

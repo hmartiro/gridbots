@@ -7,8 +7,14 @@ zonewait(7,.4)
 
 zmove(7, 0, 4)
 
+
 #plant rod position should be the same as tree (282, 114)
 #but approach from 7 direction
 #8/26/14 updated to 282, 112
 
+
 #Robot loc: (283, 112)
+
+
+# Added by hayk because unit 2 verts were offset from unit 1
+zmove(7, -1, 0)
