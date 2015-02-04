@@ -5,12 +5,14 @@
 import os
 import sys
 import math
+import yaml
 import pickle
 import mathutils as mu
-import networkx as nx
 import logging
 
 import gridbots
+from gridbots.utils.simstate import SimulationState
+from gridbots.core.simulation import STATES_PER_FILE
 
 import bge
 
@@ -32,24 +34,38 @@ class BlenderDrawer():
 
     """
 
-    def __init__(self, paths_name, speed=DEFAULT_SPEED):
+    def get_state(self, frame):
+
+        if frame not in self.states:
+
+            base_frame = frame - frame % STATES_PER_FILE
+            paths_file = os.path.join(
+                gridbots.path, 'spec', 'paths', self.sim_name,
+                '{}.pickle'.format(base_frame)
+            )
+
+            if not os.path.isfile(paths_file):
+                return None
+
+            with open(paths_file, 'rb') as f:
+                self.states = pickle.load(f)
+
+        return SimulationState.deserialize(self.states[frame])
+
+    def __init__(self, sim_name, speed=DEFAULT_SPEED):
 
         self.logger = logging.getLogger(__name__)
 
-        # Read the paths file
-        paths_file = os.path.join(gridbots.path, 'spec', 'paths', '{}.pickle'.format(paths_name))
-        with open(paths_file, 'rb') as pf:
-            paths_data = pickle.load(pf)
-
-        # Get map data
-        map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(paths_data["map_name"]))
-        self.map = nx.read_gpickle(map_path)
-
-        self.vertices = {}
-        for n, d in self.map.nodes_iter(data=True):
-            self.vertices[n] = mu.Vector((d['x'], d['y'], d['z']))
-
-        self.edges = self.map.edges()
+        meta_path = os.path.join(gridbots.path, 'spec', 'paths', sim_name, 'meta.yml')
+        with open(meta_path) as f:
+            data = yaml.load(f.read())
+            self.sim_name = data['sim_name']
+            self.num_frames = data['num_frames']
+            self.num_bots = data['num_bots']
+            self.num_rods = data['num_rods']
+            self.bot_data = data['bots']
+            self.rod_data = data['rods']
+            self.end_time = data['end_time']
 
         # TODO read from data
         self.rate = DEFAULT_RATE
@@ -58,15 +74,7 @@ class BlenderDrawer():
         self.framerate = self.rate * self.speed
         self.superstep = self.framerate / BLENDER_FPS
 
-        self.bot_data = paths_data["bots"]
-        self.structure_data = paths_data["structure"]
-
-        self.frames = paths_data["frames"]
-        self.stations = paths_data["stations"]
-
-        self.script_history = paths_data['script_history']
-
-        self.rod_history = paths_data['rod_history']
+        self.states = {}
 
         # Top-level BGE objects
         self.C = bge.logic.getCurrentController()
@@ -103,52 +111,58 @@ class BlenderDrawer():
         self.time = 0.0
         self.frame_int = int(self.frame)
 
-        self.bots = {}
-        for bot in self.bot_data.keys():
-            self.bots[bot] = self.S.addObject(self.bot_data[bot]['type'], self.C.owner)
-            self.bots[bot].orientation = (0, 0, math.pi/2)
+        self.bot_objs = {}
+        for bot_name, bot_type in self.bot_data.items():
+            self.bot_objs[bot_name] = self.S.addObject(bot_type, self.C.owner)
+            self.bot_objs[bot_name].orientation = (0, 0, math.pi/2)
+            self.bot_objs[bot_name]['type'] = bot_type
 
-        self.rods = {}
+        self.rod_objs = {}
         self.rod_type_to_model_map = {
             'h': 'rod_y',
             'v': 'rod_z'  # TODO this is awkward
         }
         self.bot_to_rod_pos_offset = {
             'bot_rod_h': mu.Vector([.47136, 0, .17335]),
-            'bot_rod_v': mu.Vector([.47136, 0, .20895]),
+            'bot_rod_v': mu.Vector([.47136, 0, .30]),
         }
 
-        for rod, rod_data in self.rod_history[-1].items():
-            rod_type = self.rod_type_to_model_map[rod_data['type']]
-            self.rods[rod] = self.S.addObject(rod_type, self.C.owner)
-            self.rods[rod].position = mu.Vector([0, 0, 100])
-        print(self.rod_history[-1])
+        for rod_id, rod_type in self.rod_data.items():
+            rod_type = self.rod_type_to_model_map[rod_type]
+            self.rod_objs[rod_id] = self.S.addObject(rod_type, self.C.owner)
+            self.rod_objs[rod_id].position = mu.Vector([0, 0, 100])
 
-        self.stage = self.S.objects['stage']
+        self.stage_obj = self.S.objects['stage']
 
         self.structure = {}
 
-        # Start in paused state to allow for loading the graphics
-        self.paused = True
+        self.state = self.get_state(self.frame_int)
+        if self.state is None:
+            raise Exception('Could not find data for frame 0!')
+
         self.logger.info('Hit space to start playback.')
 
-        # Draw the scene
-        self.render()
+        self.paused = False
+
+        # Draw the initial scene
+        self.update()
+
+        # Start in paused state to allow for loading the graphics
+        self.paused = True
 
     def update(self):
 
-        self.handle_keys()
-        self.handle_camera()
-        self.handle_text()
+        self.handle_keys(self.state)
+        self.handle_camera(self.state)
+        self.handle_text(self.state)
 
         self.framerate = self.rate * self.speed
         self.superstep = self.framerate / BLENDER_FPS
-        self.frame_int = int(self.frame)
 
         if self.paused:
             return
 
-        self.render()
+        self.render(self.state)
 
         self.logger.debug('------- frame {} -------'.format(self.frame_int))
 
@@ -158,60 +172,65 @@ class BlenderDrawer():
         if self.frame < 0:
             self.frame = 0
             self.time = 0
+            self.paused = True
 
-        elif self.frame > self.frames - 1:
-            self.frame = self.frames - 1
-            self.time -= self.superstep / self.rate
+        elif self.frame > self.num_frames - 1:
+            self.frame = self.num_frames - 1
+            self.time = self.end_time
+            self.paused = True
 
-    def render(self):
+        self.frame_int = int(self.frame)
+        self.state = self.get_state(self.frame_int)
+        assert self.state is not None
 
-        if self.frame > self.frames - 1:
+    def render(self, state):
+
+        if self.frame > self.num_frames - 1:
             return
 
-        for bot_name, bot in self.bots.items():
-
-            node = self.bot_data[bot_name]['move_history'][self.frame_int]
-            bot.position = self.vertices[node]
-
-            z_rot = self.bot_data[bot_name]['rot_history'][self.frame_int]
-            bot.orientation = (0, 0, z_rot)
+        for bot_name, bot_state in state.bots.items():
+            self.bot_objs[bot_name].position = bot_state[0]
+            self.bot_objs[bot_name].orientation = mu.Euler([0, 0, bot_state[1]])
 
         # Move the stage
-        stage_pos = self.structure_data['move_history'][self.frame_int]
-        stage_pos = mu.Vector([v/24.0 for v in stage_pos])
-        self.stage.position = stage_pos
+        stage_pos = mu.Vector(state.structure)
+        self.stage_obj.position = stage_pos
 
-        for rod_id, rod_data in self.rod_history[self.frame_int].items():
-
-            rod = self.rods[rod_id]
-            bot = rod_data['bot']
+        for rod_id, rod_data in state.rods.items():
+            rod_type, rod_bot, rod_pos, rod_rot, rot_done = rod_data
+            rod_obj = self.rod_objs[rod_id]
 
             # Rod is on a bot currently, draw it relative to bot's loc
-            if bot:
+            if rod_bot:
+                bot_type = self.bot_objs[rod_bot]['type']
+                bot_pos = self.bot_objs[rod_bot].position
+                bot_ori = self.bot_objs[rod_bot].orientation
 
-                bot_pos = self.vertices[self.bot_data[bot]['move_history'][self.frame_int]]
-                bot_to_rod = self.bot_to_rod_pos_offset[self.bot_data[bot]['type']]
-                bot_to_rod_rotated = self.bots[bot].orientation * bot_to_rod
+                bot_to_rod = self.bot_to_rod_pos_offset[bot_type]
+                bot_to_rod_rotated = bot_ori * bot_to_rod
 
-                rod.position = bot_pos
-                rod.position += bot_to_rod_rotated
+                rod_obj.position = bot_pos + bot_to_rod_rotated
 
-                if self.bot_data[bot]['type'] == 'bot_rod_h':
-                    rod.orientation = (0, 0, self.bot_data[bot]['rot_history'][self.frame_int])
-                elif self.bot_data[bot]['type'] == 'bot_rod_v':
-                    rod.orientation = (math.radians(90), 0, self.bot_data[bot]['rot_history'][self.frame_int])
+                if bot_type == 'bot_rod_h':
+                    rod_obj.orientation = bot_ori
+                elif bot_type == 'bot_rod_v':
+                    rod_obj.orientation = mu.Euler([math.pi/2, 0, 0])
+                    rod_obj.orientation.rotate(bot_ori)
                 else:
-                    raise Exception('Unexpected bot type: {}'.format(self.bot_data[bot]['type']))
+                    raise Exception('Unexpected bot type: {}'.format(bot_type))
+
+                print('position of rod {}: {}'.format(rod_id, rod_obj.position))
 
             # Rod is on its own, just draw
             else:
-                rod.position = mu.Vector([v/24 for v in rod_data['pos']])
-                rod.orientation = mu.Vector(rod_data['rot'])
+                rod_obj.position = mu.Vector(rod_pos)
+                rod_obj.orientation = mu.Vector(rod_rot)
+                if rot_done:
+                    rod_obj.position += mu.Vector(self.stage_obj.position)
 
-                if rod_data['done']:
-                    rod.position += mu.Vector(self.stage.position)
+                print('position of rod {}: {}'.format(rod_id, rod_obj.position))
 
-    def handle_text(self):
+    def handle_text(self, state):
 
         self.text['speed'].text = 'Speed: {:.2f}x'.format(self.speed)
         self.text['frame'].text = 'Frame: {}'.format(self.frame_int)
@@ -224,12 +243,12 @@ class BlenderDrawer():
         self.text['status'].text = 'Status: {}'.format(state_text)
 
         self.text['scripts'].text = ''
-        for script in self.script_history[self.frame_int]:
+        for script in state.scripts:
             if script == 'simscript' or not script:
                 continue
             self.text['scripts'].text += '\n' + str(script)
 
-    def handle_keys(self):
+    def handle_keys(self, state):
 
         for key, status in self.keyboard.events:
 
@@ -249,10 +268,10 @@ class BlenderDrawer():
 
             if key == bge.events.IKEY:
                 if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
-                    for bot in self.bots:
+                    for bot in self.bot_objs:
                         self.logger.info('Bot %s: Pos: %s, Rot: %s', bot,
-                                         self.bot_data[bot]['move_history'][self.frame_int],
-                                         self.bot_data[bot]['rot_history'][self.frame_int])
+                                         bot.position,
+                                         bot.orientation)
 
             if key == bge.events.RKEY:
                 if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
@@ -277,7 +296,7 @@ class BlenderDrawer():
                     self.logger.info('Halving speed.')
                     self.speed *= 0.5
 
-    def handle_camera(self):
+    def handle_camera(self, state):
 
         # Get current window dimensions (pixel)
         width = bge.render.getWindowWidth()
@@ -336,12 +355,8 @@ def start_rendering():
 
     global renderer
 
-    if len(sys.argv) >= 9:
-        paths_name = sys.argv[8]
-    else:
-        paths_name = 'paths_two_cross'
-
-    renderer = BlenderDrawer(paths_name=paths_name)
+    sim_name = sys.argv[8]
+    renderer = BlenderDrawer(sim_name)
 
 
 def render_frame():

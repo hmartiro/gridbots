@@ -8,13 +8,18 @@ import yaml
 from pprint import pprint, pformat
 import logging
 import networkx as nx
+import pickle
+import shutil
 
 import gridbots
 from gridbots import utils
 from gridbots.core.bot import Bot
 from gridbots.core.structure import Structure
 from gridbots.controllers.single_routine import SingleRoutineConroller
-from gridbots.utils.maputils import pos_from_node
+from gridbots.utils.simstate import SimulationState
+
+STATES_PER_FILE = 10000
+
 
 class Simulation:
 
@@ -68,7 +73,8 @@ class Simulation:
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
             self.sim_data['bots'],
-            self
+            self.node_aliases,
+            self.map
         )
         self.bot_dict = {b.name: b for b in self.bots}
 
@@ -95,8 +101,24 @@ class Simulation:
         # Current system rate
         self.rate = self.DEFAULT_RATE
 
-        # History of scripts being run
-        self.script_history = [[]]
+        # Create the paths directory if needed
+        top_paths_dir = os.path.join(gridbots.path, 'spec', 'paths')
+        if not os.path.exists(top_paths_dir):
+            os.makedirs(top_paths_dir)
+
+        # Create the simulation-specific directory in paths
+        self.paths_dir = os.path.join(top_paths_dir, self.sim_name)
+        shutil.rmtree(self.paths_dir)
+        if not os.path.exists(self.paths_dir):
+            os.makedirs(self.paths_dir)
+
+        # First frame that we are currently holding states for in memory
+        self.new_file_frame = self.frame
+
+        # List of frame: SimulationStates since self.new_file_frame
+        self.states = {}
+
+        self.record_state({})
 
         # ---------------------
         # Debug info
@@ -164,11 +186,26 @@ class Simulation:
 
         self.structure.update(control_inputs)
 
-        self.script_history.append(control_inputs['script'])
+        self.record_state(control_inputs)
 
         # Update the simulation metadata
         self.time += 1 / self.rate
         self.frame += 1
+
+    def record_state(self, control_inputs):
+
+        s = SimulationState(self.frame)
+
+        s.set_bots(self.bots)
+        s.set_structure(self.structure)
+
+        if 'script' in control_inputs:
+            s.set_scripts(control_inputs['script'])
+
+        self.states[self.frame] = s.serialize()
+
+        if len(self.states) >= STATES_PER_FILE:
+            self.dump_data()
 
     def run(self):
         """
@@ -179,7 +216,13 @@ class Simulation:
         while not self.to_exit:
             self.update()
 
-        return self.output()
+        # Dump the rest of the states
+        self.dump_data()
+
+        # Dump the simulation metadata
+        self.dump_meta()
+
+        return self.sim_name
 
     def print_status(self):
 
@@ -189,60 +232,25 @@ class Simulation:
         for bot in self.bots:
             self.logger.info(bot)
 
-    def output(self):
-        """
-        Write the results of the simulation, along with the trajectories of all
-        bots and resources, to a paths file.
+    def dump_data(self):
 
-        """
+        paths_file = os.path.join(self.paths_dir, '{}.pickle'.format(self.new_file_frame))
+        with open(paths_file, 'wb') as f:
+            pickle.dump(self.states, f)
 
-        self.logger.info('')
-        self.logger.info('===============================')
+        self.new_file_frame = self.frame + 1
+        self.states = {}
 
-        output = {}
+    def dump_meta(self):
 
-        if self.status == self.STATUS["success"]:
-            self.logger.info('Simulation finished successfully!')
-        elif self.status == self.STATUS["traffic_jam"]:
-            self.logger.error('Simulation stuck in a traffic jam!')
-        elif self.status == self.STATUS["in_progress"]:
-            self.logger.error('Output called but simulation still in progress!')
-
-        output["status"] = [s for s, val in self.STATUS.items() if val == self.status][0]
-
-        output["map_name"] = self.map_name
-        output["sim_name"] = self.sim_name
-
-        output["frames"] = len(self.bots[0].move_history)
-
-        output["stations"] = self.stations
-
-        output["bots"] = {}
-        for bot in self.bots:
-            output["bots"][bot.name] = {}
-            output["bots"][bot.name]['type'] = bot.type
-            output["bots"][bot.name]['move_history'] = bot.move_history
-            output["bots"][bot.name]['rot_history'] = bot.rot_history
-
-        output["structure"] = {}
-        output['structure']['move_history'] = self.structure.move_history
-
-        output['script_history'] = self.script_history
-
-        output['rod_history'] = self.structure.rod_history
-
-        # Create the paths directory if needed
-        paths_dir = os.path.join(gridbots.path, 'spec', 'paths')
-        if not os.path.exists(paths_dir):
-            os.makedirs(paths_dir)
-
-        # Create and write to the paths file
-        paths_name = "paths_{}".format(self.sim_name)
-        paths_path = os.path.join(paths_dir, '{}.pickle'.format(paths_name))
-
-        import pickle
-
-        with open(paths_path, 'wb') as t_file:
-            pickle.dump(output, t_file)
-
-        return paths_name
+        meta_file = os.path.join(self.paths_dir, 'meta.yml')
+        with open(meta_file, 'w') as f:
+            f.write(yaml.dump({
+                'sim_name': self.sim_name,
+                'num_frames': self.frame,
+                'num_rods': len(self.structure.rods),
+                'num_bots': len(self.bots),
+                'end_time': self.time,
+                'bots': {b.name: b.type for b in self.bots},
+                'rods': {rod_id: rod['type'] for rod_id, rod in self.structure.rods.items()}
+                }))

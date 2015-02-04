@@ -2,9 +2,11 @@
 
 #pull diagonally away
 zmove(7, -0.5, 0.5)
-zonewait(7, 0.3)
+	zonewait(7, 0.5)
+	wait(0.5)
 zmove(7, -0.5, 0.5)
-zonewait(7, 0.3)
+	zonewait(7, 0.5)
+	wait(0.5)
 zmove(7, -1, 1)
 zmove(7, -1, 0)
 

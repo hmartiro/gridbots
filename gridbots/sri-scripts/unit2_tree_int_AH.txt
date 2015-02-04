@@ -1,0 +1,37 @@
+#<<<USR_INPUT>>>
+<unit2_getglue
+
+	<units1&2_buffer_advance
+	feed(h)
+
+<unit2_gettree
+
+	<units1&2_buffer_advance
+	<units1&2_buffer_advance
+
+	rate(80)
+<unit2_tree_putglue
+
+	<units1&2_buffer_advance
+
+	rate(100)
+
+	
+<unit2_tree_putrod
+	
+	wait(1)
+	uv(1)
+	wait(20)
+	uv(0)
+
+<unit2_tree_retrod
+
+	rate(180)
+	<units1&2_buffer_advance
+	<units1&2_buffer_advance
+
+	#stagerel(0,0,5)
+	wait(1)
+
+
+

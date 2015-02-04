@@ -26,22 +26,22 @@ def parse_jobs(jobs_data, job_types):
     return job_queue
 
 
-def parse_bots(bots_data, sim):
+def parse_bots(bots_data, node_aliases, graph):
 
     from gridbots.core.bot import Bot
 
     bots = []
     for bot_name, bot_data in bots_data.items():
 
-        if bot_data['position'] in sim.node_aliases:
-            bot_data['position'] = sim.node_aliases[bot_data['position']]
+        if bot_data['position'] in node_aliases:
+            bot_data['position'] = node_aliases[bot_data['position']]
 
         bot = Bot(
             name=bot_name,
-            position=bot_data['position'],
+            node=bot_data['position'],
             rotation=bot_data['rotation'],
             bot_type=bot_data['type'],
-            sim=sim
+            graph=graph
         )
         bots.append(bot)
 

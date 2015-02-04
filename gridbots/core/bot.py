@@ -6,11 +6,7 @@ import math
 import logging
 from operator import itemgetter
 
-import numpy as np
-from numpy import linalg
-
-from gridbots.utils.geometry import rotation_between
-from gridbots.utils.maputils import pos_from_node
+import mathutils as mu
 
 
 class Bot:
@@ -21,7 +17,7 @@ class Bot:
 
     logger = logging.getLogger(__name__)
 
-    def __init__(self, name, position, rotation, bot_type, sim):
+    def __init__(self, name, node, rotation, bot_type, graph):
 
         # Bot name
         self.name = str(name)
@@ -30,25 +26,34 @@ class Bot:
         self.type = bot_type
 
         # Current node
-        self.pos = position
-
-        # Last position
-        self.last_pos = self.pos
-
-        # Current orientation
-        self.rot = rotation
+        self.node = node
 
         # Last movement vector (for rotation calc)
         self.last_move_vector = None
 
         # Save a reference to the simulation
-        self.sim = sim
+        self.graph = graph
 
-        self.graph = self.sim.map
+        # Handy for getting the position from the node
+        # self.xyz_getter(self.graph.node[self.node])
+        self.xyz_getter = itemgetter('x', 'y', 'z')
+
+        # Position (coordinates)
+        # Directly calculable from the current node
+        self.pos = self.node_to_pos(self.node)
+        self.last_pos = None
+
+        # Current orientation
+        self.rot = rotation
 
         # Full history of bot state at each time step
-        self.move_history = [self.pos]
+        self.move_history = [self.node]
         self.rot_history = [self.rot]
+
+        self.last_pos = None
+
+    def node_to_pos(self, node):
+        return mu.Vector(self.xyz_getter(self.graph.node[self.node])) * 24
 
     def __repr__(self):
         """ String representation of the bot.
@@ -56,7 +61,7 @@ class Bot:
         return '<Bot {}> Type: {}, Position: {}'.format(
             self.name,
             self.type,
-            self.pos
+            self.node
         )
 
     def rotate(self):
@@ -64,18 +69,15 @@ class Bot:
             and the move history.
         """
 
-        if not self.move_history:
+        if not self.last_pos:
             return
 
-        n0 = self.move_history[-1]
-        n1 = self.pos
-
-        c0 = np.array(itemgetter('x', 'y', 'z')(self.graph.node[n0]))
-        c1 = np.array(itemgetter('x', 'y', 'z')(self.graph.node[n1]))
+        c0 = self.last_pos
+        c1 = self.pos
 
         v0 = self.last_move_vector
         v1 = c1 - c0
-        v1 = v1[:2] / linalg.norm(v1[:2])
+        v1 = mu.Vector([v1.x, v1.y, 0]).normalized()
 
         # Can't make rotation decision if we have no data
         if v0 is None:
@@ -83,13 +85,13 @@ class Bot:
             return
 
         # No need to do calculations if movement in same direction
-        if (v0 == v1).all():
+        if v0 == v1:
             return
 
-        v0p = np.array([v0[1], -v0[0]])
+        v0p = mu.Vector([v0.y, -v0.x, 0])
 
-        d1 = np.dot(v0, v1)
-        d2 = np.dot(v0p, v1)
+        d1 = v0.dot(v1)
+        d2 = v0p.dot(v1)
 
         # Axis of rotation, whether along v0 or perpendicular to it
         v_rot = v0 if abs(d1) > abs(d2) else v0p
@@ -97,7 +99,7 @@ class Bot:
         # Direction
         v_rot = v_rot if d1 > 0 else -v_rot
 
-        theta = rotation_between(v_rot, v1)
+        theta = v_rot.rotation_difference(v1).to_euler().z
 
         if d1 == 0:
             theta = 0
@@ -118,14 +120,14 @@ class Bot:
         """
 
         # Logging header
-        # self.logger.debug('################### Bot %s'.format(self.name, self.pos))
+        # self.logger.debug('################### Bot %s'.format(self.name, self.node))
 
         moves_to_make = []
 
         # TODO return if only waiting
 
         # Line below is optimized w/ low-level nx access since this is a critical region
-        for n2, edge_data in self.graph.adj[self.pos].items():
+        for n2, edge_data in self.graph.adj[self.node].items():
             for zone in edge_data.keys():
                 if zone in control_inputs:
                     if edge_data[zone] == control_inputs[zone]:
@@ -138,25 +140,15 @@ class Bot:
 
         if len(moves_to_make) > 0:
 
-            new_pos = moves_to_make[0]
-            if new_pos == self.pos:
-                raise Exception('Bot {} moving to same node {}!'.format(self.name, self.pos))
-            # self.logger.debug('%s, %s, %s'.format(self.pos, new_pos, self.move_history[-5:]))
-            self.pos = new_pos
+            new_node = moves_to_make[0]
+            if new_node == self.node:
+                raise Exception('Bot {} moving to same node {}!'.format(self.name, self.node))
+
+            self.node = new_node
+            self.last_pos = self.pos
+            self.pos = self.node_to_pos(self.node)
             self.rotate()
 
         # Record my current position
-        self.move_history.append(self.pos)
-        self.rot_history.append(self.rot)
-
-    def distance_to_node(self, node):
-
-        node_pos = np.array(pos_from_node(self.graph, node))
-        return self.distance_to(node_pos)
-
-    def distance_to(self, pos):
-
-        feed_pos = np.array(pos)
-        bot_pos = np.array(pos_from_node(self.graph, self.pos))
-        dist = linalg.norm(feed_pos - bot_pos)
-        return dist
+        #self.move_history.append(self.node)
+        #self.rot_history.append(self.rot)

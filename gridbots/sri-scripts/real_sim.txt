@@ -1,35 +1,55 @@
 # Script for demoing units_1&2_tree_int
 
+# Get into tree placement position
 <units1&2_buffer_reverse
 <units1&2_tree_ready
 <units1&2_buffer_reverse
 
+# ---------------------------------
+# Build trees
+# ---------------------------------
+
+# Build three on base layer
+<units1&2_tree_int
+<unit2_tree_int_AH.txt
+stagerel(0, -24, 0)
+wait(1)
+
+stagerel(0, 12, 12)
+wait(1)
+
+# Build three on second layer
+<units1&2_tree_int
+<unit2_tree_int_AH.txt
+stagerel(0, -24, 0)
+wait(1)
+
+stagerel(0, 12, 12)
+wait(1)
+
+# Build three on third layer
+<units1&2_tree_int
+<unit2_tree_int_AH.txt
+stagerel(0, -24, 0)
+wait(1)
+
+# ---------------------------------
+# Verts
+# ---------------------------------
+
+stagerel(14,0,0)
+wait(1)
 stagerel(0, 0, -24)
 wait(1)
-<_tree_int
+<units1&2_buffer_advance
+<units1&2_buffer_advance
 
-stagerel(0, 0, 12)
+stagerel(0, 12, 2)
 wait(1)
-<_tree_int
+<units1&2_vert_int
+<unit2_vert_int
 
-stagerel(0, 0, 12)
+stagerel(0, -24, 12)
 wait(1)
-<_tree_int
-
-<_tree_to_vert.txt
-stagerel(0, 0, 0)
-wait(1)
-
-<_vert_int
-
-#<units1&2_tree_int
-
-#<units1&2_tree_to_vert
-#<units1&2_tlap_to_vert
-#<units1&2_vert_int
-
-#<units1&2_vert_to_horz
-#<units1&2_horz_int
-
-#<units1&2_horz_to_tlap
-#<units1&2_tlap_int
+<units1&2_vert_int
+<unit2_vert_int

@@ -16,12 +16,12 @@
 
 #put glue on left rods
 rate(80)
-<Units1&2_horz_putglue
+<units1&2_horz_putglue
 
 #move stage, advance buffer and put glue on right rods
 stagerel(0,12,0)
 <units1&2_buffer_advance
-<Units1&2_horz_putglue
+<units1&2_horz_putglue
 
 #move stage between two glue rods, advance buffer and put rod
 stagerel(0,-6, 0)

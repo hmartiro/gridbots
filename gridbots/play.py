@@ -44,5 +44,4 @@ if __name__ == '__main__':
     os.environ['PYTHONPATH'] = ':'.join(pythonpath)
 
     # Execute blenderplayer
-    call([bp_exec, "-m", "2", "-w", "1000", "562", gridbots_blend, "-", 'paths_{}'.format(sim_name)],
-         env=os.environ)
+    call([bp_exec, "-m", "2", "-w", "1000", "562", gridbots_blend, "-", sim_name], env=os.environ)

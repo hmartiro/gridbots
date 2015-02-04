@@ -3,7 +3,7 @@
 """
 
 import networkx as nx
-from operator import itemgetter
+import mathutils as mu
 
 ERROR_TOLERANCE = 1e-4
 
@@ -39,7 +39,7 @@ def pos_from_node(G, node):
     """
     Given a node ID, return the node's coordinates in millimeters.
     """
-    return G.node[node]['x']*24, G.node[node]['y']*24, G.node[node]['z']*24
+    return mu.Vector([G.node[node]['x']*24, G.node[node]['y']*24, G.node[node]['z']*24])
 
 
 def shortest_path(p1, p2):

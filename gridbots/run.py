@@ -33,7 +33,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     sim = Simulation(sim_name)
-    paths_name = sim.run()
+    sim.run()
 
     # Get blenderplayer symbolic link (usually "/usr/local/bin/blenderplayer")
     bp_link = check_output(['which', 'blenderplayer'])[:-1]
@@ -53,5 +53,5 @@ if __name__ == '__main__':
     os.environ['PYTHONPATH'] = ':'.join(pythonpath)
 
     # Execute blenderplayer
-    call([bp_exec, "-m", "2", "-w", "1000", "562", gridbots_blend, "-", paths_name],
+    call([bp_exec, "-m", "2", "-w", "1000", "562", gridbots_blend, "-", sim_name],
          env=os.environ)
