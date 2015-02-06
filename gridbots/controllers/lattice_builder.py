@@ -28,7 +28,9 @@ class LatticeController():
             ''
         ))
 
-    def _start_to_tree(self):
+    def _start_to_tree(self, v1):
+
+        v1_mm = mu.Vector(v1) * LATTICE_SPACING
 
         self.commands.extend((
             '# TRANSITION: start -> tree',
@@ -37,7 +39,8 @@ class LatticeController():
             '<units1&2_tree_ready',
             '<units1&2_buffer_reverse',
             '',
-            'stagerel(12, 0, 0)',
+            #'stagerel(12, 0, 0)',
+            'stagerel({}, {}, {})'.format(v1_mm.x, v1_mm.y, v1_mm.z),
             'stagerel(-6, 0, 0)',
             '# -----------------------------',
             ''
@@ -52,7 +55,7 @@ class LatticeController():
         self.commands.extend((
             '# Place tree rod from {} to {}'.format(v1, v2),
             'stagerel({},{},{})'.format(move.x, move.y, move.z),
-            '<unit2_tree_int_AH.txt'
+            '<unit2_tree_int_AH.txt',
             ''
         ))
 
@@ -203,8 +206,6 @@ class LatticeController():
         }
         mode = 'tree'
 
-        self._start_to_tree()
-
         # Create a set of tree attachment points by looking at the verticals
         # of the first layer
         tree_verts = set()
@@ -223,6 +224,7 @@ class LatticeController():
         tree_verts.sort(key=lambda p: (-p[0], -p[2], -p[1]))
 
         # Build the trees
+        self._start_to_tree(tree_verts[0])
         for v in tree_verts:
             self._tree(v, [v[0]+1, v[1], v[2]])
 

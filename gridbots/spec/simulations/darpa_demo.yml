@@ -11,56 +11,12 @@
 # ---------------------------------------------------------
 map: "stage"
 
-stage_pos: [299, 96, -20]
-
 # Name of the file that defines the target truss structure
 # as a graph of edges (rods) and nodes (glue points)
 #
 # Expecting a file name from gridbots/structures
 # ---------------------------------------------------------
-structure: "cube1x1"
-
-# Temporary: Manually specified routine
-# for SingleRoutineController
-# ---------------------------------------------------------
-#routine: "2x2x5tower.txt"
-routine: "alignall.txt"
-
-# Classification of bot types and their properties
-# ---------------------------------------------------------
-#bot_types:
-#  builder_x: # Name of bot type
-#    speed: 1.0 # Speed of this type of bot
-#    radius: 0.05 # Physical radius of this bot
-
-bot_types:
-
-  bot_rod_v: {}
-  bot_rod_h: {}
-  bot_glue_brush: {}
-  bot_glue_dab: {}
-
-# Classification of required job types, by name
-# Currently not used.
-# ---------------------------------------------------------
-#job_types:
-#  rod_x: # Name of job type
-#    operations: [grab_glue, attach rod] # List of ops
-#    bot_type: builder_x # Required bot type
-
-job_types: {}
-
-#  rod_x:
-#    operations: [grab_rod_x, grab_glue_x, attach_rod]
-#    bot_type: builder_x
-#
-#  rod_y:
-#    operations: [grab_rod_y, grab_glue_y, attach_rod]
-#    bot_type: builder_y
-#
-#  rod_z:
-#    operations: [grab_rod_z, grab_glue_z, attach_rod]
-#    bot_type: builder_z
+structure: "cube2x2"
 
 # Aliases for nodes in this map
 # ---------------------------------------------------------
@@ -96,6 +52,20 @@ node_aliases:
   bot_10_start: 'Z01.P.007.2082' # (246, 12)
   bot_11_start: 'Z03.P.005.2078' # (218, 12)
   bot_12_start: 'Z03.P.002.322' # (190, 12)
+
+# Classification of bot types and their properties
+# ---------------------------------------------------------
+#bot_types:
+#  builder_x: # Name of bot type
+#    speed: 1.0 # Speed of this type of bot
+#    radius: 0.05 # Physical radius of this bot
+
+bot_types:
+
+  bot_rod_v: {}
+  bot_rod_h: {}
+  bot_glue_brush: {}
+  bot_glue_dab: {}
 
 # Definition of bots in this map, by name
 # ---------------------------------------------------------
@@ -159,40 +129,6 @@ bots:
     rotation: 0
     type: bot_rod_h
 
-# Definition of stations in this map, by type
+# Starting position of the stage
 # ---------------------------------------------------------
-#stations:
-#  glue_station: # Station type
-#    # List of stations of this type
-#    - position: 1 # Location node
-#      time: 2.0 # How long a bot takes here
-
-stations: {}
-
-#  grab_rod_x:
-#    - position: grab_rod_x
-#      time: 2.0
-#
-#  grab_rod_y:
-#    - position: grab_rod_y
-#      time: 2.0
-#
-#  grab_rod_z:
-#    - position: grab_rod_z
-#      time: 2.0
-#
-#  grab_glue_x:
-#    - position: grab_glue_x
-#      time: 2.0
-#
-#  grab_glue_y:
-#    - position: grab_glue_y
-#      time: 2.0
-#
-#  grab_glue_z:
-#    - position: grab_glue_z
-#      time: 2.0
-#
-#  attach_rod:
-#    - position: attach_rod
-#      time: 2.0
+stage_pos: [299, 96, -20]

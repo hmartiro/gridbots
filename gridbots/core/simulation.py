@@ -66,12 +66,6 @@ class Simulation:
         map_path = os.path.join(gridbots.path, 'spec', 'maps', '{}.gpickle'.format(self.map_name))
         self.map = nx.read_gpickle(map_path)
 
-        # Iterate through the waypoints and create Stations
-        self.stations = utils.parse.parse_stations(self.sim_data['stations'], self.node_aliases)
-
-        # Parse routines from script files
-        self.routine = utils.parse.parse_routine(self.sim_data['routine'])
-
         # Iterate through the input file and create bots
         self.bots = utils.parse.parse_bots(
             self.sim_data['bots'],
@@ -146,12 +140,6 @@ class Simulation:
         self.logger.debug("----- BOTS -----")
         for bot in self.bots:
             self.logger.debug(bot)
-
-        self.logger.debug("----- STATIONS -----")
-        for station_type in self.stations.keys():
-            self.logger.debug('* {}'.format(station_type))
-            for station in self.stations[station_type]:
-                self.logger.debug('  {}'.format(station))
 
     def __str__(self):
 
