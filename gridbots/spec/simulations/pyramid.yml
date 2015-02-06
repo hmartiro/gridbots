@@ -8,7 +8,7 @@
 #
 # Expecting a file name from gridbots/structures
 # ---------------------------------------------------------
-structure: "testcone"
+structure: "pyramid"
 
 # Name of the file that defines the physical surface
 # as a graph of nodes bots can occupy and edges they
