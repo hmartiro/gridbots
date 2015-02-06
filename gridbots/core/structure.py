@@ -3,9 +3,10 @@
 """
 
 import logging
-from gridbots.core.bot import Bot
-from gridbots.utils.maputils import pos_from_node, node_from_pos
-from copy import deepcopy
+from gridbots.utils.maputils import pos_from_node
+from gridbots.generators.structure.ply_to_graph import ply_to_graph
+from gridbots.generators.structure.structure_from_ply import fill_hollow_box_mesh
+
 import mathutils as mu
 import math
 
@@ -19,12 +20,18 @@ class Structure:
     ROD_PICKUP_MAX_X = -126  # mm
     ROD_PICKUP_MIN_Y = 120  # mm
 
-    def __init__(self, sim, graph):
+    def __init__(self, sim, structure_file):
 
         self.logger = logging.getLogger(__name__)
 
         self.sim = sim
-        self.g = graph
+        self.structure_file = structure_file
+
+        # Read the ply
+        hollow_edges, hollow_verts = ply_to_graph(structure_file)
+
+        # Fill in the build
+        self.vertices, self.edges = fill_hollow_box_mesh(hollow_edges, hollow_verts)
 
         self.pos = mu.Vector(self.sim.sim_data['stage_pos'])
 
@@ -97,6 +104,9 @@ class Structure:
                     if rod_data['bot']:
                         bot = self.sim.bot_dict[rod_data['bot']]
 
+                        # if bot.type != 'bot_rod_v' and bot.type != 'bot_rod_h':
+                        #     continue
+
                         if bot.pos.x > self.ROD_DETACH_MIN_X:
 
                             rot = mu.Matrix.Rotation(bot.rot, 4, 'Z')
@@ -137,3 +147,4 @@ class Structure:
                         self.logger.info('Bot {} ({}) at {} picked up rod {} at {} on frame {}'.format(
                             bot.name, bot.type, bot.pos, rod_id, self.rods[rod_id]['pos'], self.sim.frame
                         ))
+                        self.logger.info('Scripts: {}'.format(self.sim.last_control_input))

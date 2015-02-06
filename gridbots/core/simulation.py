@@ -16,6 +16,7 @@ from gridbots import utils
 from gridbots.core.bot import Bot
 from gridbots.core.structure import Structure
 from gridbots.controllers.single_routine import SingleRoutineConroller
+from gridbots.controllers.lattice_builder import LatticeController
 from gridbots.utils.simstate import SimulationState
 
 STATES_PER_FILE = 10000
@@ -80,13 +81,13 @@ class Simulation:
         self.bot_dict = {b.name: b for b in self.bots}
 
         # Parse the structure file
-        structure_path = os.path.join(gridbots.path, 'spec', 'structures',
-                                      '{}.yml'.format(self.structure_name))
-        structure_graph = utils.graph.read_graph(structure_path)
-        self.structure = Structure(self, structure_graph)
+        structure_file = os.path.join(gridbots.path, 'spec', 'structures',
+                                      '{}.ply'.format(self.structure_name))
+        self.structure = Structure(self, structure_file)
 
         # Controller that provides control inputs for each time step
-        self.controller = SingleRoutineConroller(self.bots, self.map, self.routine)
+        #self.controller = SingleRoutineConroller(self.bots, self.map, self.routine)
+        self.controller = LatticeController(self.bots, self, self.structure)
 
         # Count frames
         self.frame = 0
@@ -121,6 +122,8 @@ class Simulation:
 
         self.record_state({})
 
+        self.last_control_input = {}
+
         # ---------------------
         # Debug info
         # ---------------------
@@ -130,9 +133,8 @@ class Simulation:
         ))
 
         self.logger.debug("----- STRUCTURE -----")
-        self.logger.info('Build a truss with {} rods and {} nodes.'.format(
-            len(self.structure.g.edges()),
-            len(self.structure.g.nodes()),
+        self.logger.info('Build a truss with {} rods.'.format(
+            len(self.structure.edges)
             ))
 
         self.logger.debug("----- MAP -----")
@@ -177,6 +179,7 @@ class Simulation:
 
         # Run the controller to get inputs for this time step
         control_inputs = self.controller.step(self.frame)
+        self.last_control_input = control_inputs
 
         if not control_inputs:
             return

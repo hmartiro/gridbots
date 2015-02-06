@@ -18,12 +18,13 @@ stage_pos: [299, 96, -20]
 #
 # Expecting a file name from gridbots/structures
 # ---------------------------------------------------------
-structure: "stair"
+structure: "cube1x1"
 
 # Temporary: Manually specified routine
 # for SingleRoutineController
 # ---------------------------------------------------------
-routine: "2x2x5tower.txt"
+#routine: "2x2x5tower.txt"
+routine: "alignall.txt"
 
 # Classification of bot types and their properties
 # ---------------------------------------------------------
