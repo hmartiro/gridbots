@@ -15,7 +15,7 @@ import gridbots
 from gridbots import utils
 from gridbots.core.bot import Bot
 from gridbots.core.structure import Structure
-from gridbots.controllers.single_routine import SingleRoutineConroller
+from gridbots.controllers.single_routine import RoutineController
 from gridbots.controllers.lattice_builder import LatticeController
 from gridbots.utils.simstate import SimulationState
 
@@ -58,7 +58,6 @@ class Simulation:
 
         # Get names
         self.sim_name = sim_name
-        self.structure_name = self.sim_data["structure"]
         self.map_name = self.sim_data["map"]
         self.node_aliases = self.sim_data['node_aliases']
 
@@ -74,14 +73,19 @@ class Simulation:
         )
         self.bot_dict = {b.name: b for b in self.bots}
 
-        # Parse the structure file
-        structure_file = os.path.join(gridbots.path, 'spec', 'structures',
-                                      '{}.ply'.format(self.structure_name))
-        self.structure = Structure(self, structure_file)
+        # Create a structure object
+        self.structure = Structure(self)
 
         # Controller that provides control inputs for each time step
-        #self.controller = SingleRoutineConroller(self.bots, self.map, self.routine)
-        self.controller = LatticeController(self.bots, self, self.structure)
+        controller_type = self.sim_data['controller']['type']
+        if controller_type == 'LatticeController':
+            controller_class = LatticeController
+        elif controller_type == 'RoutineController':
+            controller_class = RoutineController
+        else:
+            raise Exception('Unknown controller type: {}'.format(controller_type))
+
+        self.controller = controller_class(self, self.sim_data['controller']['options'])
 
         # Count frames
         self.frame = 0
@@ -118,29 +122,6 @@ class Simulation:
 
         self.last_control_input = {}
 
-        # ---------------------
-        # Debug info
-        # ---------------------
-
-        self.logger.debug('Simulating {}'.format(
-            self.sim_name
-        ))
-
-        self.logger.debug("----- STRUCTURE -----")
-        self.logger.info('Build a truss with {} rods.'.format(
-            len(self.structure.edges)
-            ))
-
-        self.logger.debug("----- MAP -----")
-        self.logger.info('Map {} has {} nodes.'.format(
-            self.map_name,
-            self.map.number_of_nodes()
-        ))
-
-        self.logger.debug("----- BOTS -----")
-        for bot in self.bots:
-            self.logger.debug(bot)
-
     def __str__(self):
 
         """
@@ -148,7 +129,7 @@ class Simulation:
 
         """
 
-        return '[Simulation] Bots: {}'.format(len(self.bots))
+        return '[{}] Bots: {}'.format(self.sim_name, len(self.bots))
 
     def update(self):
         """

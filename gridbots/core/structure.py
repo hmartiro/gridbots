@@ -4,8 +4,6 @@
 
 import logging
 from gridbots.utils.maputils import pos_from_node
-from gridbots.generators.structure.ply_to_graph import ply_to_graph
-from gridbots.generators.structure.structure_from_ply import fill_hollow_box_mesh
 
 import mathutils as mu
 import math
@@ -20,18 +18,11 @@ class Structure:
     ROD_PICKUP_MAX_X = -126  # mm
     ROD_PICKUP_MIN_Y = 120  # mm
 
-    def __init__(self, sim, structure_file):
+    def __init__(self, sim):
 
         self.logger = logging.getLogger(__name__)
 
         self.sim = sim
-        self.structure_file = structure_file
-
-        # Read the ply
-        hollow_edges, hollow_verts = ply_to_graph(structure_file)
-
-        # Fill in the build
-        self.vertices, self.edges = fill_hollow_box_mesh(hollow_edges, hollow_verts)
 
         self.pos = mu.Vector(self.sim.sim_data['stage_pos'])
 

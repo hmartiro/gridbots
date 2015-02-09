@@ -51,3 +51,10 @@ gridbots/spec/paths/
 .idea/
 
 *.autosave
+
+# Auto generated stuff
+gridbots/stage-generated.blend
+gridbots/spec/maps/*.gpickle
+gridbots/sri-scripts/_*
+
+media/
