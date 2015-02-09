@@ -41,8 +41,8 @@ if __name__ == '__main__':
     # Get absolute location of blenderplayer
     # (usually like "/usr/local/blender-2.70a-linux-glibc211-x86_64/blenderplayer")
     # For some reason, it throws an error when using a symlink
-    #bp_exec = check_output(['readlink', bp_link])[:-1]
-    bp_exec = bp_link
+    bp_exec = check_output(['readlink', bp_link])[:-1]
+    #bp_exec = bp_link
 
     # Location of gridbots blender file
     gridbots_blend = os.path.join(gridbots.path, 'gridbots.blend')

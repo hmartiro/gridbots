@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=MicroFactory CAD-to-Build
+GenericName=MicroFactory CAM
+Comment=Path planning and simulation of the MicroFactory platform
+Exec=sh -c "${GRIDBOTS}/gridbots/runners/cad-to-build.sh"
+Icon=python3
+Terminal=false
+Type=Application
+Categories=Graphics;3DGraphics;
+MimeType=application/x-blender;
+Name[en_US]=CAD-to-Build
