@@ -319,7 +319,7 @@ if __name__ == '__main__':
 
         G = parse_all()
 
-        name = sys.argv[4][:-6]
+        name = sys.argv[2][:-6]
 
         nx.write_gpickle(G, 'spec/maps/{}.gpickle'.format(name))
 

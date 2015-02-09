@@ -1,5 +1,5 @@
 # ---------------------------------------------------------
-# Build specification file
+# Gridbots simulation file
 # ---------------------------------------------------------
 ---
 
@@ -16,7 +16,7 @@
 controller:
   type: LatticeController
   options:
-    structure: testcone.ply
+    structure: pyramid.ply
     dual_build: True
 
 # RoutineController just runs a single build script. This can
@@ -25,7 +25,7 @@ controller:
 #controller:
 #  type: RoutineController
 #  options:
-#    routine: _darpa_demo.txt
+#    routine: _pyramid.txt
 
 # Name of the file that defines the physical surface
 # as a graph of nodes bots can occupy and edges they
@@ -35,12 +35,47 @@ controller:
 # ---------------------------------------------------------
 map: "stage"
 
-# Starting position of the stage, in millimeters
+# Aliases for nodes in this map
 # ---------------------------------------------------------
-stage_pos: [299, 96, -20]
 
-# Classification of robot types and their properties
+node_aliases:
+
+  rod_feed_tree: 'Z11.PF.000.5191'
+
+  dropoff_tree_1: 'Z07.P.030.2221'
+  dropoff_tree_2: 'Z01.P.023.2220'
+
+  well_1: 'Z06.PF.001.4252'
+  well_4: 'Z06.PF.004.4256'
+
+  grab_rod_y: 'Z11.P.052.2076'
+  grab_rod_z: 'Z11.P.053.2076'
+
+  grab_glue_x: 'Z06.P.063.2076'
+  grab_glue_y: 'Z06.P.064.2076'
+  grab_glue_z: 'Z06.P.065.2076'
+
+  attach_rod: 'Z07.P.033.2100'
+
+  bot_1_start: 'Z10.P.041.2094' # (162,156)
+  bot_2_start: 'Z08.P.042.2098' # (190, 156)
+  bot_3_start: 'Z08.P.039.2078' # (218, 156)
+  bot_4_start: 'Z07.P.031.2082' # (246, 108)
+  bot_5_start: 'Z09.P.029.2078' # (218, 108)
+  bot_6_start: 'Z09.P.026.2098' # (190, 108)
+  bot_7_start: 'Z04.P.017.2094' # (162, 60)
+  bot_8_start: 'Z02.P.018.2098' # (190, 60)
+  bot_9_start: 'Z02.P.015.2078' # (218, 60)
+  bot_10_start: 'Z01.P.007.2082' # (246, 12)
+  bot_11_start: 'Z03.P.005.2078' # (218, 12)
+  bot_12_start: 'Z03.P.002.322' # (190, 12)
+
+# Classification of bot types and their properties
 # ---------------------------------------------------------
+#bot_types:
+#  builder_x: # Name of bot type
+#    speed: 1.0 # Speed of this type of bot
+#    radius: 0.05 # Physical radius of this bot
 
 bot_types:
 
@@ -51,6 +86,11 @@ bot_types:
 
 # Definition of bots in this map, by name
 # ---------------------------------------------------------
+#bots:
+#  steve: # Bot name
+#    position: Z01.P.015.124 # Position node
+#    rotation: 0 # Z-rotation angle
+#    type: bot_rod_v # Bot type
 
 bots:
 
@@ -106,38 +146,6 @@ bots:
     rotation: 0
     type: bot_rod_h
 
-
-# Aliases for nodes in this map, for readability
+# Starting position of the stage
 # ---------------------------------------------------------
-
-node_aliases:
-
-  rod_feed_tree: 'Z11.PF.000.5191'
-
-  dropoff_tree_1: 'Z07.P.030.2221'
-  dropoff_tree_2: 'Z01.P.023.2220'
-
-  well_1: 'Z06.PF.001.4252'
-  well_4: 'Z06.PF.004.4256'
-
-  grab_rod_y: 'Z11.P.052.2076'
-  grab_rod_z: 'Z11.P.053.2076'
-
-  grab_glue_x: 'Z06.P.063.2076'
-  grab_glue_y: 'Z06.P.064.2076'
-  grab_glue_z: 'Z06.P.065.2076'
-
-  attach_rod: 'Z07.P.033.2100'
-
-  bot_1_start: 'Z10.P.041.2094' # (162,156)
-  bot_2_start: 'Z08.P.042.2098' # (190, 156)
-  bot_3_start: 'Z08.P.039.2078' # (218, 156)
-  bot_4_start: 'Z07.P.031.2082' # (246, 108)
-  bot_5_start: 'Z09.P.029.2078' # (218, 108)
-  bot_6_start: 'Z09.P.026.2098' # (190, 108)
-  bot_7_start: 'Z04.P.017.2094' # (162, 60)
-  bot_8_start: 'Z02.P.018.2098' # (190, 60)
-  bot_9_start: 'Z02.P.015.2078' # (218, 60)
-  bot_10_start: 'Z01.P.007.2082' # (246, 12)
-  bot_11_start: 'Z03.P.005.2078' # (218, 12)
-  bot_12_start: 'Z03.P.002.322' # (190, 12)
+stage_pos: [299, 96, -20]

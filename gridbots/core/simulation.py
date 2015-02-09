@@ -108,9 +108,10 @@ class Simulation:
 
         # Create the simulation-specific directory in paths
         self.paths_dir = os.path.join(top_paths_dir, self.sim_name)
-        shutil.rmtree(self.paths_dir)
-        if not os.path.exists(self.paths_dir):
-            os.makedirs(self.paths_dir)
+
+        if os.path.exists(self.paths_dir):
+            shutil.rmtree(self.paths_dir)
+        os.makedirs(self.paths_dir)
 
         # First frame that we are currently holding states for in memory
         self.new_file_frame = self.frame
