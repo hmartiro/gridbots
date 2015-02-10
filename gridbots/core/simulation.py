@@ -119,7 +119,9 @@ class Simulation:
         # List of frame: SimulationStates since self.new_file_frame
         self.states = {}
 
-        self.record_state({})
+        self.full_state = None
+
+        #self.record_state({})
 
         self.last_control_input = {}
 
@@ -172,13 +174,23 @@ class Simulation:
 
             s = SimulationState(self.frame)
 
-            s.set_bots(self.bot_dict)
-            s.set_structure(self.structure)
+            s.set_bots(self.bot_dict, self.full_state)
+            s.set_structure(self.structure, self.full_state)
 
             if 'script' in control_inputs:
-                s.set_scripts(control_inputs['script'], self.time)
+                s.set_scripts(control_inputs['script'], self.time, self.full_state)
 
             self.states[self.frame] = s.serialize()
+
+            # Update full_state with everything
+            if not self.full_state:
+                self.full_state = SimulationState(self.frame)
+            else:
+                self.full_state.frame = self.frame
+            self.full_state.set_bots(self.bot_dict)
+            self.full_state.set_structure(self.structure)
+            if 'script' in control_inputs:
+                self.full_state.set_scripts(control_inputs['script'], self.time)
 
         if len(self.states) >= STATES_PER_FILE:
             self.dump_data()

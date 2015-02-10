@@ -35,7 +35,7 @@ class BlenderDrawer():
 
     """
 
-    def __init__(self, sim_name, start_frame=0, speed=DEFAULT_SPEED):
+    def __init__(self, sim_name, speed=DEFAULT_SPEED):
 
         self.logger = logging.getLogger(__name__)
 
@@ -90,7 +90,7 @@ class BlenderDrawer():
         bge.logic.setPhysicsTicRate(BLENDER_FPS)
 
         # Which simulation frame are we on?
-        self.frame = start_frame
+        self.frame = 0
         self.frame_int = int(self.frame)
 
         self.bot_objs = {}
@@ -118,7 +118,12 @@ class BlenderDrawer():
 
         self.structure = {}
 
+        # Frame 0 is a complete state
         self.state = self.get_state(self.frame_int)
+        self.logger.info('---- FIRST STATE DATA ----')
+        self.logger.info(self.state.structure)
+        self.logger.info(self.state.bots)
+
         if self.state is None:
             raise Exception('Could not find data for frame 0!')
 
@@ -144,12 +149,40 @@ class BlenderDrawer():
             )
 
             if not os.path.isfile(paths_file):
+                self.logger.error('Did not find paths file: {}'.format(paths_file))
                 return None
 
             with open(paths_file, 'rb') as f:
                 self.states = pickle.load(f)
 
         return SimulationState.deserialize(self.states[frame])
+
+    def update_state(self):
+
+        old_frame = self.state.frame
+        new_frame = self.frame_int - self.frame_int % FRAMES_PER_STATE
+
+        # self.logger.info('Old frame: {}, new frame: {}'.format(old_frame, new_frame))
+
+        num_frames = int((new_frame - old_frame)/FRAMES_PER_STATE)
+
+        if num_frames >= 0:
+            frames = [old_frame + (i+1)*FRAMES_PER_STATE for i in range(num_frames)]
+        else:
+            frames = [old_frame - (i+1)*FRAMES_PER_STATE for i in range(-num_frames)]
+
+        for frame in frames:
+            state = self.get_state(frame)
+            self.state.bots.update(state.bots)
+            self.state.rods.update(state.rods)
+            if state.scripts:
+                self.state.scripts = state.scripts
+            if state.time:
+                self.state.time = state.time
+            if state.structure:
+                self.state.structure = state.structure
+
+        self.state.frame = new_frame
 
     def update(self):
 
@@ -176,8 +209,7 @@ class BlenderDrawer():
             self.frame = self.num_frames - 1
 
         self.frame_int = int(self.frame)
-        self.state = self.get_state(self.frame_int)
-        assert self.state is not None
+        self.update_state()
 
     def render(self, state):
 
