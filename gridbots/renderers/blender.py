@@ -63,8 +63,17 @@ class BlenderDrawer():
         self.C = bge.logic.getCurrentController()
         self.S = bge.logic.getCurrentScene()
 
-        # Camera object
-        self.camera = self.S.objects['Camera']
+        self.camera_keymap = {
+            bge.events.ONEKEY: self.S.objects['camera_1'],
+            bge.events.TWOKEY: self.S.objects['camera_2'],
+            bge.events.THREEKEY: self.S.objects['camera_3'],
+            bge.events.FOURKEY: self.S.objects['camera_4'],
+            bge.events.FIVEKEY: self.S.objects['camera_5'],
+            bge.events.SIXKEY: self.S.objects['camera_6']
+        }
+
+        # Active camera object
+        self.S.active_camera = self.S.objects['camera_1']
 
         # Mouse information
         self.mouse = self.S.objects['Navigator'].controllers['Mouse'].sensors['Mouse']
@@ -326,6 +335,15 @@ class BlenderDrawer():
                     self.logger.info('Halving speed.')
                     self.speed *= 0.5
 
+            if key in self.camera_keymap:
+                if status == bge.logic.KX_INPUT_JUST_ACTIVATED:
+                    self.logger.info('Changing to view {}'.format(self.camera_keymap[key]))
+                    self.S.active_camera = self.camera_keymap[key]
+
+                    text_visible = self.S.active_camera == self.S.objects['camera_1']
+                    for text_obj in self.text.values():
+                        text_obj.setVisible(text_visible)
+
     def handle_camera(self, state):
 
         # Get current window dimensions (pixel)
@@ -353,20 +371,32 @@ class BlenderDrawer():
 
         if left_ctrl and left_pressed:
             m = mu.Vector((0, 0, -dy)) * zoom_scale
-            self.camera.applyMovement(m, True)
+            self.S.active_camera.applyMovement(m, True)
 
         elif left_shift and left_pressed:
             m = mu.Vector((-dx, -dy, 0)) * pan_scale
-            self.camera.applyMovement(m)
+            self.S.active_camera.worldPosition += self.S.active_camera.worldOrientation * m
 
         elif left_pressed:
             m = mu.Vector((-dy, dx, 0)) * look_scale
-            self.camera.applyRotation(m, True)
+            self.S.active_camera.applyRotation(m, True)
 
         self.mouse_x = x
         self.mouse_y = y
         self.mouse_left = left_pressed
         self.mouse_right = right_pressed
+
+        # Make camera 6 fixed to a robot
+        if self.S.active_camera == self.S.objects['camera_6']:
+            for bot_obj in self.bot_objs.values():
+                if bot_obj['type'] == 'bot_rod_h':
+                    offset = mu.Vector([-0.9, 0, 0.4])
+                    rotated_offset = bot_obj.orientation * offset
+                    self.S.objects['camera_6'].worldPosition = bot_obj.position + rotated_offset
+
+                    rotation_offset = mu.Euler([math.pi/2, 0, -math.pi/2]).to_matrix()
+                    self.S.objects['camera_6'].worldOrientation = bot_obj.orientation * rotation_offset
+                    break
 
 # --------------------------------------------------
 
