@@ -281,3 +281,44 @@ Annjoe office number: 650 859 3538
 * Truss structure
   * Carbon fiber rods, 0.5mm and 
   * Skin = fiberglass platelets
+
+This note describes basic usage of the micro-factory CAD-to-build software. The software is located in ~/gridbots. It is a git repository hosted privately on GitHub at https://github.com/hmartiro/gridbots. To get access to the repository, contact Hayk (hayk.mart@gmail.com). You should be added as a collaborator, and you will be able to push code. Hayk can also transfer ownership of the repository when someone takes over.
+
+---------------------------
+To run the software
+---------------------------
+
+The ~/gridbots directory contains some documentation and media. The actual python package is in ~/gridbots/gridbots. When working on the software, go into this location and run:
+
+	cd ~/gridbots/gridbots
+	workon gridbots
+
+The workon command loads an isolated python environment. This is so we don't have package conflicts with the system versions of Python. Google virtualenv and virtualenvwrapper to learn more.
+
+The main scripts are compute.py, play.py, and run.py.
+
+compute.py takes the name of a simulation (*.yml in spec/simulations) and runs the simulation. It saves build scripts in sri-scripts/, and the output states in spec/paths under the simulation name.
+
+play.py takes in the name of a simulation, reads the output state files, and plays back the visualization using blenderplayer. It doesn't take any time for computation.
+
+run.py is a combination of compute and play.
+
+To run any of these scripts from within the gridbots/gridbots/ directory, use:
+
+	python compute/play/run.py [simulation_name]
+
+----------------------------
+To reconfigure the board
+----------------------------
+
+The board is located in stage.blend. You can configure it as you wish. Keep in mind that the zones are marked by Groups, and material colors match with the groups, although this has no meaning for the parser. Place regular, rotational, and flex pixels and make sure their edges overlap exactly if you want them to become merged. They should retain their P., PR., and PF. prefixes.
+
+Once the file is saved, generate the networkx graph from the blend file:
+
+	python utils/stage_reader.py stage.blend
+
+This will read in all of the objects from stage.blend, merge their vertices, and save it as a compressed binary graph format that is fast to read in later.
+
+The gridbots.blend file is the one loaded by the visualizer. It links the objects from stage.blend to avoid duplication. Whatever is in gridbots.blend will show up in the visualization.
+
+
